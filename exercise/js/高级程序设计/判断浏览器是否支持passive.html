@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 所有cancelEnable为true的都可以通过passive进行优化 -->
+   <script>
+    try{
+        let canPassive = false;
+        let option = Object.defineProperty({},'passive',{
+            get: function(){
+                canPassive = true;
+                console.log('canPassive')
+            }
+        });
+        window.addEventListener('click',null,option);
+    }catch(err){
+        console.log('catch error')
+    }
+</script> 
+</body>
+</html>

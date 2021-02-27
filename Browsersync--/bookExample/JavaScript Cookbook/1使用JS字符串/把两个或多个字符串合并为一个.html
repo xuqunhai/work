@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+//  使用＋来连接字符串
+  var string1 = "This is a ";
+  var string2 = "test";
+  var string = string1 + string2;  //This is a test
+
+//  字符串缩写形式（＋＝）
+  var oldValue = "apples";
+  oldValue += " and oranges";  //apples and oranges
+
+  var a="a",b="b";
+  a+=b;    //ab
+  a=a+b;   //ab
+  a=b+a;   //ba
+
+//  内建的String方法concat也可以连接多个字符串
+  var nwString = "".concat("This "," is", " a"," string");  //"This is a string"
+//  concat方法可能是从多个值产生一个字符串的一种比较简单的方法，例如从几个表单字段来生成一个字符串
+//  然而，相加运算符是更加常用的方法
+
+</script>
+</body>
+</html>

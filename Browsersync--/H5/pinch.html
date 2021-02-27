@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+_onTouchMove(e) {
+
+<span class="hljs-keyword" style="font-weight: bold;">if</span>(e.touches.length > <span class="hljs-number" style="color: rgb(0, 128, 128);">1</span>) {
+
+<span class="hljs-keyword" style="font-weight: bold;">let</span> xLen = <span class="hljs-built_in" style="color: rgb(0, 134, 179);">Math</span>.abs(e.touches[<span class="hljs-number" style="color: rgb(0, 128, 128);">0</span>].pageX - e.touches[<span class="hljs-number" style="color: rgb(0, 128, 128);">1</span>].pageX);
+
+<span class="hljs-keyword" style="font-weight: bold;">let</span> yLen = <span class="hljs-built_in" style="color: rgb(0, 134, 179);">Math</span>.abs(e.touches[<span class="hljs-number" style="color: rgb(0, 128, 128);">1</span>].pageY - e.touches[<span class="hljs-number" style="color: rgb(0, 128, 128);">1</span>].pageY);
+
+<span class="hljs-keyword" style="font-weight: bold;">let</span> touchDistance = <span class="hljs-keyword" style="font-weight: bold;">this</span>._getDistance(xLen,yLen);
+
+<span class="hljs-keyword" style="font-weight: bold;">if</span>(<span class="hljs-keyword" style="font-weight: bold;">this</span>.touchDistance) {
+
+<span class="hljs-keyword" style="font-weight: bold;">let</span> pinchScale = touchDistance / <span class="hljs-keyword" style="font-weight: bold;">this</span>.touchDistance;
+
+<span class="hljs-keyword" style="font-weight: bold;">this</span>._emitEvent(<span class="hljs-string" style="color: rgb(221, 17, 68);">'onPinch'</span>,{scale:pinchScale - <span class="hljs-keyword" style="font-weight: bold;">this</span>.previousPinchScale});
+
+<span class="hljs-keyword" style="font-weight: bold;">this</span>.previousPinchScale = pinchScale;
+
+}
+
+}<span class="hljs-keyword" style="font-weight: bold;">else</span> {
+
+}
+
+}
+
+<script>
+//  缩放是两个手指的行为，需要检测屏幕上是否有两个接触点。
+//  缩放比例的量化，是通过两次缩放行为之间的距离的比值得到
+//勾股定理
+function _getDistance(xLen,yLen) {
+  return Math.sqrt(xLen * xLen + yLen * yLen);
+}
+function _onTouchStart(e) {
+  if(e.touches.length > 1) {
+    let point1 = e.touches[0];
+    let point2 = e.touches[1];
+    let xLen = Math.abs(point2.pageX - point1.pageX);
+    let yLen = Math.abs(point2.pageY - point1.pageY);
+    this.touchDistance = this._getDistance(xLen, yLen);
+  } else { }
+}
+function _onTouchMove(e) {
+  if(e.touches.length > 1) {
+    let xLen = Math.abs(e.touches[0].pageX - e.touches[1].pageX);
+    let yLen = Math.abs(e.touches[1].pageY - e.touches[1].pageY);
+    let touchDistance = this._getDistance(xLen,yLen);
+    if(this.touchDistance) {
+      let pinchScale = touchDistance / this.touchDistance;
+      this._emitEvent('onPinch',{scale:pinchScale - this.previousPinchScale});
+      this.previousPinchScale = pinchScale;
+    }
+  }else { }
+}
+</script>
+</body>
+</html>

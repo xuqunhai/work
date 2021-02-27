@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        hr {
+            margin: 20px;
+        }
+
+        img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .container {
+            width: 191px;
+            height: 191px;
+            border: 2px solid #beceeb;
+        }
+
+        .container img {
+            position: absolute;
+            height: 191px;
+            width: 100%;
+        }
+
+        .transform {
+            -webkit-transform: scale(1);
+            -ms-transform: scale(1);
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>transform提升元素的'z-index'</h1>
+    <p>
+        <h1>正常右边使用负marginLeft会覆盖左边</h1>
+        <img src="../img/1.jpg" alt="">
+        <img src="../img/3.jpg" style="margin-left: -60px;" alt="">
+    </p>
+    <p>
+        <h1>但是当左边用了transfrom属性时就不会被覆盖</h1>
+        <img src="../img/1.jpg" style="transform:scale(1);" alt="">
+        <img src="../img/3.jpg" style="margin-left: -60px;" alt="">
+    </p>
+    <hr>
+    <div>
+        <h1>overflow:hidden对子元素为绝对定位的不起作用</h1>
+        <div style="display: inline-block;width: 100px;height: 100px;border-radius: 50px;overflow: hidden;">
+            <img src="../img/2.jpeg" style="position: absolute;" alt="">
+        </div>
+    </div>
+    <div>
+        <h1>overflow:hidden+transform对子元素为绝对定位的有效---chrome有效，但是safari无效</h1>
+        <div style="transform:scale(1);display: inline-block;width: 100px;height: 100px;border-radius: 50px;overflow: hidden;">
+            <img src="../img/2.jpeg" style="position: absolute;" alt="">
+        </div>
+
+    </div>
+    <div>
+        <h1>overflow:hidden对子元素为绝对定位+transform的不起作用</h1>
+        <div style="display: inline-block;width: 100px;height: 100px;border-radius: 50px;overflow: hidden;">
+            <img src="../img/2.jpeg" style="transform:scale(1);position: absolute;" alt="">
+        </div>
+    </div>
+    <div>
+        <h1>overflow:hidden对子元素为绝对定位中间嵌套元素加transform有效</h1>
+        <div style="display: inline-block;width: 100px;height: 100px;border-radius: 50px;overflow: hidden;">
+            <p style="transform:scale(1);">
+                <img src="../img/2.jpeg" style="position: absolute;" alt="">
+            </p>
+        </div>
+    </div>
+    <hr>
+    <div>
+        <h1>设置absolute元素宽度100%, 则都会参照第一个非static值的position祖先元素计算</h1>
+        <p>
+            <strong>容器不含transform</strong>
+            <div class="container">
+                <img src="../img/2.jpeg" />
+            </div>
+        </p>
+        <h1>所有绝对定位图片100%宽度，都是相对设置了transform的容器计算</h1>
+        <p>
+            <strong>容器transform</strong>
+            <div class="container transform">
+                <img src="../img/2.jpeg" />
+            </div>
+        </p>
+    </div>
+    <hr>
+    <div>
+        <h1>父级zIndex非数字时，子元素谁大谁在上面,注意：z-index为auto所在的div元素是一个普通的元素，也就是非数字的zIndex都是普通元素，跟没写一样</h1>
+        <div style="position:relative; z-index:auto;">
+            <img src="../img/2.jpeg" style="position:absolute; z-index:2;">
+        </div>
+        <div style="position:relative; z-index:auto;">
+            <img src="../img/3.jpg" style="width: 200px;height:auto;position:relative; z-index:1;">
+        </div>
+        <h1>父级zIndex为数字时，父zIndex水大谁在上面，一样大时后面覆盖前面,也就是此时zIndex大小无效,注意：z-index为0所在的div元素是层叠上下文元素</h1>
+        <div style="position:relative; z-index:0;">
+            <img src="../img/2.jpeg" style="position:absolute; z-index:2;">
+        </div>
+        <div style="position:relative; z-index:0;">
+            <img src="../img/3.jpg" style="width: 200px;height:auto;position:relative; z-index:1;">
+        </div>
+    </div>
+    <div>
+        <h1>在CSS2.1时代，z-index属性必须和定位元素一起使用才有作用，但是，在CSS3的世界里，非定位元素也能和z-index愉快地搞基。position:fixed元素天然层叠上下文元素，无需z-index为数值；relative/absolute在层叠上下文这一块是一路货色，都是需要z-index为数值才行。</h1>
+        <h1>子元素zIndex为负数时一定会躲在父元素后面吗？？？NO，只有父元素不是层叠上下文元素时才可以！！！！！！</h1>
+        <h2>下面图片position: relative;且zIndex为数字，从而使得img成为层叠上下文元素；而它的父级div虽然zIndex为1，但是因为没有任何非static的定位，所以父级只是一个普通block元素； 而block元素层级在负zIndex之上，所以蓝色div在img之上；
+        </h2>
+        <div class="box">
+            <div style="background-color: blue; z-index: 1;">
+                <img src="../img/1.jpg" style="position: relative; z-index: -1; right: -50px;">
+            </div>
+        </div>
+        <h1>父级需要是display:flex或者display:inline-flex水平;子元素的z-index不是auto，必须是数值。此时，这个子元素为层叠上下文元素</h1>
+        <div class="box" style="display: flex;">
+            <div style="background-color: blue; z-index: 1;">
+                <img src="../img/1.jpg" style="position: relative; z-index: -1; right: -50px;">
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div>
+        <h1>正常情况下图片为相对定位且有负zIndex时图片就是层叠上下文，而因为父元素蓝色div因为是普通元素，所以它和子元素图片的层级就会遵循层叠顺序法则：背景/边框 《 负zIndex 《 block 《 float 《 inline/inline-block
+            《 zIndex为0 《 正zIndex</h1>
+        <div class="box" style="background-color: blue;">
+            <img style="position: relative; z-index: -1; right: -150px;" src="../img/1.jpg">
+        </div>
+        <h1>半透明元素具有层叠上下文，图片的z-index:-1无法穿透，于是，在蓝色背景上面乖乖显示了。</h1>
+        <div class="box" style="background-color: blue;opacity: 0.5;">
+            <img style="position: relative; z-index: -1; right: -150px;" src="../img/1.jpg">
+        </div>
+        <h1>transform元素具有层叠上下文，图片的z-index:-1无法穿透，于是，在蓝色背景上面乖乖显示了。</h1>
+        <div class="box" style="background-color: blue;transform: scale(1);">
+            <img style="position: relative; z-index: -1; right: -150px;" src="../img/1.jpg">
+        </div>
+    </div>
+</body>
+
+</html>

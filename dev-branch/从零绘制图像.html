@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    // 创建指定宽高的像素，默认透明黑色
+    // 返回一个包含data属性的对象
+    const imageData = ctx.createImageData(200, 200);
+    const pixels = imageData.data;
+    const numPixels = imageData.width * imageData.height;
+    // 读写canvasPixelArray中颜色值，每个像素有4个颜色值
+    for(let i = 0;i < numPixels; i++) {
+      // 红色
+      // pixels[i*4] = 255;
+      // pixels[i*4+1] = 0;
+      // pixels[i*4+2] = 0;
+      // pixels[i*4+3] = 255;
+      // 随机绘制像素
+      pixels[i*4] = Math.floor(Math.random()*255);
+      pixels[i*4+1] = Math.floor(Math.random()*255);
+      pixels[i*4+2] = Math.floor(Math.random()*255);
+      pixels[i*4+3] = 255;
+    }
+    // 将新像素画到画布的原点坐标(0,0)上
+    ctx.putImageData(imageData,0,0);
+  </script>
+</body>
+</html>

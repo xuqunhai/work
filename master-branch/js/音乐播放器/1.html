@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+
+      body {
+        padding-top: 100px;
+      }
+
+      .progress {
+        width: 80%;
+        height: 44px;
+        padding-top: 21px;
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid blue;
+        background: black;
+      }
+
+      .pro-wrap {
+        position: relative;
+        flex: 1;
+      }
+
+      .pro-top,
+      .pro-bottom {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 2px;
+      }
+
+      .pro-top {
+        background: green;
+        transform: translateX(-100%);
+      }
+
+      .spot {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        right: -8px;
+        top: -3px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: white;
+      }
+
+      .spot::after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: -5px;
+        top: -5px;
+        right: -5px;
+        bottom: -5px;
+        background: transparent;
+      }
+
+      .pro-bottom {
+        background: red;
+      }
+
+      .pro-bottom::after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -3px;
+        right: 20%;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="progress" id="progress">
+      <div class="pro-wrap">
+        <div class="pro-bottom"></div>
+        <div class="pro-top" id="pro">
+          <div class="spot" id="spot"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var spot = document.getElementById('spot');
+      var progress = document.getElementById('progress');
+      var pro = document.getElementById('pro');
+      var left = progress.getBoundingClientRect().left;
+      var width = progress.getBoundingClientRect().width;
+      var leftFlag = true;
+      var startPoint = -100;
+      var done = false;
+      var timer = null;
+
+      function touchstartFn(e) {
+        done = false;
+        if (startPoint >= -22.8) {
+          console.log('可以回退');
+          leftFlag = false;
+        } else {
+          leftFlag = true;
+        }
+        spot.addEventListener('touchmove', touchmoveFn)
+        spot.addEventListener('touchend', touchendFn)
+      }
+
+      function touchmoveFn(e) {
+        var x = e.changedTouches[0].clientX;
+        var percent = (((x - left) / width) - 1) * 100;
+        if (percent <= -100) {
+          percent = -100;
+        }
+        if (percent >= -2.6) {
+          percent = -2.6;
+        }
+
+        // console.log('touchmoveFn', percent)
+        startPoint = percent;
+        if (leftFlag) {
+          if (percent >= -22.8) {
+            percent = -22.8;
+            pro.style.transform = 'translateX(' + percent + '%)'
+            if (!done) {
+              timer = setTimeout(() => {
+                clearTimeout(timer);
+                alert('next');
+              }, 17)
+              done = true;
+            }
+            startPoint = percent;
+            return;
+          }
+        }
+        pro.style.transform = 'translateX(' + percent + '%)'
+      }
+
+      function touchendFn(e) {
+        spot.removeEventListener('touchmove', touchmoveFn)
+        spot.removeEventListener('touchend', touchendFn)
+        // console.log('touchendFn')
+      }
+      spot.addEventListener('touchstart', touchstartFn)
+
+      function start(precentage) {
+        lastPercent = precentage === undefined ? lastPercent : precentage;
+        cancelAnimationFrame(frameId);
+        startTime = new Date().getTime();
+
+        function frame() {
+          var curTime = new Date().getTime();
+          var precent = lastPercent + (curTime - startTime) / (curDuration * 1000);
+          if (precent < 1) {
+            frameId = requestAnimationFrame(frame);
+            updata(precent);
+          } else {
+            cancelAnimationFrame(frameId);
+            $scope.find(".next-btn").trigger("click");
+          }
+
+        }
+        frame()
+      }
+
+      function stop() {
+        var stopTime = new Date().getTime();
+        lastPercent = lastPercent + (stopTime - startTime) / (curDuration * 1000);
+        cancelAnimationFrame(frameId);
+      }
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "koa2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -w src --exec \"babel-node src --presets env\"",
+    "precommit": "standard --parser babel-eslint src/**/*.js | snazzy",
+    "build": "rimraf dist && babel src -s -D -d dist --presets env",
+    "production": "node dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "raferxu <raferxu@163.com> (http://raferxu.com/)",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "rimraf": "^3.0.2"
+  },
+  "dependencies": {
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-runtime": "^6.26.0",
+    "koa": "^2.13.0",
+    "vant": "^2.10.8"
+  }
+}

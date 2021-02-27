@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+你可能知道,以下两行 CSS 代码并不是等价的:
+background: rebeccapurple;
+background-color: rebeccapurple;
+前者是简写,它可以确保你得到   rebeccapurple 纯色背景;
+但如果 你用的是展开式的单个属性(background-color),
+那这个元素的背景最终 有可能会显示为一个粉色的渐变图案、一张猫的图片或其他任何东西,
+因为 同时可能会有一条 background-image 声明在起作用。
+不要害怕使用简写属性。合理使用简写 是一种良好的防卫性编码方式,可以抵御未来的风险。
+
+相比较这个写法
+background: url(tr.png) no-repeat top right / 2em 2em,
+            url(br.png) no-repeat bottom right / 2em 2em,
+            url(bl.png) no-repeat bottom left / 2em 2em;
+
+在这个例子中,top right显然是background-position,
+而2em 2em是 background-size,不管它们的顺序如何。
+但是,请设想一下50% 50%这样的值,
+它到底是background- size
+还是 background-position 呢?
+当你在使用展开式属性时,CSS 解析器明白你的意图;
+而当你使用 简写属性时,解析器需要在没有属性名提示的情况下弄清楚 50% 50% 到底指什么。
+这就是需要引入斜杠的 原因。
+
+可以把这些重复的值从简 写属性中抽出来写成一个展开式属性:
+background: url(tr.png) top right,
+            url(br.png) bottom right,
+            url(bl.png) bottom left;
+            background-size: 2em 2em;
+            background-repeat: no-repeat;
+现在,我们只需要在一处修改,就可以改变所有的 background-size 和 background-repeat 了。
+
+
+</body>
+</html>

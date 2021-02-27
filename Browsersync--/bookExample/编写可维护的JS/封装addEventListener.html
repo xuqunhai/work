@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+//  这个函数可以做到在各个浏览器中给元素添加事件处理程序
+  /*
+  function addListener(target, type, handler) {
+    if(target.addEventListener){
+      target.addEventListener(type, handler, false);
+    }else if(target.attachEvent){
+      target.attachEvent('on'+type, handler);
+    }else{
+      target['on'+type] = handler;
+    }
+  }
+  */
+
+//  通过JS来修改元素样式的最佳方法
+  /*
+  element.className += 'reveal';  //原生方法
+  element.classList.add('reveal');  //HTML5
+  //不过由于CSS无法计算元素重新定位，所以可以在CSS中定义元素默认属性，在JS中通过style.top、style.left等修改默认中；
+  */
+
+//  这个方法的好处就是如果函数名需要修改，那只需要修改一个文件；如果点击发生时想额外做一些工作，也只需在一处做修改
+/*
+  function doSomething() {}
+  var btn = document.getElementById('action-btn');
+  btn.addEventListener('click',doSomething,false);
+*/
+
+//  让一个对象表示本书的一章
+/*
+  //这段代码创建了4个全局对象Book, Chapter1, Chapter2, Chapter3;
+  function Book(title) {
+    this.title = title;
+    this.page = 1;
+  }
+  Book.prototype.turnPage = function (direction) {
+    this.page += direction;
+  };
+  var Chapter1 = new Book("Introduction to Style Guidelines");
+  var Chapter2 = new Book("Basic Formatting");
+  var Chapter3 = new Book("Comments");
+  //单全局变量模式,这段代码只有一个全局对象,其他任何信息都挂载到了这个对象上
+  var MaintainableJS = {};
+  MaintainableJS.Book = function (title) {
+    this.title = title;
+    this.page = 1;
+  };
+  MaintainableJS.Book.prototype.turnPage = function (direction) {
+    this.page += direction;
+  };
+  MaintainableJS.Chapter1 = new MaintainableJS.Book("Introduction to Style Guidelines");
+  MaintainableJS.Chapter2 = new MaintainableJS.Book("Basic Formatting");
+  MaintainableJS.Chapter3 = new MaintainableJS.Book("Comments");
+*/
+
+//  将功能按照命名空间进行分组，让单全局对象井然有序
+/*
+  Y.DOM的所有方法都是和DOM操作相关的；
+  Y.Event所有方法都是和事件相关的；
+  Y.Mail邮箱
+*/
+
+//  给命名空间挂载东西时保证这个命名空间已经存在的方法
+/*
+  var YourGlobal = {
+    namespace: function (ns) {
+      var parts = ns.split('.'),
+      object = this,
+        i, len;
+
+      for(i=0,len=parts.length;i<len;i++){
+        if(!object[parts[i]]){
+          object[parts[i]] = {};
+        }
+        object = object[parts[i]];
+      }
+
+      return object;
+    }
+  };
+*/
+
+//  隔离应用逻辑
+  //这段代码的event对象被无节制地分发，而event对象包含很多额外信息；
+/*
+  var MyApplication = {
+    handleClick: function (event) {
+      this.showPopup(event);
+    },
+    showPopup: function (event) {
+      var popup = document.getElementById('popup');
+      popup.style.left = event.clientX + 'px';
+      popup.style.top = event.clientY + 'px';
+      popup.className = 'reveal';
+    }
+  };
+  addListener(element, 'click', function (event) {
+    MyApplication.handleClick(event);
+  });
+*/
+  //最佳办法是让事件处理程序使用event对象来处理事件，然后拿到所需的数据传给应用逻辑
+/*
+  var MyApplication = {
+    handleClick: function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.showPopup(event.clientX, event.clientY);
+    },
+    showPopup: function (x, y) {
+      var popup = document.getElementById('popup');
+      popup.style.left = x + 'px';
+      popup.style.top = y + 'px';
+      popup.className = 'reveal';
+    }
+  };
+  addListener(element, 'click', function (event) {
+    MyApplication.handleClick(event);
+  });
+*/
+
+//  检测原始值的最佳选择是使用typeof运算符
+/*
+  typeof variable;
+  对于字符串，返回'string'；
+  对于数字，返回'number'；
+  对于布尔值，返回'boolean'；
+  对于undefined，返回'undefined'；
+*/
+/*
+  if(typeof name === 'string'){
+    anotherName = name.substring(3);
+  }
+ if(typeof count === 'number'){
+    updateCount(count);
+ }
+ if(typeof fond === 'boolean' && found){
+    message('Found');
+ }
+ if(typeof MyApp === 'undefined'){
+    MyApp = {};
+ }
+ if(element !== null){  //运行typeof numm返回'object', 这是低效判断null方法;
+    element.className = 'found';
+ }
+*/
+//  检测引用值的类型的最好方法是使用instanceof运算符, value instanceof constructor;
+//  检测函数的最好方法是使用typeof,会返回'function'
+/*
+  if(value instanceof Date){
+    console.log(value.getFullYear());
+  }
+  if(value instanceof RegExp){
+    if(value.test(anotherValue)){
+      console.log('Matches');
+    }
+  }
+  if(value instanceof Error){
+    throw value;
+  }
+*/
+//  instanceof不仅检测构造器，还检测原型链，因此不能用来判断对象是否属于某个特定类型
+/*
+  var now = new Date();
+  console.log(now instanceof Object);  //true
+  console.log(now instanceof Date);  //true
+*/
+//JS检测自定义类型的最好做法就是使用instanceof运算符
+/*
+  function Person(name) {
+    this.name =name;
+  }
+  var me =new Person('James');
+  console.log(me instanceof Object);  //true
+  console.log(me instanceof Person);  //true
+*/
+</script>
+</body>
+</html>

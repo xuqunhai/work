@@ -1,0 +1,28 @@
+yarn add babel-loader @babel/core @babel/preset-env @babel/plugin-transform-runtime -D
+yarn add @babel/runtime -S
+
+babel.config.js和.babelrc的区别：
+前者可以编译node_modules目录下的模块；
+
+.babelrc文件解读：
+https://my.oschina.net/jamesview/blog/3093226
+1. 什么是babel? 它是干什么用的？
+js新语法和API有兼容性问题，所以babel就是把es6代码转换成浏览器能识别的代码；
+
+2. 理解 babel-polyfill 和 babel-runtime 及 babel-plugin-transform-runtime
+Babel默认只转换新的javascript语法，而不转换新的API，比如 Iterator, Generator, Set, Maps, Proxy, Reflect,Symbol,Promise 等全局对象。以及一些在全局对象上的方法(比如 Object.assign)都不会转码。
+babel-polyfill 的原理是当运行环境中并没有实现的一些方法，babel-polyfill会做兼容。通过向全局对象和内置对象的prototype上添加方法来实现的。缺点就是会造成全局空间污染。
+babel-runtime 它是将es6编译成es5去执行。比如说我们需要Promise，我们只需要import Promise from 'babel-runtime/core-js/promise'即可，也有缺点的，比如上，如果我现在有100个文件甚至更多的话，难道我们需要一个个文件加import Promise from 'babel-runtime/core-js/promise' 吗？
+babel-plugin-transform-runtime，它就可以帮助我们去避免手动引入 import的痛苦，并且它还做了公用方法的抽离。比如说我们有100个模块都使用promise，但是promise的polyfill仅仅存在1份。
+
+3. 理解 babel-preset-env
+presets属性告诉Babel要转换的源码使用了哪些新的语法特性，如需要在.babelrc的presets加入es2015一个配置就可以完成全部ES2015语法的支持，但是我们随着时间的推移，将来可能会有跟多的版本插件,比如 bebel-preset-es2018,.... 等等。
+因此 babel-preset-env 出现了，它的功能类似于 babel-preset-latest，它会根据目标环境选择不支持的新特性来转译。
+
+4. 理解 babel-preset-env 中的选项配置：'modules': false
+设置为false就不会转换模块。默认为 'commonjs'.该值可以有如下：'amd' | 'umd' | 'systemjs' | 'commonjs' | false；
+这样做的目的是：以前我们需要使用babel来将ES6的模块语法转换为AMD, CommonJS，UMD之类的模块化标准语法，但是现在webpack都帮我做了这件事了，所以我们不需要babel来做，否则的话，会产生冲突。
+
+5. 理解 babel-presets-stage-x
+预设(preset), 有两种，一个是按年份(babel-preset-es2017)，一个是按阶段(babel-preset-stage-0)。
+数字越小，阶段越靠后，存在依赖关系。也就是说stage-0是包括stage-1的，以此类推。因此 stage-0包含stage-1/2/3的内容。所以如果我们不知道需要哪个stage-x的话，直接引入stage-0就好了。

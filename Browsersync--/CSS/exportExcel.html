@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+//  Js导出表格为Excel文件
+//  的常见一种办法是调用：ActiveXObject("Excel.Application") ，但是这种方法有局限性，只能在IE系列下的浏览器里实现，兼容性方面不理想。
+//这种方法在谷歌/火狐系列浏览器里是OK的，但是在IE里会有“传递给系统调用的数据区域太小
+//”的报错提示，原因是href指定的值的字节数过多。
+//So，对于IE浏览器只好判断下，采用ActiveXObject的形式。
+//乳此便能较好的使用Javascript导出HTML内容到Excel文件。
+
+  var str = "博客, 域名Blog, 2Sjolzy.cn, 3";
+  var uri = 'data:text/csv;charset=utf-8,' + str;
+
+  var downloadLink = document.createElement("a");
+  downloadLink.href = uri;
+  downloadLink.download = "export.csv";
+
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+</script>
+</body>
+</html>

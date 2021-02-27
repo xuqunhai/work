@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/ex.js"],"names":["name","name2"],"mappings":";;;;;AAAO,IAAMA,sBAAO,OAAb;QACUC,K,GAARD,I,EAAiB","file":"ex.js","sourcesContent":["export const name = 'rafer';\nexport { name as name2 }; // import {name2 as name3} from './ex.js'\n"]}

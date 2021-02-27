@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+使用相加(+)和缩写赋值(+=)
+var numValue = 23.45;
+var total = "And the total is " + numValue;  //"And the total is 23.45"
+
+一个字符串和其他数据类型相加的时候，过程有所不同；
+把布尔值加到一个字符串；
+var boolValue = true;
+var stringValue = "The value is " + boolValue;  //"The value is true"
+把一个数字加到一个字符串；
+var numValue = 3.0;
+stringValue = "The value is " + numValue;  //"The value is 3"
+连接一个String对象和一个字符串直接量，最终得到的是一个字符串直接量；
+var strObject = new String("The value is ");
+var strngLiteral = "a string";
+var strngValue = strObject + strngLiteral;  //"The value is a string",是一个字符串直接量
+</body>
+</html>

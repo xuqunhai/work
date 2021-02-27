@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>滚动至顶部后固定</title>
+    <style type="text/css">
+      .wrapper {
+        width: 100%;
+        height: 2000px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .header {
+        height: 80px;
+        width: 100%;
+        background-color: greenyellow;
+        position: fixed;
+        top: 0;
+      }
+
+      #testbody {
+        padding-top: 80px;
+        height: 120px;
+        background-color: #2AC845;
+      }
+
+      #nav_test_1 {
+        height: 80px;
+        position: relative;
+        top: 0;
+        background: #125430;
+        width: 100%;
+      }
+
+      #nav_test_2 {
+        height: 80px;
+        width: 100%;
+        position: relative;
+        top: 0;
+        background-color: red;
+      }
+
+      #nav_test_3 {
+        height: 80px;
+        width: 100%;
+        position: relative;
+        top: 0;
+        background-color: blueviolet;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div id="top_1" class="header">标题</div>
+      <div id="nav_test_1">
+        顶端导航测试1
+      </div>
+      <ul>
+        <li>test1</li>
+        <li>test2</li>
+        <li>test3</li>
+        <li>test4</li>
+        <li>test5</li>
+        <li>test6</li>
+        <li>test7</li>
+        <li>test8</li>
+        <li>test9</li>
+        <li>test10</li>
+        <li>test11</li>
+        <li>test12</li>
+        <li>test13</li>
+        <li>test14</li>
+        <li>test15</li>
+        <li>test16</li>
+        <li>test17</li>
+        <li>test18</li>
+        <li>test19</li>
+        <li>test20</li>
+        <li>test21</li>
+        <li>test22</li>
+        <li>test23</li>
+        <li>test24</li>
+        <li>test25</li>
+        <li>test26</li>
+        <li>test27</li>
+        <li>test28</li>
+        <li>test29</li>
+        <li>test30</li>
+        <li>test31</li>
+        <li>test32</li>
+        <li>test33</li>
+        <li>test34</li>
+        <li>test35</li>
+        <li>test36</li>
+        <li>test37</li>
+        <li>test38</li>
+        <li>test39</li>
+        <li>test40</li>
+      </ul>
+    </div>
+    <script type="text/javascript">
+      var ha = new Array();
+      var fixHight = 0; //由于postion变动高度变成不计算
+      function menuFixed(preid, id) {
+        var obj = document.getElementById(id); //当前div ID对象
+        var preobj = document.getElementById(preid); //前一个DIV ID对象
+        var _getTop = obj.offsetTop - fixHight; //当前div距离顶端距离
+        var _preTop = preobj.offsetTop; //前一个DIV距离顶端距离
+        var _preHeight = preobj.offsetHeight; //前一个DIV高度
+        fixHight = fixHight + obj.offsetHeight;
+        console.log('preid:' + preid + " _preHeight:" + _preHeight);
+        ha.push({
+          id: id,
+          _getTop: _getTop,
+          _preTop: _preTop,
+          _preHeight: _preHeight,
+          preid: preid
+        });
+        console.log("arry:" + JSON.stringify(ha));
+      }
+      window.onscroll = function () {
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        var i = getIndex(scrollTop);
+        console.log('index:' + i);
+
+        changePos(ha[i].preid, ha[i]._preHeight, ha[i].id, ha[i]._getTop, scrollTop);
+      }
+
+      function getIndex(scrollTop) {
+        var length = ha.length;
+        for (var i = 0; i < length; i++) {
+          if (ha[i]._getTop >= scrollTop && scrollTop >= ha[i]._preTop)
+            return i;
+        }
+        return length - 1;
+      }
+
+      function changePos(preid, preheight, id, gettop, scrollTop) {
+        var obj = document.getElementById(id);
+        var preobj = document.getElementById(preid);
+        console.log('scrollTop:' + scrollTop + ' gettop:' + gettop);
+        if (scrollTop < gettop) {
+          preobj.style.position = 'fixed';
+          obj.style.position = 'relative';
+          if (scrollTop - gettop <= 0 && scrollTop - gettop >= -preheight) {
+            preobj.style.top = gettop - preheight - scrollTop + 'px';
+          } else if (scrollTop - gettop <= 0) {
+            preobj.style.top = 0;
+          } else {
+            preobj.style.top = -preheight + 'px';
+          }
+        } else {
+          obj.style.position = 'fixed';
+          console.log('id:' + id);
+        }
+      }
+    </script>
+    <script type="text/javascript">
+      window.onload = function () {
+        menuFixed('top_1', 'nav_test_1');
+      }
+    </script>
+  </body>
+
+</html>

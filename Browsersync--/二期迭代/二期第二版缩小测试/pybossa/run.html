@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    // _fetchProject工程信息查询  _fetchTask获取任务信息  _fetchNewTask为用户分配一个任务  _resolveNextTaskLoaded顺序执行
+
+    function _run (projectname, _window) {
+        _window = _window || window;
+//        根据工程名查询工程信息
+        _fetchProject(projectname).done(function(project) {
+            project = project[0];
+
+            // 根据第二参数请求接口1或接口2，成功后进一步根据第二参数决定是再次请求接口2成功后请求接口3还是直接请求接口3
+            function getNextTask(offset, previousTask) {
+                offset = offset || 0;
+                var def = $.Deferred();
+                var taskId = _getCurrentTaskId(_window.location.pathname);
+                var xhr = (taskId && (previousTask === undefined)) ? _fetchTask(taskId) : _fetchNewTask(project.id, offset);
+                xhr.done(function(task) {
+                    if (previousTask && task.id === previousTask.id) {
+                        var secondTry = _fetchNewTask(project.id, offset+1)
+                            .done(function(secondTask){
+                                _resolveNextTaskLoaded(secondTask, def);
+                            });
+                    }
+                    else {
+                        _resolveNextTaskLoaded(task, def);
+                    }
+                });
+                return def.promise();
+            }
+
+            // 执行上面的函数getNextTask，根据url确定nextUrl后把nextUrl放入历史栈
+            // 对调用_presentTask和getNextTask完成后继续执行loop
+            function loop(task) {
+                var nextLoaded = getNextTask(1, task),
+                    taskSolved = $.Deferred(),
+                    nextUrl;
+                if (task.id) {
+
+// 解决传参问题
+// *********************************修改前代码开始*******************************
+                    /*
+                     if (url != '/') {
+                     nextUrl = url + '/project/' + projectname + '/task/' + task.id;
+                     }
+                     else {
+                     nextUrl = '/project/' + projectname + '/task/' + task.id;
+                     }
+                     history.pushState({}, "Title", nextUrl);
+                     */
+// *********************************修改前代码结束*********************************
+// *********************************修改后代码开始*********************************
+
+                    var para = location.search;
+                    console.log(location.href);
+                    if (url != '/') {
+                        nextUrl = url + '/project/' + projectname + '/task/' + task.id + para;
+                    }
+                    else {
+                        nextUrl = '/project/' + projectname + '/task/' + task.id + para;
+                    }
+                    history.pushState({}, "Title", nextUrl);
+
+// *********************************修改后代码结束***********************************
+
+                }
+                _presentTask(task, taskSolved);
+                $.when(nextLoaded, taskSolved).done(loop);
+            }
+            getNextTask(0, undefined).done(loop);
+        });
+    }
+
+</script>
+</body>
+</html>

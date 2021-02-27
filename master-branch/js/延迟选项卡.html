@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>src里js和iframe的巧妙应用，嘿嘿，不过还是不推荐使用iframe</title>
+    <script type="text/ecmascript">
+        var getButton = {
+
+            static: 1
+
+            , valueOf: function () {
+                return "<button οnclick=/"window.frameElement.parentNode.removeChild(window.frameElement) / ">删除第 "
+                    + (this.static++) + " 个iframe<//button>";
+            }
+
+            , toString: function () {
+                return this.valueOf();
+            }
+
+        };
+
+        var a = function () {
+            var i, d = document.createElement("iframe");
+            document.body.appendChild(d);
+            i = d.contentWindow; //这个是iframe的window对象
+            i.onload = function () {
+                this.document.body.innerHTML = getButton;
+            };
+            i = d = null;
+        };
+
+        var b = function () {
+            var a = ["/" < s" + "cript", "<//s" + "cript>/""], d = document.createElement("iframe");
+            d.src = [
+                //这很明显，JS为的href或者src等属性里的javascript:的执行环境，都是新的地址为准（就是window对象）
+                "javascript:"
+                , a[0]
+                , ">window.o" + "nload = function () { document.body.innerHTML = top.getButton; };"
+                , a[1]
+            ].join("");
+            document.body.appendChild(d);
+            d = null;
+        };
+
+        window.onload = function () {
+            //如果想给ifm值的话
+            try {
+                a();
+            } catch (exp) {
+                alert("a 函数错误:" + exp.message);
+            }
+            try {
+                b();
+            } catch (exp) {
+                alert("b 函数错误:" + exp.message);
+            }
+        };
+    </script>
+</head>
+
+<body>
+</body>
+
+</html> 

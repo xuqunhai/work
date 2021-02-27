@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="Author" contect="raferxu">
+  <meta name="keywords" contect="drawSpectrum">
+  <title>音频数据分析</title>
+  <script>
+    var ctx,canvasOne,WIDTH,HEIGHT,audioContext,analyser,mic,canRecord = true,max = 0,startP = 0,x = 0;
+    function init() {
+      canvasOne = document.getElementById('canvasOne');
+      ctx = canvasOne.getContext("2d");
+    }
+    function record() {
+        navigator.getMedia = ( navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia);
+        navigator.getMedia ( { audio: true }, function (stream) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext);
+          mic = audioContext.createMediaStreamSource(stream);
+          analyser= audioContext.createAnalyser();
+          analyser.fftSize = 256;
+          mic.connect(analyser);
+          drawSpectrum();
+        },function(){});
+    }
+    function start() {
+      canRecord = true;
+      record();
+    }
+    function end() {
+      canRecord = false;
+    }
+    function drawSpectrum() {
+      WIDTH = canvasOne.width;
+      HEIGHT= canvasOne.height;
+      var array =  new Uint8Array(128);
+      analyser.getByteFrequencyData(array);
+      if(canRecord){
+        var sum = 0;
+        ctx.beginPath();
+        ctx.moveTo(x, startP);
+        for ( var i = 0; i < (array.length); i++ ){
+          var value = array[i];
+          max = Math.max(value,max);
+          sum+= (value);
+        }
+        var y = sum/array.length;
+        x += 1;
+        ctx.lineTo(x, (HEIGHT-y));
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+        startP = (HEIGHT-y);
+        requestAnimationFrame(drawSpectrum);
+      }else{
+        x = 0;
+        ctx.clearRect(0,0,WIDTH,HEIGHT);
+        if(max>180){
+          alert('环境嘈杂');
+        }else{
+          alert('环境符合');
+        }
+        for (var i = array.length - 1; i >= 0; i--) {
+          array[i] = 0;
+        }
+        cancelAnimationFrame(drawSpectrum);
+        max = 0;
+      }
+    }
+  </script>
+  <style>
+    #canvasOne {
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body onload="init();">
+
+<h1>
+  录音数据实时图
+  <button id="startBtn" onclick="start()">开始</button>
+  <button id="endBtn" onclick="end()">结束</button>
+</h1>
+<canvas id="canvasOne" width="640"></canvas>
+</body>
+</html>

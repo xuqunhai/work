@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+
+        p {
+            position: absolute;
+            left: 300px;
+            height: 200px;
+            width: 1px;
+            background: blue;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="button" id="btn" value="startMove" onclick="startMove()">
+    <div id="rect"></div>
+    <p></p>
+    <script>
+        let timer = null
+        let speed = 11
+        const target = 300
+        function startMove() {
+            clearInterval(timer)
+            timer = setInterval(() => {
+                if (rect.offsetLeft + speed >= target) { // 匀速时最后无法整除的解决方法
+                    clearInterval(timer)
+                    rect.style.left = target + 'px'
+                } else {
+                    rect.style.left = rect.offsetLeft + speed + 'px'
+                }
+            }, 30)
+
+        }
+    </script>
+</body>
+
+</html>

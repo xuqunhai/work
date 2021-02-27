@@ -1,0 +1,79 @@
+可同时引入多个scss
+@import "variables", "mixin";
+
+.headline {
+  font-family: $headline-ff;
+}
+.main {
+  .headline {
+    font: {
+      family: $main-sec-ff;
+      size: 16px;
+    }
+  }
+}
+
+sass写法是不加大括号，而scss是和css写法更类似的；
+
+定义mixin，调用include；
+@mixin col-6 {
+  width: 50%;
+  float: left;
+}
+.a {
+  @include col-6();
+}
+带参数，且有默认值
+@mixin col ($width: 50%) {
+  width: $width;
+  float: left;
+}
+加上媒体查询
+@mixin col ($width: 50%) {
+  @media (min-width: 768px) {
+    width: $width;
+    float: left;
+  }
+}
+.a {
+  @include col(25%);
+}
+
+.error {
+  color: #f00;
+}
+.serious-error {
+  @extend .error;
+  border: 1px #f00; // 在error样式基础上扩展
+}
+extend不能继承嵌套选择器
+如果不想error样式生成，可用%，即
+%error {
+  color: #f00;
+}
+.serious-error {
+  @extend %error;
+  border: 1px #f00;
+}
+
+@mixin col-sm ($width: 50%) {
+  @if type-of($width) != number {
+    @error "$width必须是一个数值类型，你输入的width是：#{$width}";
+  }
+  @if not unitless($width) {
+    @if unit($width) != '%' {
+      @error "$width应该是一个百分值，你输入的width是：#{$width}.";
+    }
+  } @else {
+    @warn "$width应该是一个百分值，你输入的width是：#{$width}.";
+    $width: (percentage($width) / 100);
+  }
+}
+
+.main-sec {
+  @at-root { // 里面样式解析后不会被外面嵌套
+    .main-sec-headline {
+      font-size: 22px;
+    }
+  }
+}

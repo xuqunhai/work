@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500"></canvas>
+  <script>
+    var canvas=document.getElementById('canvas');
+    var ctx=canvas.getContext('2d');
+    var image = new Image();
+    image.src = '../img/nba.jpg';
+    image.onload = function(){
+      ctx.drawImage(image,0,0,1024,700,0,0,500,500);
+      var imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      var pixels = imageData.data;
+      // 书上没除4，但是应该除，而且效果一样，不然后面循环多了
+      var numPixels = pixels.length/4;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(var i=0;i<numPixels;i++){
+        // 反向
+        // pixels[i*4]=255-pixels[i*4];
+        // pixels[i*4+1]=255-pixels[i*4+1];
+        // pixels[i*4+2]=255-pixels[i*4+2];
+        // 灰度,取现有颜色的平均值
+        var average=(pixels[i*4]+pixels[i*4+1]+pixels[i*4+2])/3;
+        pixels[i*4]=average;
+        pixels[i*4+1]=average;
+        pixels[i*4+2]=average;
+      }
+      ctx.putImageData(imageData,0,0);
+    };
+  </script>
+</body>
+</html>

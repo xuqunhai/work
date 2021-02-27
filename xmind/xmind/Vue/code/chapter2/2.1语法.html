@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style></style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.js"></script>
+</head>
+<body>
+    <div id="app">
+        <span>Text1: {{text}}</span>
+        <!-- <span>Text2: {{*text}}</span> -->
+        <!-- <div>LOGO: {{{logo}}}</div> -->
+        <div v-html="logo"></div>
+        <div v-text="text">Text</div>
+        <div>{{example | toUpperCase}}</div>
+        <br>
+        <input v-model="searchQuery" placeholder="Type something">
+        <strong>{{ searchIndicator }}</strong>
+    </div>
+    
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                text: 'test',
+                logo: '<span>span tag</span>',
+                example: 'example',
+                searchQuery: '',
+                searchQueryIsDirty: false,
+                isCalculating: false
+            },
+            filters: {
+                toUpperCase(v){
+                    return v.toUpperCase()
+                }
+            },
+            methods: {
+                 // 这是 debounce 实现的地方。
+                expensiveOperation: _.debounce(function () {
+                    this.isCalculating = true
+                    setTimeout(function () {
+                        this.isCalculating = false
+                        this.searchQueryIsDirty = false
+                    }.bind(this), 1000)
+                }, 500)
+            },
+            watch: {
+                searchQuery: function () {
+                    this.searchQueryIsDirty = true
+                    this.expensiveOperation()
+                }
+            },
+            computed: {
+                searchIndicator: function () {
+                    if (this.isCalculating) {
+                        return '⟳ Fetching new results'
+                    } else if (this.searchQueryIsDirty) {
+                        return '... Typing'
+                    } else {
+                        return '✓ Done'
+                    }
+                }
+            },
+            components: {
+
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

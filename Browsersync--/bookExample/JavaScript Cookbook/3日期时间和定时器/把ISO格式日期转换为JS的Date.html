@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    #dateSubmit{
+      background-color: #ff0;
+      width: 200px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+  </style>
+  <script>
+    window.onload = function () {
+      document.getElementById("dateSubmit").onclick = convertDate;
+    };
+    function convertDate() {
+      var dtstr = document.getElementById("datestring").value;
+      var convdate = convertISO8601toDate(dtstr);
+      document.getElementById("result").innerHTML = convdate;
+    }
+    function convertISO8601toDate(dtstr) {
+      dtstr = dtstr.replace(/\D/g," ");
+      dtstr = dtstr.replace(/\s+$/," ");
+      var dtcomps = dtstr.split(" ");
+      //必须有月份、日期和年份
+      if(dtcomps.length < 3) return "invalid date";
+      //当没有足够元素包含一个时间时，小时、分钟和秒钟都设置为0
+      if(dtcomps.length < 4){
+        dtcomps[3] = 0;
+        dtcomps[4] = 0;
+        dtcomps[5] = 0;
+      }
+      dtcomps[1]--;
+      var convdt = new Date(Date.UTC(dtcomps[0],dtcomps[1],dtcomps[2],dtcomps[3],dtcomps[4],dtcomps[5]));
+      return convdt.toUTCString();
+    }
+  </script>
+</head>
+<body>
+<form action="#">
+  <p>Datestring in ISO 8601 format: <input type="text" id="datestring"></p>
+</form>
+<div id="dateSubmit">
+  <p>Convert Date</p>
+</div>
+<div id="result"></div>
+</body>
+</html>

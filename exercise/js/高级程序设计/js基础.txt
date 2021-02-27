@@ -1,0 +1,253 @@
+https://www.ximalaya.com/jiaoyu/3740790/
+红宝书
+script放头部情况
+ rem设置
+避免js缓存
+ 添加时间戳
+script的6个属性
+ defer async src type charset language
+同一个script内联和外链一起写时，只有外链起作用
+
+区分大小写
+ html、css不区分大小写，js区分大小写；
+ 当把js写在html中时，js要区分大小写吗？
+ 如<div onclick="fnName"></div>，前面的onclick是不区分大小写的，而后面的fnName是区分大小写的
+
+data-前缀加上自定义的属性名,命名可以用驼峰命名方式，但取值是必需全部使用小写
+<div id="testDiv" data-cartCd="24">
+console.log(testDiv.dataset.cartcd);//注意是“cartcd”,不管是不是驼峰命名，一切都是小些。
+
+js命名是以字母数字下划线开头，其实字母是包括中文的；
+默认js遇到一行结尾没有分号时会尝试合并下一行代码，除非遇到return、continue、break这几个关键字；
+function test(){};
+test
+();
+以上代码会执行test函数；
+例外：
+var a=1;
+var b=2;
+a
+++
+b;
+console.log(a,b);  //1 3;  ++操作符会和后面的合并
+
+
+当定义一个变量时，js并没有给这个变量设置具体数据类型，当我们用typeof执行时此时js才动态给变量赋值，然后检测赋的值的数据类型；
+
+var a='x';
+a.len=4;
+a.len;  //undefined
+当字符串、数字等基本类型被添加属性值，js默认会先把它们变成包装类型，然后再添加属性，但是操作完成后立即销毁；
+
+var m = true, n=true;
+typeof m==n;  //false
+会先运算typeof m后再和n进行比较;
+
+undefined与null
+相同
+都是基本数据类型
+转成布尔值都是false
+不同
+null是关键字，undefined不是；即var undefined;不会报错，而var null;会报错；
+typeof undefined; 'undefined'
+typeof null;  //'object';
+null是一个表示"无"的对象，转为数值时为0；undefined是一个表示"无"的原始值，转为数值时为NaN。
+null表示"没有对象"，即该处不应该有值,作为对象原型链的终点:Object.getPrototypeOf(Object.prototype)// null
+undefined表示"缺少值"，就是此处应该有一个值，但是还没有定义
+
+当我们定义一个变量但未赋予其初始值，例如：var aValue;JavaScript在所谓的预编译时会将其初始值设置为对window.undefined属性的引用；
+于是，当我们将一个变量或值与undefined比较时，实际上是与window对象的undefined属性比较。
+这个比较过程中，JavaScript会搜索window对象名叫‘undefined'的属性，然后再比较两个操作数的引用指针是否相同。
+由于window对象的属性值是非常多的，在每一次与undefined的比较中，搜索window对象的undefined属性都会花费时间。
+在需要频繁与undefined进行比较的函数中，这可能会是一个性能问题点。
+因此，在这种情况下，我们可以自行定义一个局部的undefined变量，来加快对undefined的比较速度。例如：
+function a(){
+    var undefined;  //自定义局部undefined变量
+    if(x==undefined){  //作用域上的引用比较
+
+    }
+}
+定义undefined局部变量时，其初始值会是对window.undefined属性值的引用。
+新定义的局部undefined变量存在与该函数的作用域上。
+在随后的比较操作中，JavaScript代码的书写方式没有任何的改变，但比较速度却很快。
+因为作用域上的变量数量会远远少于window对象的属性，搜索变量的速度会极大提高。
+许多前端JS框架为什么常常要自己定义一个局部undefined变量的原因！
+
+(function( window, undefined ) {})(window)写法的理解：
+为防止undefined被修改，确保undefined是真的未定义，形参设undefined， 传入空值。
+所以，就算外面的人把 undefined 定义了，里面的 undefined 依然不受影响。
+大概是为了最大程度防止外界的变量定义对所做封装的内部造成影响吧。
+
+0.1+0.2 == 0.3  //false
+因为计算机用的都是二进制，但是把小数转成二进制是没有准确的，只能找到一个很接近的，
+所以相当于把0.1和0.2分别转成很接近的二进制的数，然后进行相加后再转回十进制，所以会有小误差，
+即0.1+0.2；   //0.30000000000000004
+解决方法有两个：乘以一个够大的倍数或者用toFix四舍五入；
+
+涉及乘法和加法的小数时，要注意前后书写顺序一致，否则会导致前后结果不一样，如：
+0.9*17.45*3；  //47.115
+17.45*3*0.9；  //47.114999999999995
+
+判断变量能否转换为数字，可用isNaN方法；
+0/0；  //NaN
+1/-0；  //-Infinity
+-1/0；  //-Infinity
+
+转化为布尔值为false的变量：
+null  undefined  0 -0  ''  NaN  false
+
+Boolean(new Boolean(false));  //true
+
+var a=[];
+a.toString();  //""
+
+function a(){};
+a.toString();  //"function a(){}"
+
+对象（无序集合）
+有属性
+有方法
+能改变
+
+Object('a');
+{
+    0: 'a',
+    length: 1
+}
+Object(null);  // {}
+Object(undefined);   // {}
+Object(123);  // 包装类数字对象
+
+查询对象属性
+obj.k
+obj['k']
+js解析器碰到点或中括号，如果判断前面是null或undefined，就直接报错；
+如果前面不是对象，就会将其转换成对象;
+如果是点，直接获取对应值，如果值或对应名字不存在，返回undefinded；
+如果是中括号，先将里面值进行计算，转成字符串，再取获取对应值；
+所以用数字1和字符串1去获取数组对应值，js内部都会先将1转成字符串1，再去获取值；
+
+toString/valueOf
+对象到字符串的转换：
+如果具有toString()方法，则调用这个方法，如果它返回一个原始值，js将其转换为字符串，并返回这个字符结果；
+否则js会去调用valueOf()。
+对象到数值的转换：
+如果对象具有valueOf()方法，后者返回一个原始值，则javascript 将这个原始值转换为数字并返回这个数字；
+否则，如果对象具有toString() 方法，后者返回一个原始值，则js将这个原始值转换返回。
+
+toString:
+[1,2].toString();  //"1,2"
+
+function x(){};
+x.toString();  //"function x(){}"
+
+var d=new Date();
+d.toString();  //"Sun Jul 15 2018 22:21:00 GMT+0800 (中国标准时间)"
+
+var x={};
+x.toString();  //"[object Object]"
+
+valueOf:
+有原始值直接返回原始值，如果没有直接返回本身；但是date日期对象除外：
+d.valueOf()；  //1531664460014
+
+创建对象方法：
+对象直接量 var obj = {};
+new Object()当不传参数时可以省略后面括号，即new Object;
+Object.create(继承原型,对象描述性信息);
+
+
+36面试大全
+js数据类型
+string、number、boolean、null、undefined、object、es6的Symbol(不需要new初始化)
+
+typeof默认后面可不添加括号，typeof的优先级很高；
+
+判断是不是数组：constructor、isArray，但是在不同域下会有问题，应用Object.prototype.toString.call(obj)==="[object array]";
+
+数组中对原数组有影响方法：reverse、splice、sort、pop、push、shift、unshift；
+
+数组去重：
+创建空数组，遍历用数组indexOf方法后push进去；
+不创建空数组，直接遍历后用indexOf查看后续有无重复项，有的话splice删除当前项，并把数组长度减1；
+使用对象属性不能重复原理进行去重；
+排序、循环，相邻相同时去掉；
+[...new Set(arr)];
+
+伪数组：DOM选择器选择的节点列表，arguments对象，jq对象；
+创建空数组，把伪数组每一个push进去；
+Array.prototype.slice.call(obj);
+[].slice.call(obj);
+源码里slice的实现也是同上面第一种;
+
+字符串方法；
+charAt、slice、substr、substring、indexof、match、replace、fromCharCode、toString、valueOf、toLowerCase、toUpperCase等等；
+
+判断数字是不是NaN：使用全等判断是否和自身相等；
+isNaN方法主要判断当前值能不能转换为数字，不过es6中Number.isNaN可以判断数字是不是NaN;
+
+转为布尔类型为false：false,null,undefined,'',0,-0;
+
+new做了什么？
+创建空对象，
+把对象原型指向构造函数原型，
+用对象调用构造函数，
+返回该对象；
+
+当实例化对象不传参数时，后面的括号可以省略，即new Object()等价于new Object;
+
+当构造函数内部return一个对象时，系统会直接把该return返回值返回，而忽略创建的对象；
+
+js继承方式：
+原型链继承：只能继承原型链上属性，而且是共享的，改了一个相当于全部都改了，而且无法实现多个父类继承，只能继承一个父类；
+B.prototype = new A();
+构造函数继承：可继承构造函数上属性，但是无法继承原型链上属性，而且所有属性都是独立的，占内存，相当于在每个子类里都把父类重新执行了一遍；
+function B(){
+    A.apply(this,arguments);
+}
+组合式继承：最常用，但存在两个小问题：父类构造函数被执行了两遍，相同属性在子类实例和父类原型对象都存了一份，占内存；
+原型链继承+构造函数继承；
+
+完美继承：中介；
+var inherit=(function(){
+  var F=function(){};
+  return function(C,P){
+  F.prototype=P.prototype;
+  C.prototype=new F();
+  C.uber = P.prototype;//存储超类
+  C.prototype.constructor=C;//重置构造函数指针
+ }
+}())
+https://blog.csdn.net/zhoujie_zhoujie/article/details/56304516
+https://segmentfault.com/a/1190000008888142
+
+上面都是构造函数之间继承，下面两个是对象之间继承：
+原型式继承：
+Create.prototype = A;
+b = new Create;
+es5中的create也是这种，这是两个对象间实现继承，而上面是通过两个类实现继承；
+
+寄生式继承：
+在原型式继承基础上，套了一层函数，然后在该函数内部对对象属性进行进一步增强；
+
+promise的catch可以捕获异步异常，而try catch只能捕获同步异常；
+
+ES6-函数的扩展-双冒号运算符
+用来取代 call、apply、bind 调用。
+foo::bar;
+// 等同于
+bar.bind(foo);
+ 
+foo::bar(...arguments);
+// 等同于
+bar.apply(foo, arguments);
+
+65-90 97-122  String.fromCharCode转成a-zA-Z
+
+
+
+
+
+
+js访问class要用className；
+用void 0代替undefined是因为js里undefined不是关键字，只是变量，可能被赋其他值；

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+  </head>
+
+  <body>
+    <section>
+      <h1>水平居中</h1>
+      <h2>内联或内联块_子元素text-align: center</h2>
+      <section class="horizontally1">
+        <style>
+          body {
+            background: #f06d06;
+          }
+
+          .horizontally1 header,
+          .horizontally1 nav {
+            text-align: center;
+            background: white;
+            margin: 20px 0;
+            padding: 10px;
+          }
+
+          .horizontally1 nav a {
+            text-decoration: none;
+            background: #333;
+            border-radius: 5px;
+            color: white;
+            padding: 3px 8px;
+          }
+        </style>
+        <header>
+          This text is centered.
+        </header>
+        <nav role='navigation'>
+          <a href="#0">One</a>
+          <a href="#0">Two</a>
+          <a href="#0">Three</a>
+          <a href="#0">Four</a>
+        </nav>
+      </section>
+      <h2>一个块元素——父级margin: 0 auto</h2>
+      <section class="horizontally2">
+        <style>
+          .horizontally2 main {
+            background: white;
+            margin: 20px 0;
+            padding: 10px;
+          }
+
+          .horizontally2 .center {
+            margin: 0 auto;
+            width: 200px;
+            background: black;
+            padding: 20px;
+            color: white;
+          }
+        </style>
+        <main>
+          <div class="center">
+            I'm a block level element and am centered.
+          </div>
+        </main>
+      </section>
+    </section>
+    <section>
+      <h1>垂直居中</h1>
+      <h2>内联元素或内联块元素</h2>
+      <h2>单行文本——上下padding或line-height和height同一个值</h2>
+      <h2>多行文本_使用table，会自动添加tbody，而且给tbody添加display: table-row-group;
+        vertical-align: middle;这就是能居中原因</h2>
+      <section>
+        <style>
+          table {
+            background: white;
+            width: 240px;
+            border-collapse: separate;
+            margin: 20px;
+            height: 250px;
+          }
+
+          table td {
+            background: black;
+            color: white;
+            padding: 20px;
+            border: 10px solid white;
+            /* default is vertical-align: middle; */
+          }
+
+          .center-table {
+            display: table;
+            height: 250px;
+            background: white;
+            width: 240px;
+            margin: 20px;
+          }
+
+          .center-table p {
+            display: table-cell;
+            margin: 0;
+            background: black;
+            color: white;
+            padding: 20px;
+            border: 10px solid white;
+            vertical-align: middle;
+          }
+        </style>
+        <table>
+          <tr>
+            <td>
+              I'm vertically centered multiple lines of text in a real table cell.
+            </td>
+          </tr>
+        </table>
+
+        <div class="center-table">
+          <p>I'm vertically centered multiple lines of text in a CSS-created table layout.</p>
+        </div>
+      </section>
+      <h2>块级元素</h2>
+      <h2>已知高度——父元素相对定位，子元素绝对定位+top50%+负marginTop</h2>
+      <h2>未知高度——父元素相对定位，子元素绝对定位+top50%+translateY(-50%)</h2>
+      <h2>未知高度——父元素display:table,子元素display:table-cell+vertical-align:middle</h2>
+    </section>
+    <section>
+      <h1>水平垂直居中</h1>
+    </section>
+  </body>
+
+</html>

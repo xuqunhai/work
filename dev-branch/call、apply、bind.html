@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function sayHelloTo (to) {
+      console.log(`${this.name} say hello to ${to}`)
+    }
+
+    var Jerry = {
+      name: 'Jerry'
+    }
+    sayHelloTo.call(Jerry, 'Tom')
+    //Jerry say hello to Tom.
+
+    // 将当前函数挂载到第一个参数对象上，并调用返回结果
+    // 用扩展运算符(…)将原来是数组的args转发为逗号分隔一个个参数传入到函数中
+    Function.prototype.myCall = function(context, ...args) {
+      // 判断是否是undefined和null
+      if (typeof context === 'undefined' || context === null) {
+        context = window
+      }
+      let fnSymbol = Symbol()
+      context[fnSymbol] = this
+      let fn = context[fnSymbol] (...args)
+      delete context[fnSymbol] 
+      return fn
+    }
+
+    var Foo = {
+      name: 'Foo'
+    }
+    sayHelloTo.apply(Foo, ['Bar'])
+    //Foo say hello to Bar.
+
+    // 和call一样，只是把参数数组转发为逗号分隔一个个参数传入到函数中
+    Function.prototype.myApply = function(context, args) {
+      // 判断是否是undefined和null
+      if (typeof context === 'undefined' || context === null) {
+        context = window
+      }
+      let fnSymbol = Symbol()
+      context[fnSymbol] = this
+      let fn = context[fnSymbol] (...args)
+      return fn
+    }
+
+    var XYZ = {
+      name: 'XYZ'
+    }
+    var say = sayHelloTo.bind(XYZ)
+    say('ABC')
+    //XYZ say hello to ABC.
+
+    // 返回一个函数，繁华的函数会调用apply方法
+    Function.prototype.myBind = function(context) {
+      // 判断是否是undefined和null
+      if (typeof context === "undefined" || context === null) {
+        context = window;
+      }
+      self = this;
+      return function(...args) {
+        return self.apply(context, args);
+      }
+    }
+  </script>
+</body>
+</html>

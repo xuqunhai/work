@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+使用RegExp test方法
+var cookbookString = new Array();
+cookbookString[0] = "Joe's Cooking Book";
+cookbookString[1] = "Sam's CookBook";
+cookbookString[2] = "JavaScript CookBook";
+cookbookString[3] = "JavaScript BookCook";
+
+var pattern = /Cook.*Book/;
+for(var i=0;i<cookbookString.length;i++){
+  alert(cookbookString[i] + " " + pattern.test(cookbookString[i]));  //true false true false
+}
+</body>
+</html>

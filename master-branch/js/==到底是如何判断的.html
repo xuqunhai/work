@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+    其实==的判断规则分为两大类： 类型相同和不相同
+    类型相同
+    不存在隐式类型转换
+      null == null
+      undefined == undefined
+      +0 == -0
+      true == true
+      false == false
+      对象的引用地址相同则相同
+      字符串完全相同的字符序列（长度相等且相同字符在相同位置）时返回 true。
+      数字相同则为 true
+
+    对于 NaN 来说，只要存在 NaN 就一定是 false。
+
+    类型不同
+    undefined == null 值为 true 这个是规定，不存在类型转换。
+
+    当 X, Y 中任意一人是 Boolean 类型时，把 Boolean 类型的转换成数字类型进行判断。
+    例如：
+    true == ‘1’ 这里先进行 数字化转化得到 true 转化成 1 ，最终比较的是 数字 1 和 字符串的 1。
+    False == [] 也是一样的根据这条规则转化成 0 == [] 
+    例子
+    if (a==true) {}设想一下如果a=0.5能成立吗？
+    不能，因为首先会把true转成1，也就是if(a==1){}很显然这里在我们判断最终的结果是 a == 1
+
+
+    字符串与数字的比较
+    比较规则是把字符转换成数字然后在进行比较。
+
+    Object 的类型比较
+    先检查是否具有 valueOf 函数，如果有并且返回基本类型值，就使用该值进行强制类型转换
+    var obj = {
+      value: '123',
+      valueOf() {
+        console.log("valueOf")
+        return this.value
+      }
+    }
+    console.log(obj == 123) //true
+
+    如果没有 ValueOf，或者 ValueOf 返回的不是原始值。继续寻找 toString 函数
+    var obj = {
+      value: '123',
+      valueOf() {
+        console.log("valueOf")
+        return {}
+      },
+      toString() {
+        console.log('toString')
+        return this.value
+      }
+    }
+    console.log(obj == 123) //true
+
+    如果 toString 方法返回的也不是基本类型怎么办？
+    会报一个错误。所以规范强调，务必返回原始值:
+    TypeError: Cannot convert object to primitive value
+
+    不符合上面规矩的，一律返回false
+    所以 null == 0 的值是false
+</body>
+</html>

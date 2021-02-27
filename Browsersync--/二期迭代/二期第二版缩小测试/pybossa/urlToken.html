@@ -1,0 +1,585 @@
+<script>
+    function htmlFontSize(){
+        var html = document.querySelector("html");
+        var htmlWidth = html.getBoundingClientRect().width;
+        html.style.fontSize = htmlWidth / 3.75 + "px";
+    }
+    htmlFontSize();
+    window.addEventListener("resize",function(){
+        htmlFontSize();
+    },false);
+</script>
+<!--<link rel="stylesheet" href="http://192.168.0.182:8000/h5/ZB2H5.css">-->
+<link rel="stylesheet" href="http://192.168.0.88:8000/ZB2H5.css">
+
+<!--
+    Task DOM for loading the Flickr Images
+    It uses the class="skeleton" to identify the elements that belong to the
+    task.
+-->
+<div class="row skeleton"> <!-- Start Skeleton Row-->
+    <div class="col-md-6 " style="display:none"><!-- Start of Question and Submission DIV (column) -->
+        <h1 id="question"><span id="i18n_question">Do you see a human face in this photo?</span></h1> <!-- The question will be loaded here -->
+        <div id="answer"> <!-- Start DIV for the submission buttons -->
+            <!-- If the user clicks this button, the saved answer will be value="yes"-->
+            <button class="btn btn-success btn-answer" value='Yes'><i class="icon icon-white icon-thumbs-up"></i> <span id="i18n_yes">Yes</span></button>
+            <!-- If the user clicks this button, the saved answer will be value="no"-->
+            <button class="btn btn-danger btn-answer" value='No'><i class="icon icon-white icon-thumbs-down"></i> No</button>
+            <!-- If the user clicks this button, the saved answer will be value="NoPhoto"-->
+            <button class="btn btn-answer" value='NoPhoto'><i class="icon icon-exclamation"></i> <span id="i18n_no_photo">No photo</span></button>
+            <!-- If the user clicks this button, the saved answer will be value="NotKnown"-->
+            <button class="btn btn-answer" value='NotKnown'><i class="icon icon-white icon-question-sign"></i> <span id="i18n_i_dont_know">I don't know</span></button>
+        </div><!-- End of DIV for the submission buttons -->
+        <!-- Feedback items for the user -->
+        <p><span id="i18n_working_task">You are working now on task:</span> <span id="task-id" class="label label-warning">#</span></p>
+        <p><span id="i18n_tasks_completed">You have completed:</span> <span id="done" class="label label-info"></span> <span id="i18n_tasks_from">tasks from</span>
+            <!-- Progress progress-bar for the user -->
+            <span id="total" class="label label-inverse"></span></p>
+        <div class="progress progress-striped">
+            <div id="progress" rel="tooltip" title="#" class="progress-bar" style="width: 0%;"></div>
+        </div>
+        <!--
+            This project uses Disqus to allow users to provide some feedback.
+            The next section includes a button that when a user clicks on it will
+            load the comments, if any, for the given task
+        -->
+        <div id="disqus_show_btn" style="margin-top:5px;">
+            <button class="btn btn-primary btn-lg btn-disqus" onclick="loadDisqus()"><i class="icon-comments"></i> <span id="i18n_show_comments">Show comments</span></button>
+            <button class="btn btn-lg btn-disqus" onclick="loadDisqus()" style="display:none"><i class="icon-comments"></i> <span id="i18n_hide_comments">Hide comments</span></button>
+        </div><!-- End of Disqus Button section -->
+        <!-- Disqus thread for the given task -->
+        <div id="disqus_thread" style="margin-top:5px;display:none"></div>
+    </div><!-- End of Question and Submission DIV (column) -->
+    <div class="col-md-6" style="display:none"><!-- Start of Photo DIV (column) -->
+        <a id="photo-link" href="#">
+            <img id="photo" src="http://i.imgur.com/GeHxzb7.png" style="max-width=100%">
+        </a>
+    </div><!-- End of Photo DIV (columnt) -->
+
+    <header><h1 class="tc fwn">平安众包</h1></header>
+    <main>
+        <div class="wrap">
+            <section class="billBox">
+                <div class="billImgBox pinch-zoom">
+                    <img style="display:none" class="billImg" alt="billImg">
+                </div>
+                <p class="task_rand_score">任务奖励(分/单):<span>1</span></p>
+                <div class="billOperate">
+                    <nav class="clearfloat">
+                        <img src="http://192.168.0.182:8000/h5/billIcon.png" alt="billIcon" class="icon l">
+                        <span class="l">票据显示</span>
+                        <span class="taskGuide r">任务指引</span>
+                    </nav>
+                    <input type="text" class="showInfo tc bsb">
+                    <p class="textTip tc">请适当修改，保证票据内容与文本输入框一致</p>
+                    <input type="button" class="next tc bsb" value="下一张">
+                    <!--<input type="button" class="next tc bsb" value="下一张">-->
+                </div>
+            </section>
+            <div class="divide"></div>
+            <section class="countBox">
+                <nav class="clearfloat">
+                    <img src="http://192.168.0.182:8000/h5/count.png" alt="count" class="icon l">
+                    <span class="l">任务统计</span>
+                    <span class="more r">点击查看</span>
+                </nav>
+                <div class="clearfloat countInfo">
+                    <div class="l tc total today_order">
+                        <p>今日提交(单):</p>
+                        <p class="num">1</p>
+                    </div>
+                    <div class="l tc total">
+                        <p>累计提交(单)</p>
+                        <p class="num">1</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer style="display:none">
+        <input type="text" class="reviseInfo">
+    </footer>
+    <div id="showMes" style="display:none;position:absolute;left:0;right:0;top:0;bottom:0;background:transparent;color:white;text-align:center;font-size:36px;z-index:100;">
+        <div style="position:absolute;top:50%;left:50%;width:1.2rem;height:.65rem;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);background:rgba(0,0,0,.7);border-radius:.1rem">
+            <img src="http://192.168.0.182:8000/loading.png" alt="loading" style="display:block;width:.36rem;height:.36rem;margin:.15rem auto;animation:change 2s linear infinite;-webkit-animation:change 2s linear infinite;">
+            <!--<img src="加载@2x.png" alt="loading" style="position:absolute;top:50%;left:50%;animation:change 2s linear infinite;-webkit-animation:change 2s linear infinite;">-->
+        </div>
+    </div>
+    <div id="toLogin" style="display:none;position:absolute;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,.3);color:#ff6000;text-align:center;font-size:24px;z-index:10;">
+        <div style="position:absolute;top:50%;left:50%;width:2.4rem;height:1.2rem;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);background:rgba(255,255,255,1);border-radius:.1rem">
+            <p style="width:100%;height:.82rem;line-height:.82rem;color:#323232;border-bottom:1px solid #c8c8c8;box-sizing:border-box">未登录</p>
+            <div class="clearfloat" style="width:100%;height:.38rem;line-height:.38rem">
+                <p id="cacelBtn" class="l" style="width:50%;color:#ff6000;border-right:1px solid #c8c8c8;box-sizing:border-box">取消</p>
+                <p id="loginBtn" class="l" style="width:50%;color:#ff6000">登录</p>
+            </div>
+        </div>
+    </div>
+
+</div><!-- End of Skeleton Row -->
+
+<script type="text/javascript" src="http://192.168.0.182:8000/h5/pinchzoom201.js"></script>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    function loadDisqus() {
+        $("#disqus_thread").toggle();
+        $(".btn-disqus").toggle();
+        var disqus_shortname = 'pybossa'; // required: replace example with your forum shortname
+        //var disqus_identifier = taskId;
+        var disqus_developer = 1;
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    }
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<script type="text/javascript">
+    (function() {
+// Default language
+        var userLocale = "en";
+// Translations
+        var messages = {"en": {
+            "i18n_welldone": "Well done!",
+            "i18n_welldone_text": "Your answer has been saved",
+            "i18n_loading_next_task": "Loading next task...",
+            "i18n_task_completed": "The task has been completed!",
+            "i18n_thanks": "Thanks a lot!",
+            "i18n_congratulations": "Congratulations",
+            "i18n_congratulations_text": "You have participated in all available tasks!",
+            "i18n_yes": "Yes",
+            "i18n_no_photo": "No photo",
+            "i18n_i_dont_know": "I don't know",
+            "i18n_working_task": "You are working now on task:",
+            "i18n_tasks_completed": "You have completed:",
+            "i18n_tasks_from": "tasks from",
+            "i18n_show_comments": "Show comments:",
+            "i18n_hide_comments": "Hide comments:",
+            "i18n_question": "Do you see a human face in this photo?",
+        },
+            "es": {
+                "i18n_welldone": "Bien hecho!",
+                "i18n_welldone_text": "Tu respuesta ha sido guardada",
+                "i18n_loading_next_task": "Cargando la siguiente tarea...",
+                "i18n_task_completed": "La tarea ha sido completadas!",
+                "i18n_thanks": "Muchísimas gracias!",
+                "i18n_congratulations": "Enhorabuena",
+                "i18n_congratulations_text": "Has participado en todas las tareas disponibles!",
+                "i18n_yes": "Sí",
+                "i18n_no_photo": "No hay foto",
+                "i18n_i_dont_know": "No lo sé",
+                "i18n_working_task": "Estás trabajando en la tarea:",
+                "i18n_tasks_completed": "Has completado:",
+                "i18n_tasks_from": "tareas de",
+                "i18n_show_comments": "Mostrar comentarios",
+                "i18n_hide_comments": "Ocultar comentarios",
+                "i18n_question": "¿Ves una cara humana en esta foto?",
+            }
+        };
+
+        // 获取token
+
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null){
+                return  r[2];
+            }
+            return null;
+        }
+        console.log('window.location.search'+window.location.search);
+        var getToken = GetQueryString("token") || null;
+        console.log(getToken);
+
+        /*
+         var getToken = window.location.search.substring(7);
+         console.log('location.search'+getToken);
+         */
+
+//        var getToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjE1MjA4Mjg3MDAyIiwidGltZSI6IjIwMTctMDQtMDkgMTU6Mjc6MzQifQ.gyauuZR8xhrbPB24IqmmvcuPctND7PfxWYQtGb3pu0o';
+        /*
+         $("#showMes").show();
+         var token;
+         $.ajax({
+         type: 'GET',
+         url: window.location.href,
+         async: false,
+         success: function (output, status, xhr) {
+         var ResponseHeader = xhr.getResponseHeader('Content-Type');
+         console.log('ResponseHeader');
+         console.log(ResponseHeader);
+         token = xhr.getResponseHeader('Authorization');
+         console.log('token');
+         console.log(token);
+         },
+         error: function () {
+         console.log('strError');
+         }
+         });
+         */
+// Update userLocale with server side information
+        $(document).ready(function(){
+            userLocale = document.getElementById('PYBOSSA_USER_LOCALE').textContent.trim();
+        });
+
+        function i18n_translate() {
+            var ids = Object.keys(messages[userLocale]);
+            for (i=0; i<ids.length; i++) {
+                console.log("Translating: " + ids[i]);
+                if (document.getElementById(ids[i])) {
+                    document.getElementById(ids[i]).innerHTML = messages[userLocale][ids[i]];
+                }
+            }
+        }
+
+        function loadUserProgress() {
+            pybossa.userProgress('sn').done(function(data){
+                var pct = Math.round((data.done*100)/data.total);
+                $("#progress").css("width", pct.toString() +"%");
+                $("#progress").attr("title", pct.toString() + "% completed!");
+                $("#progress").tooltip({'placement': 'left'});
+                $("#total").text(data.total);
+                $("#done").text(data.done);
+            });
+        }
+
+        pybossa.taskLoaded(function(task, deferred) {
+            if ( !$.isEmptyObject(task) ) {
+
+                $("#showMes").show();
+
+                // load image from flickr
+                var img = $('<img class="billImg"/>');
+                img.load(function() {
+                    // continue as soon as the image is loaded
+                    deferred.resolve(task);
+                    pybossaNotify("", false, "loading");
+                });
+                img.attr('src', task.info.url).css('height', 'auto');
+                task.info.image = img;
+            }
+            else {
+                deferred.resolve(task);
+            }
+        });
+
+        pybossa.presentTask(function(task, deferred) {
+            if ( !$.isEmptyObject(task) ) {
+                loadUserProgress();
+                i18n_translate();
+
+                $('.pinch-zoom').html('').append(task.info.image);
+
+                // 计算图片最终大小和移动的坐标
+                function calc(config) {
+
+                    // 获取图片原始大小
+                    var initImgW = config.imgInitW || 0;
+                    var initImgH = config.imgInitH || 0;
+
+                    // 获取图片展示框大小
+                    var imgWrapW = config.imgWrapW || 0;
+                    var imgWrapH = config.imgWrapH || 0;
+
+                    // 确定水平还是垂直方向占满
+                    var direct = (imgWrapW / initImgW * initImgH < imgWrapH) ? 'h' : 'v';
+                    var scale = 1, scaleImgH, scaleImgW,pdt,pdl;
+
+                    // 确定缩放比、缩放后的宽高及留白大小
+                    if(direct == 'h'){
+                        scale = imgWrapW / initImgW;
+                        scaleImgW = imgWrapW;
+                        scaleImgH = initImgH * scale;
+                        pdt = (imgWrapH - scaleImgH) / 2;
+                        pdl = 0;
+                    }else{
+                        scale = imgWrapH / initImgH;
+                        scaleImgH = imgWrapH;
+                        scaleImgW = initImgW * scale;
+                        pdl = (imgWrapW - scaleImgW) / 2;
+                        pdt = 0;
+                    }
+
+                    // 返回显示在屏幕的图片的宽高和左边及上边的留白
+                    return {
+                        'fw' : scaleImgW,
+                        'fh' : scaleImgH,
+                        'pl' : pdl,
+                        'pt' : pdt
+                    };
+                }
+
+                // 获取展示区域宽高
+                var imgBoxW = $('.billImgBox').width();
+                var imgBoxH = $('.billImgBox').height();
+
+                // 判断图片是否加载完成
+                function imgLoaded(img) {
+                    return img.complete && img.naturalHeight !== 0;
+                }
+
+                // 确保图片加载完成及执行的回调
+                var imgLoadTimer = setInterval(function () {
+                    if(imgLoaded($('.billImg')[0])){
+                        clearInterval(imgLoadTimer);
+                        imgCallback($('.billImg')[0]);
+                    }
+                },500);
+
+                // 定义图片加载后的回调
+                function imgCallback(img) {
+
+                    // 获取图片原始宽高
+                    var imgInitH = img.naturalHeight;
+                    var imgInitW = img.naturalWidth;
+
+                    //计算图片最终显示的大小及留白
+                    var result = calc({
+                        'imgInitW' : imgInitW,
+                        'imgInitH' : imgInitH,
+                        'imgWrapW' : imgBoxW,
+                        'imgWrapH' : imgBoxH
+                    });
+                    // console.log(result);
+
+                    // billImg
+                    $('.billImg').css({
+                        'width' : result.fw +'px',
+                        'height' : result.fh + 'px',
+                        'marginTop' : result.pt +'px',
+                        'marginLeft' : result.pl +'px',
+                        // 'transform':'rotate(90deg)',
+                        'display' : 'inline-block'
+                    });
+                }
+
+                // 获取task_id
+//                var task_id = 1;
+                var task_id = task.id;
+                $('#task-id').html(task.id);
+
+                $('body').css('padding','0px');
+
+                var fontSize = parseInt($('html').css('fontSize'));
+                var opt = {zoomFactor:3,offset:{x:3.75*fontSize,y:1.32*fontSize},maxZoom:8};
+                $('div.pinch-zoom').each(function () {
+                    new RTP.PinchZoom($(this), opt);
+                });
+
+                $(document).ajaxStart(function(){
+                    console.log('ajaxStart');
+//                    $("#showMes").show();
+                }).ajaxStop(function(){
+                    console.log('ajaxStop');
+                    $("#showMes").hide();
+                    if(!getToken){
+                        $('html')[0].addEventListener('touchstart',function () {
+                            $('#toLogin').show();
+                        },true);
+                    }
+                });
+
+                // 发送图片获取识别字符串，并放入input中
+//                {"result": "上海市第六人民医院东院"}
+                var str;
+
+                var urlData = {"url": task.info.url,"type": task.info.type};
+//                 setTimeout(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://192.168.0.88:5001/ocr_api/block_rec',
+                    dataType: 'json',
+                    data: JSON.stringify(urlData),
+//                     beforeSend: function (xhr) {
+//                         xhr.setRequestHeader('Content-Type','application/json;charset=utf-8');
+//                         xhr.setRequestHeader('Accept','application/json,text/plain');
+//                     },
+                    success: function (data) {
+                        console.log('str');
+                        console.log(data);
+                        if(data){
+                            str = data['result'];
+                        }else{
+                            str = '空';
+                        }
+                        $('.showInfo').val(str);
+                        $('.reviseInfo').val(str);
+                    },
+                    error: function () {
+                        console.log('strError');
+                    }
+                });
+//                 },500);
+
+
+//                模拟数据
+//                var str = "1404021205";
+
+//                $('.showInfo').val(str);
+//                $('.reviseInfo').val(str);
+
+                // 软键盘控制底部input的显示
+                var winH = window.innerHeight;
+                $('.showInfo')[0].addEventListener('focus',function (e) {
+                    $('footer').show().children().focus();
+                    $('.showInfo').val(window.innerHeight+'+'+winH);
+                    /*
+                    var timeA = setInterval(function () {
+                        if(window.innerHeight != winH){
+                            $('footer').show().children().focus();
+                            $('.showInfo').val(window.innerHeight+'+'+winH);
+                        }else{
+                            $('footer').hide();
+                            $('.showInfo').val(window.innerHeight+'+'+winH+'footerHide'+$('.reviseInfo').val());
+                        }
+                    },500);
+                    */
+                });
+
+//                拿到token判断有没登录
+                if(!getToken){
+                    console.log('没有token');
+
+                    $('.task_rand_score span').html(0);
+                    $('.total .num').html(0);
+                    $('.today_order .num').html(0);
+
+                }else{
+                    console.log('有token');
+
+                    //发起ajax请求获取任务统计数据userInfo插入页面中
+                    var userData = {'token': getToken,'task_id':task_id};
+                    console.log(userData);
+                    userData = JSON.stringify(userData);
+                   /*
+                     $.ajax({
+                     type : 'POST',
+                     url : 'http://192.168.0.182:5000/token/statistics/userInfo',
+                     data : userData,
+                     dataType : 'json',
+                     beforeSend: function (xhr) {
+                     xhr.setRequestHeader('Content-Type','application/json;charset=utf-8');
+                     xhr.setRequestHeader('Accept','application/json,text/plain');
+                     },
+                     success : function (userInfo) {
+                     console.log('userInfo: '+userInfo['body']['task_rand_score']);
+                     $('.task_rand_score span').html(userInfo.body.task_rand_score);
+                     $('.total .num').html(userInfo.body.total_order_num);
+                     $('.today_order .num').html(userInfo.body.current_day_tasks);
+                     },
+                     error : function (err) {
+                     console.log('error: '+err);
+                     }
+                     });
+
+                     // 判断是否需要跳到抽奖页面的接口数据
+                     $.ajax({
+                     type : 'GET',
+                     url : 'http://192.168.0.182:5000/token/lottery/getchanceconfig',
+                     dataType : 'json',
+                     success : function (lotteryInfo) {
+                     console.log('lotteryInfo: ' + lotteryInfo);
+                     var interval = lotteryInfo['body']['chance_configs'][0]['interval'];
+                     },
+                     error : function (err) {
+                     console.log('error: '+err);
+                     }
+                     });
+                   */
+//                判断是否需要跳到抽奖页面 getchanceconfig／interval  ＝＝  userInfo／total_order_num ？
+                    $.when(
+                        $.ajax({
+                            type : 'POST',
+                            url : 'http://192.168.0.182:5000/token/statistics/userInfo',
+                            data : userData,
+                            dataType : 'json',
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader('Content-Type','application/json;charset=utf-8');
+                                xhr.setRequestHeader('Accept','application/json,text/plain');
+                            }
+                        }),
+                        $.ajax({
+                            type : 'GET',
+                            url : 'http://192.168.0.182:5000/token/lottery/getchanceconfig',
+                            dataType : 'json'
+                        })
+                    ).then(function (userInfo, lotteryInfo){
+                        var total_order_num = userInfo[0].body.total_order_num;
+                        $('.task_rand_score span').html(userInfo[0].body.task_rand_score);
+                        $('.total .num').html(total_order_num);
+                        $('.today_order .num').html(userInfo[0].body.current_day_tasks);
+                        console.log('total_order_num: ' + total_order_num);
+
+                        for(var i=0,len=lotteryInfo[0]['body']['chance_configs'].length;i<len;i++){
+                            var interval = lotteryInfo[0]['body']['chance_configs'][i]['interval'];
+                            var times = lotteryInfo[0]['body']['chance_configs'][i]['times'];
+                            var lottery_id = lotteryInfo[0]['body']['chance_configs'][i]['lottery_id'];
+                            console.log('interval['+i+']: ' + interval);
+
+                            if(interval == total_order_num){
+//                            jobTask.lotteryConfigInterval(interval,times,lottery_id);
+                                jobTask.lotteryConfigInterval(JSON.stringify({'interval':interval,'times':times,'lottery_id':lottery_id}));
+                            }
+                        }
+                    });
+
+//                点击任务指引
+                    $('.taskGuide').off('touchstart').on('touchstart',function () {
+                        console.log(1111111);
+                        jobTask.taskGuide();
+                    });
+
+//                点击查看
+                    $('.more').off('touchstart').on('touchstart',function () {
+                        jobTask.checkTaskStatistics();
+                    });
+
+//                点击下一张按钮
+                    $('.next').off('click').on('click', function(evt) {
+                        var answer = {"text": $('.showInfo').val()};
+                        if (typeof answer != 'undefined') {
+                            pybossa.saveTask(task.id, answer).done(function() {
+                                pybossaNotify("Loading picture...", true, "loading");
+                                deferred.resolve();
+                            });
+                            if ($("#disqus_thread").is(":visible")) {
+                                $('#disqus_thread').toggle();
+                                $('.btn-disqus').toggle();
+                            }
+                        }
+                        else {
+                            pybossaNotify("Oops... Something went wrong.", true, "error");
+                        }
+                        $('.showInfo').val('');
+                        $('.pinch-zoom-container').css('height','auto');
+                    });
+                }
+
+//                单击未登录的取消按钮
+                $('#cacelBtn').on('touchstart',function () {
+                    $('#toLogin').hide(300);
+                    $('html')[0].addEventListener('touchstart',function () {
+                        $('#toLogin').show();
+                    },true);
+                });
+//                单击登录跳转登录页面
+                $('#loginBtn').on('touchstart',function () {
+                    jobTask.launchLoginPage();
+                });
+
+                pybossaNotify("Loading picture...", false, "loading");
+
+            }
+            else {
+                window.location.href = "http://192.168.0.182:8000/h5/noTask.html?token="+getToken;
+            }
+        });
+
+        pybossa.run('sn');
+    })();
+</script>

@@ -1,0 +1,53 @@
+压缩js
+npm i -g uglify-js
+uglifyjs demo.js -o demo.min.js // -o表示output，即把demo.js压缩到demo.min.js中，注意这里不会压缩变量名，需要传额外参数
+
+commonJS-服务器端
+核心：同步加载、module.exports导出、require导入、global变量
+浏览器不支持，因为同步会阻塞(请求时间远大于本机读取时间)，且没有上面四个变量：module、exports、require、global；如要使用需要使用工具转换，如Browserify：
+npm install browserify -g
+browserify main.js -o bundle.js
+
+所以出现了AMD(require.js)，异步加载+回调：
+核心是通过define定义模块，require加载模块（）依赖于require.js；
+示例：
+(function(){
+  require.config({
+    paths: { // 规定如何找依赖
+      m2: './modules/m2',
+      jquery: './libs/jquery'
+    }
+  })
+  require(moduleId,['m2', 'jquery'],function(m2,$){ // 这里jquery必须都是小写，因为jq源码define暴露出的就是jquery；
+    m2.show()
+  }) // 前两个参数可选
+})()
+
+AMD的问题就是依赖会一次性加载，无论是否使用，为了解决这个问题就出现了CMD(sea.js)；CMD可以按需加载(require.async)：
+define(function(require,exports,module){
+  // 同步加载
+  var m2=require('./m2);
+  m2();
+  // 异步
+  require.async('./m3', function(m3){
+    m3.foo()
+  });
+  function fun(){}
+  exports.m4=fun; // 默认exports=module.exports,所以不能使用exports=xxx，因为这样就不是对module.exports的引用了
+})
+
+exports本质是一个空对象，至于为什么能使用exports.xxx=...是因为默认做了以下赋值：exports = module.exports;
+
+
+es6
+引入import，导出export；需要借助babel才能被浏览器支持；
+export var a='123';
+export function a(){}
+export default a='123';
+import theDefault, {m2,m3} from 'lib';
+import {m2,m3} from 'lib';
+import {m1 as myName, m2} from 'lib';
+import * as myLib from 'lib';
+import 'lib';
+
+webpack支持AMD、ES Modules和CommonJS(因为webpack是基于NodeJS)，重点关注ES Modules；

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            position: absolute;
+            top: 20px;
+            left: -100px;
+            width: 100px;
+            height: 200px;
+            background: grey;
+        }
+
+        p {
+            position: absolute;
+            left: 100px;
+            top: 70px;
+            height: 50px;
+            width: 30px;
+            background: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="rect">
+        <p id="btn"></p>
+    </div>
+
+    <script>
+        let timer = null
+        let speed = 5
+        rect.onmouseover = function () {
+            doing(0)
+        }
+        rect.onmouseout = function () {
+            doing(-100)
+        }
+        function doing(target) {
+            clearInterval(timer)
+            let speed;
+            if (target < 0) {
+                speed = -5
+            } else {
+                speed = 5
+            }
+            timer = setInterval(() => {
+                if (rect.offsetLeft === target) {
+                    clearInterval(timer)
+                } else {
+                    rect.style.left = rect.offsetLeft + speed + 'px'
+                }
+            }, 30)
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+if((typeof a != "undefined") && (typeof a.valueOf() == "string") && (a.length > 0))
+为了防止a未定义时a.length报错，所以前面必须加上typeof a != "undefined"，
+String对象的typeof将返回一个"object"数据类型而不是"string",所以要加入typeof a.valueOf() == "string"，
+valueOf返回其基本值，对于Number、String和布尔类型，返回原始值，对于函数返回函数文本，对于String对象返回字符串直接量，
+对于字符串直接量，由于valueOf方法会临时将它封成一个String对象，所以仍返回一个字符直接量；
+</body>
+</html>

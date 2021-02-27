@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+    function execute(code) {
+        eval(code);
+
+        function subroutine(){
+            return window;
+        }
+
+        var w = subroutine();
+
+        //what value is w?
+    };
+
+    execute("var window = {};")
+    // 创建了一个局部变量window，此时w等同于局部变量window而非全局window对象，只有执行了这段代码才会发现问题
+    // with语句、catch子句、eval函数都被认为是动态作用域
+
+    // 只有确实必要时才推荐使用动态作用域
+    </script>
+</body>
+</html>

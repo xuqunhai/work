@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        var token = [];
+        const start = char => { // 返回函数inNumber或自身start
+            if (char === '1'
+                || char === '2'
+                || char === '3'
+                || char === '4'
+                || char === '5'
+                || char === '6'
+                || char === '7'
+                || char === '8'
+                || char === '9'
+                || char === '0'
+            ) {
+                // console.log('start函数传入数字，push进token,返回inNumber函数', char)
+                token.push(char);
+                return inNumber;
+            }
+            if (char === '+'
+                || char === '-'
+                || char === '*'
+                || char === '/'
+            ) { // 打印
+                // console.log('start函数传入加减乘除，打印', char)
+                emmitToken(char, char);
+                return start
+            }
+
+            if (char === ' ') {
+                // console.log('start函数传入空格，忽略', char)
+                return start;
+            }
+            if (char === '\r'
+                || char === '\n'
+            ) {
+                // console.log('start函数传入回车换行，忽略', char)
+                return start;
+            }
+        }
+        const inNumber = char => { // 返回函数自身inNumber或start
+            if (char === '1'
+                || char === '2'
+                || char === '3'
+                || char === '4'
+                || char === '5'
+                || char === '6'
+                || char === '7'
+                || char === '8'
+                || char === '9'
+                || char === '0'
+            ) {
+                // console.log('inNumber函数传入数字，push', char)
+                token.push(char);
+                return inNumber;
+            } else { // 打印
+                // console.log('inNumber函数传入非数字，打印，清空token，调用start函数', char)
+                emmitToken("Number", token.join(""));
+                token = [];
+                return start(char); // put back char
+            }
+        }
+
+        var source = []
+
+        function emmitToken(type, value = '') {
+            source.push({
+                type, value
+            })
+        }
+
+        var input = "1024 + 2 * 256"
+        /*
+        数字到数字，走 start - inNumber
+        数字到非数字，走 inNumber - start
+        */
+
+        var state = start;
+
+        for (var c of input.split(''))
+            state = state(c);
+
+        state(Symbol('EOF'))
+
+        source.push({ type: "EOF" })
+
+        console.log('source', JSON.stringify(source)) // 把输入的字符串变成token
+        // [
+        //     { "type": "Number", "value": "1024" }, 
+        //     { "type": "+", "value": "+" }, 
+        //     { "type": "Number", "value": "2" }, 
+        //     { "type": "*", "value": "*" }, 
+        //     { "type": "Number", "value": "256" },
+        //     { type: "EOF" }
+        // ]
+
+    </script>
+    <script>
+
+        function Expression(source) {
+            if (source[0].type === "AdditiveExpression" && source[1] && source[1].type === "EOF") {
+                let node = {
+                    type: "Expression",
+                    children: [source.shift(), source.shift()]
+                }
+                source.unshift(node);
+                return node;
+            }
+            AdditiveExpression(source);
+            return Expression(source);
+        }
+        function AdditiveExpression(source) {
+            if (source[0].type === "MultiplicativeExpression") {
+                let node = {
+                    type: "AdditiveExpression",
+                    children: [source[0]]
+                }
+                source[0] = node;
+                return AdditiveExpression(source);
+            }
+            // 遇到加减符号时，把符号和前面的放入node.children，然后把符号后面的所有进行MultiplicativeExpression调用
+            if (source[0].type === "AdditiveExpression" && source[1] && source[1].type === "+") {
+                let node = {
+                    type: "AdditiveExpression",
+                    operator: "+",
+                    children: []
+                }
+                // 比如： 1+2*3+4
+                node.children.push(source.shift());
+                node.children.push(source.shift());
+                // 把1和+shift，剩下2*3+4
+                // 虽然这个函数可能会返回source[0]，但是这里并不处理返回，所以返回没什么用，这个函数主要处理的是后面的乘除部分，把乘除部分揉成一个整体
+                MultiplicativeExpression(source);
+                // 经过上面这个函数处理后，2*3揉成一个，
+                node.children.push(source.shift());
+                source.unshift(node);
+                // 再通过shift到node上后变成node.children(2&3)+4,此时source[1]就是+号
+                return AdditiveExpression(source);
+            }
+            if (source[0].type === "AdditiveExpression" && source[1] && source[1].type === "-") {
+                let node = {
+                    type: "AdditiveExpression",
+                    operator: "-",
+                    children: []
+                }
+                node.children.push(source.shift());
+                node.children.push(source.shift());
+                MultiplicativeExpression(source);
+                node.children.push(source.shift());
+                source.unshift(node);
+                return AdditiveExpression(source);
+            }
+            if (source[0].type === "AdditiveExpression")
+                return source[0];
+            MultiplicativeExpression(source);
+            return AdditiveExpression(source);
+        }
+        function MultiplicativeExpression(source) { // 这个函数返回值没什么用，主要功能是对传入的source数组的处理
+            if (source[0].type === "Number") { // 监测到数字就外面包裹一层MultiplicativeExpression
+                let node = {
+                    type: "MultiplicativeExpression",
+                    children: [source[0]]
+                }
+                source[0] = node;
+                return MultiplicativeExpression(source);
+            }
+            // 如果紧接的是乘除符号，就把符号连同前后都放入node.children
+            if (source[0].type === "MultiplicativeExpression" && source[1] && source[1].type === "*") {
+                let node = {
+                    type: "MultiplicativeExpression",
+                    operator: "*",
+                    children: []
+                }
+                node.children.push(source.shift());
+                node.children.push(source.shift());
+                node.children.push(source.shift());
+                source.unshift(node);
+                return MultiplicativeExpression(source);
+            }
+            if (source[0].type === "MultiplicativeExpression" && source[1] && source[1].type === "/") {
+                let node = {
+                    type: "MultiplicativeExpression",
+                    operator: "/",
+                    children: []
+                }
+                node.children.push(source.shift());
+                node.children.push(source.shift());
+                node.children.push(source.shift());
+                source.unshift(node);
+                return MultiplicativeExpression(source);
+            }
+            if (source[0].type === "MultiplicativeExpression")
+                return source[0];
+
+            return MultiplicativeExpression(source);
+        };
+
+        // 把token变成抽象语法树
+        debugger
+        var ast = Expression(source);
+        // Expression -> AdditiveExpression -> A处：MultiplicativeExpression -
+        // B处：满足Number - 外面包裹一层MultiplicativeExpression -
+        // MultiplicativeExpression - 满足source[0].type === "MultiplicativeExpression" - 
+        // return回B处 - 回A处（这个返回值没用） - AdditiveExpression - 满足source[0].type === "MultiplicativeExpression" - 
+        // 外面包裹一层AdditiveExpression - AdditiveExpression
+
+        // source[0] -> {"type":"MultiplicativeExpression","children":[{"type":"Number","value":"1024"}]}
+        // {"type":"AdditiveExpression","children":[{"type":"MultiplicativeExpression","children":[{"type":"Number","value":"1024"}]}]}
+
+        console.log('ast', JSON.stringify(ast));
+
+        /*
+        {
+            "type":"Expression",
+            "children": [
+                {
+                    "type":"AdditiveExpression",
+                    "operator":"+",
+                    "children":[
+                        {
+                            "type":"AdditiveExpression",
+                            "children":[
+                                {
+                                    "type":"MultiplicativeExpression",
+                                    "children":[
+                                        {
+                                            "type":"Number",
+                                            "value":"1024"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type":"+",
+                            "value":"+"
+                        },
+                        {
+                            "type":"MultiplicativeExpression",
+                            "operator":"*",
+                            "children":[
+                                {
+                                    "type":"MultiplicativeExpression",
+                                    "children":[
+                                        {
+                                            "type":"Number",
+                                            "value":"2"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type":"*",
+                                    "value":"*"
+                                },
+                                {
+                                    "type":"Number",
+                                    "value":"256"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type":"EOF"
+                }
+            ]
+        }
+        */
+
+        const astDemo = {
+            "type": "Expression",
+            "children": [
+                {
+                    "type": "AdditiveExpression",
+                    "operator": "+",
+                    "children": [
+                        {
+                            "type": "AdditiveExpression",
+                            "children": [
+                                {
+                                    "type": "MultiplicativeExpression",
+                                    "children": [
+                                        {
+                                            "type": "Number",
+                                            "value": "1024"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "+",
+                            "value": "+"
+                        },
+                        {
+                            "type": "MultiplicativeExpression",
+                            "operator": "*",
+                            "children": [
+                                {
+                                    "type": "MultiplicativeExpression",
+                                    "children": [
+                                        {
+                                            "type": "Number",
+                                            "value": "2"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "*",
+                                    "value": "*"
+                                },
+                                // 为什么这里的Number外面不用嵌套？
+                                /*
+                                因为它是紧跟在乘号之后，在处理乘号逻辑时会把乘号前后都shift到同一个node里
+                                1+2*3-4
+                                开始处理
+                                1 -> 包在node里
+                                1+ -> 遇到加号会调下面函数，把1和加号push到node里，后面的2*3-4作为参数调用
+                                2 -> 包在node里
+                                2* -> 遇到乘号，把乘号前后一起放进node，[2, *, 3]
+                                因为3被直接放进去了，所以没有嵌套
+                                这是2*3被揉在一起后，后面紧接的是减号，所以直接走到return source[0];
+                                然后继续走AdditiveExpression下面逻辑，即把减号前面所有又揉成一个，如x，然后x-4继续走逻辑AdditiveExpression
+                                走到减号逻辑里，把x和-都shift掉，留下4，然后调用MultiplicativeExpression被包裹，递归一次走到return source[0]
+                                此时
+                                MultiplicativeExpression(source);
+                                node.children.push(source.shift());
+                                source.unshift(node);
+                                return AdditiveExpression(source);
+                                中第一步结束，继续把1+2*3-4揉在一起，调用AdditiveExpression
+                                这次会走到return source[0]，即结束AdditiveExpression调用
+                                Expression函数会继续走，执行return Expression(source)递归
+                                这时如果最后一个type是EOF，会结束Expression调用，得到最终ast
+                                */
+                                {
+                                    "type": "Number",
+                                    "value": "256"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "EOF"
+                }
+            ]
+        }
+
+        console.log('evaluate(ast)', evaluate(ast))
+
+        function evaluate(node) { // 遍历ast，解析执行获得结果
+            if (node.type === "Expression") {
+                return evaluate(node.children[0])
+            }
+            if (node.type === "AdditiveExpression") {
+                if (node.operator === '-') {
+                    return evaluate(node.children[0]) - evaluate(node.children[2]);
+                }
+                if (node.operator === '+') {
+                    return evaluate(node.children[0]) + evaluate(node.children[2]);
+                }
+                return evaluate(node.children[0])
+            }
+            if (node.type === "MultiplicativeExpression") {
+                if (node.operator === '*') {
+                    return evaluate(node.children[0]) * evaluate(node.children[2]);
+                }
+                if (node.operator === '/') {
+                    return evaluate(node.children[0]) / evaluate(node.children[2]);
+                }
+                return evaluate(node.children[0])
+            }
+            if (node.type === "Number") {
+                return Number(node.value);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

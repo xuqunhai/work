@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style></style>
+</head>
+<body>
+    <div id="app">
+        <rx-chart :datasets="datasets" :labels="labels" :width="width" :height="height"></rx-chart>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/1.0.15/vue.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script>
+        Vue.component('rx-chart',{
+            template: '<canvas class="vchart" v-el:chart-canvas :width="width" :height="height"></canvas>',
+            methods: {
+                parseCommonOptions(options){
+                    if(this.responsive!==null){
+                        options.responsive = this.responsive
+                    }
+                    if(this.legend!==null){
+                        options.legend = this.legend
+                    }
+                    return options
+                }
+            },
+            computed: {
+                chartData(){
+                    return {
+                        labels: this.labels,
+                        datasets: this.datasets
+                    }
+                },
+                chartOptions(){
+                    let options = {}
+                    options = this.parseCommonOptions(options)
+                    if(this.parseCommonOptions){
+                        options = this.parseCommonOptions(options)
+                    }
+                    return Object.assign(this.options,options)
+                }
+            },
+            watch: {
+                datasets: {
+                    handler(val,oldVal){
+                        this.chartInstance.data.datasets = val
+                        this.chartInstance.update()
+                    }
+                }
+            },
+            data(){
+                return {
+                    chartInstance: null
+                }
+            },
+            ready(){
+                const chartCanvas = this.$els.chartCanvas
+                const ctx = chartCanvas.getContext('2d')
+                this.chartInstance = new Chart(ctx, {
+                    type: this.chartType,
+                    data: this.chartData,
+                    options: this.chartOptions
+                })
+            },
+            props: {
+                chartType: {
+                    type: String,
+                    default: 'line'
+                },
+                width: {
+                    type: Number
+                },
+                height: {
+                    type: Number
+                },
+                labels: {
+                    type: Array,
+                    validator(value){
+                        return value.every(label=>typeof label==='string')
+                    },
+                    default(){return []}
+                },
+                datasets: {
+                    type: Array,
+                    validator(value){
+                        return value.every(series=>{
+                            return Array.isArray(series.data)&&series.data.every(val=>{
+                                return typeof val==='number'
+                            })
+                        })
+                    },
+                    coerce(val){
+                        return JSON.parse(JSON.stringify(val))
+                    },
+                    default(){return []}
+                },
+                options: {
+                    type: Object,
+                    default(){return {}}
+                },
+                responsive: {
+                    type: Boolean,
+                    default: null
+                },
+                legend: {
+                    coerce(val){
+                        if(typeof val==='boolean'){
+                            return {display: val}
+                        }
+                    },
+                    default: null
+                }
+                
+            }
+        })
+        new Vue({
+            el: '#app',
+            data: {
+                width: 500,
+                height: 200,
+                labels: ['1day','2day'],
+                datasets: [
+                    {
+                        label: '1',
+                        data: [20,30,40,50]
+                    },
+                    {
+                        label: '2',
+                        data: [80,60,10,60]
+                    }
+                ]
+            },
+            methods: {
+                
+            },
+            computed: {
+                
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

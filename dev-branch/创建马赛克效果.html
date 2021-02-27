@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500"></canvas>
+  <script>
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var imageData = ctx.createImageData(500,500);
+    var pixels = imageData.data;
+    var numTileRows = 10;
+    var numTileCols = 10;
+    // 每一块的宽高，注意宽高需要是整数
+    var tileWidth = imageData.width/numTileCols;
+    var tileHeight = imageData.height/numTileRows;
+    // 循环每一块
+    for(var r=0;r<numTileCols;r++){
+      for(var c=0;c<numTileRows;c++){
+        var red=Math.floor(Math.random()*255);
+        var green=Math.floor(Math.random()*255);
+        var blue=Math.floor(Math.random()*255);
+        // 对每一块循环每个像素
+        for(var tr=0;tr<tileHeight;tr++){
+          for(var tc=0;tc<tileWidth;tc++){
+            // 当前像素在第几排、第几列的块里的第几个
+            var trueX = (c*tileWidth)+tc;
+            var trueY = (r*tileHeight)+tr;
+            // 当前像素点对应颜色数组里的第几个
+            // 如第二排第三个像素计算
+            // 每一排像素有imageData.width个，所以颜色值有imageData.width*4
+            // trueY是从0开始，前面有trueY排，就乘以trueY
+            // trueX是从0开始，同一排里前面有trueX个，就乘以trueX
+            var pos=(trueY*(imageData.width*4))+(trueX*4);
+            pixels[pos]=red;
+            pixels[pos+1]=green;
+            pixels[pos+2]=blue;
+            pixels[pos+3]=255;
+          }
+        }
+      }
+    }
+    ctx.putImageData(imageData,0,0);
+  </script>
+</body>
+</html>

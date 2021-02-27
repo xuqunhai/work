@@ -1,0 +1,35 @@
+单纯的从性能上讲，map和forEach方法是远远落后for语句的。
+
+for语句在js刚出来的时候，就已经存在了，
+而map和forEach这两个方法都是ES5时出来的，前者为语句，后者为方法。
+
+既然map和forEach性能没有for好，那么为什么在ES5时，设计出这两个方法？
+答案是作用域保存数据的问题。
+所以，很多时候，用forEach来实现循环，会更方便一点，但性能确实比for语句差很多。
+
+map方法和forEach方法类似，都是对数组进行循环，数组中每一个成员，都被其回调函数处理一次。区别在于map有返回值，而forEach没有返回值。
+var arr = [1,2,3,4,5];
+var r = arr.map( (v, i)=>{
+  return v*2;
+} );
+console.log(r); // [2,4,6,8,10]
+如果在上文代码中，将map换为forEach，那么r的结果就是undefined，其他没区别，所以性能上map稍落后于forEach。
+
+
+
+js代码优化
+案例一：
+代码1：
+var arr = [“a”, “b”, “c”];
+for( var i=0; i<arr.length; i++ ){
+  console.log( arr[i] );
+}
+（上面的代码用了3个var，这3个var如果合并成1个，那么性能会更好。）
+优化后
+var arr = [“a”, “b”, “c”], i=0, len=arr.length;
+for( ; i<len; i++ ){
+  console.log( arr[i] );
+}
+总结：
+1， 对于反复需要获取某一个属性时，我们提前用一个变量接收，比如len=arr.length；
+2， 能够合并的代码，可以做合并操作，比如 var 声明多个变量；

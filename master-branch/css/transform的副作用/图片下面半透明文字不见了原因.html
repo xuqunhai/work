@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .box {
+            width: 256px;
+            height: 191px;
+            position: relative;
+        }
+
+        .text {
+            line-height: 30px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, .5);
+            color: #fff;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .fade {
+            -webkit-animation: fadeIn 2s 2s infinite;
+            animation: fadeIn 2s 2s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <span class="text">快播的辩词再精彩 也不配赢得掌声</span>
+        <img class="fade" style="width:256px;height:191px;" src="../img/1.jpg">
+    </div>
+    <h1>上面文字不见的原因是：fadeIn动画本质是opacity透明度的变化，opacity的值不是1的时候，是具有层叠上下文的</h1>
+    <h2>于是，当CSS3动画只要不是最终一瞬间的opacity: 1，位于DOM流后面的图片就会遵循“后来居上”准则，覆盖文字。</h2>
+    <hr>
+    <h2>想要解决这个问题</h2>
+    <h3>1. 调整DOM流的先后顺序；</h3>
+    <div class="box">
+        <img class="fade" style="width:256px;height:191px;" src="../img/1.jpg">
+        <span class="text">快播的辩词再精彩 也不配赢得掌声</span>
+    </div>
+    <hr>
+    <h3>2. 提高文字的层叠顺序，例如，设置z-index:1;</h3>
+    <div class="box">
+        <span class="text" style="z-index: 1;">快播的辩词再精彩 也不配赢得掌声</span>
+        <img class="fade" style="width:256px;height:191px;" src="../img/1.jpg">
+    </div>
+</body>
+
+</html>

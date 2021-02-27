@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+
+  var dateElement = document.getElementById("date");
+  var today = new Date();  //Mon May 01 2017 22:03:44 GMT+0800 (CST)
+  var utcDate = today.toUTCString();  //"Mon, 01 May 2017 14:25:30 GMT"
+  //两个日期差别：1、时区设定不同，2、UTC字符串中的星期几后跟着一个逗号；
+  dateElement.innerHTML = "<p>local datetime: "+today+"UTC datetime: "+utcDate+"</p>";
+
+</script>
+</body>
+</html>

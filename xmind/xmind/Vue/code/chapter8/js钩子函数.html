@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        /* .expand-transition{
+            transition: all .3s ease;
+            height: 30px;
+            padding: 10px;
+            background-color: #eee;
+            overflow: hidden;
+        }
+        .expand-enter, .expand-leave{
+            height: 0;
+            padding: 0 10px;
+            opacity: 0;
+        } */
+    </style>
+</head>
+<body>
+    <div id="app">
+        <button @click="toggle">toggle</button>
+        <div v-if="show" :transition="transitionName">hello</div>
+        
+    </div>
+    <script src="https://cdn.bootcss.com/vue/1.0.15/vue.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+    <script>
+        Vue.transition('expand',{
+            beforeEnter(el){
+                el.textContent = 'beforeEnter'
+                console.log('beforeEnter')
+            },
+            enter(el){
+                el.textContent = 'enter'
+                console.log('enter')
+            },
+            afterEnter(el){
+                el.textContent = 'afterEnter'
+                console.log('afterEnter')
+            },
+            enterCancelled(el){
+                el.textContent = 'enterCancelled'
+                console.log('enterCancelled')
+            },
+            beforeLeave(el){
+                el.textContent = 'beforeLeave'
+                console.log('beforeLeave')
+            },
+            leave(el){
+                el.textContent = 'leave'
+                console.log('leave')
+            },
+            afterLeave(el){
+                el.textContent = 'afterLeave'
+                console.log('afterLeave')
+            },
+            leaveCancelled(el){
+                el.textContent = 'leaveCancelled'
+                console.log('leaveCancelled')
+            }
+        })
+        new Vue({
+            el: '#app',
+            data: {
+                show: true,
+                transitionName: 'expand'
+            },
+            methods: { 
+                toggle(){
+                    this.show = !this.show;
+                }
+            },
+            computed: {
+                
+            },
+            components: {
+
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

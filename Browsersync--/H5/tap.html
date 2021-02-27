@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+//  分解单击事件
+//在 touchstart 发生时进入单击检测，只有一个接触点。因为单击事件限制为一个手指的动作。
+//x<10 && y<10
+//没有发生 touchmove 事件或者 touchmove 在一个很小的范围(如下图)。限制 touchmove 在一个很小范围，是为了给用户一定的冗余空间，因为不能保证用户手指在接触屏幕的时候不发生轻微的位移。
+//t2 - t1 < 500ms
+//touchend 发生在 touchstart后的很短时间内(如下图)。这个时间段的阈值是毫秒级，用来限制手指和屏幕接触的时间。因为单击事件从开始到结束是很快的。
+
+  function _getTime(){
+    return new Date().getTime();
+  }
+  function _onTouchStart(e) {
+    //记录touch开始的位置
+    this.startX = e.touches[0].pageX;
+
+
+
+    this.startY = e.touches[0].pageY;
+
+
+
+    if(e.touches.length > 1) {
+
+      //多点监测
+
+
+    }else {
+
+
+
+      //记录touch开始的时间
+
+
+
+    this.startTime = this._getTime();
+
+
+
+  }
+
+
+
+  }
+
+
+
+  function _onTouchMove(e) {
+
+
+
+
+
+
+    //记录手指移动的位置
+
+
+
+    this.moveX = e.touches[0].pageX;
+
+
+
+    this.moveY = e.touches[0].pageY;
+
+
+
+
+
+
+  }
+
+
+
+  function _onTouchEnd(e) {
+
+
+
+    let timestamp = this._getTime();
+
+
+
+    if(this.moveX !== null && Math.abs(this.moveX - this.startX) > 10 && this.moveY !== null && Math.abs(this.moveY - this.startY) > 10) {
+
+
+
+
+
+
+    } else {
+
+
+
+      //手指移动的位移要小于10像素并且手指和屏幕的接触时间要短语500毫秒
+
+
+
+    if(timestamp - this.startTime < 500){
+      this._emitEvent('onTap')
+    }
+
+
+
+    }
+
+
+
+
+
+
+
+  }
+
+</script>
+</body>
+</html>

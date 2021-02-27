@@ -1,0 +1,2 @@
+node_module
+通过npm install 自己下载吧，内容太多了，不好传啊兄弟

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style></style>
+</head>
+<body>
+    <div id="app">
+        <b>inline-template</b>
+        <my-item v-for="item in items" :item="item" inline-template>
+            <p>{{a}} , {{item.text}}</p>
+        </my-item>
+        <b>no-inline-template</b>
+        <my-item v-for="item in items" :item="item">
+            {{a}} , {{items[0].text}}
+        </my-item>
+    </div>
+    <!-- <script src="https://cdn.bootcss.com/vue/1.0.15/vue.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script>
+        var items = [
+            {number: 1, text: 'one'},
+            {number: 2, text: 'two'}
+        ]
+        new Vue({
+            el: '#app',
+            data: {
+                items: items,
+                a: 'I am in parent'
+            },
+            methods: {
+            },
+            computed: {
+                
+            },
+            components: {
+                'my-item': {
+                    props: ['item'],
+                    data: function(){
+                        return {
+                            a: 'I am child'
+                        }
+                    },
+                    template: '<p>item 模版: {{a}}, {{item.text}}; slot: <slot></slot></p>'
+                }
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

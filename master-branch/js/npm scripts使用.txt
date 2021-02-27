@@ -1,0 +1,127 @@
+package.json文件里面，
+{
+  // ...
+  "scripts": {
+    "build": "node build.js"
+  }
+}
+里面的scripts字段是一个对象。它的每一个属性，对应一段脚本。比如，build命令对应的脚本是node build.js。
+
+查看当前项目的所有 npm 脚本命令，可以使用不带任何参数的npm run命令。
+$ npm run
+
+
+npm 脚本的原理
+每当执行npm run，就会自动新建一个 Shell，在这个 Shell 里面执行指定的脚本命令。
+npm run新建的这个 Shell，会将当前目录的node_modules/.bin子目录加入PATH变量，执行结束后，再将PATH变量恢复原样。
+这意味着，当前目录的node_modules/.bin子目录里面的所有脚本，都可以直接用脚本名调用，而不必加上路径。
+test": "mocha test" => "test": "./node_modules/.bin/mocha test"
+
+向 npm 脚本传入参数，要使用--标明。
+
+如果是并行执行（即同时的平行执行），可以使用&符号。
+$ npm run script1.js & npm run script2.js
+如果是继发执行（即只有前一个任务成功，才执行下一个任务），可以使用&&符号。
+$ npm run script1.js && npm run script2.js
+
+npm 对两个脚本提供了默认值。也就是说，这两个脚本不用定义，就可以直接使用。
+"start": "node server.js"， 前提是项目根目录下有server.js这个脚本；
+"install": "node-gyp rebuild" 前提是项目根目录下有binding.gyp文件。
+
+
+npm 脚本有pre和post两个钩子。
+用户执行npm run build的时候，会自动按照下面的顺序执行。
+npm run prebuild && npm run build && npm run postbuild
+可以在这两个钩子里面，完成一些准备工作和清理工作:
+"clean": "rimraf ./dist && mkdir dist",
+"prebuild": "npm run clean",
+"build": "cross-env NODE_ENV=production webpack"
+
+自定义的脚本命令也可以加上pre和post钩子。比如，myscript这个脚本命令，也有premyscript和postmyscript钩子。
+
+
+npm 提供一个npm_lifecycle_event变量，返回当前正在运行的脚本名称，比如pretest、test、posttest等等。
+
+const TARGET = process.env.npm_lifecycle_event;
+if (TARGET === 'test') {
+  console.log(`Running the test task!`);
+}
+if (TARGET === 'pretest') {
+  console.log(`Running the pretest task!`);
+}
+if (TARGET === 'posttest') {
+  console.log(`Running the posttest task!`);
+}
+
+注意，prepublish这个钩子不仅会在npm publish命令之前运行，还会在npm install（不带任何参数）命令之前运行。这种行为很容易让用户感到困惑，所以 npm 4 引入了一个新的钩子prepare，行为等同于prepublish，而从 npm 5 开始，prepublish将只在npm publish命令之前运行。
+
+
+四个常用的 npm 脚本有简写形式。
+npm start是npm run start
+npm stop是npm run stop的简写
+npm test是npm run test的简写
+npm restart是npm run stop && npm run restart && npm run start的简写
+
+
+npm 脚本通过npm_package_前缀可以拿到package.json里面的字段。
+下面是一个package.json:
+{
+  "name": "foo", 
+  "version": "1.2.5",
+  "scripts": {
+    "view": "node view.js"
+  }
+}
+那么，变量npm_package_name返回foo，变量npm_package_version返回1.2.5。
+// view.js
+console.log(process.env.npm_package_name); // foo
+console.log(process.env.npm_package_version); // 1.2.5
+
+npm_package_前缀也支持嵌套的package.json字段。
+"repository": {
+  "type": "git",
+  "url": "xxx"
+},
+repository字段的type属性，可以通过npm_package_repository_type取到。
+
+注意，package.json里面的config对象，可以被环境变量覆盖。
+{ 
+  "name" : "foo",
+  "config" : { "port" : "8080" },
+  "scripts" : { "start" : "node server.js" }
+}
+npm_package_config_port变量返回的是8080。这个值可以用下面的方法覆盖。
+$ npm config set foo:port 80
+
+env命令可以列出所有环境变量。
+"env": "env"
+
+
+
+常用脚本示例
+// 删除目录
+"clean": "rimraf dist/*",
+
+// 本地搭建一个 HTTP 服务
+"serve": "http-server -p 9090 dist/",
+
+// 打开浏览器
+"open:dev": "opener http://localhost:9090",
+
+// 实时刷新
+ "livereload": "live-reload --port 9091 dist/",
+
+// 构建 HTML 文件
+"build:html": "jade index.jade > dist/index.html",
+
+// 只要 CSS 文件有变动，就重新执行构建
+"watch:css": "watch 'npm run build:css' assets/styles/",
+
+// 只要 HTML 文件有变动，就重新执行构建
+"watch:html": "watch 'npm run build:html' assets/html",
+
+// 部署到 Amazon S3
+"deploy:prod": "s3-cli sync ./dist/ s3://example-com/prod-site/",
+
+// 构建 favicon
+"build:favicon": "node scripts/favicon.js",

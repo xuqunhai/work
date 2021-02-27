@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // DOM作用： 操作HTML
+        // 实现方式： JS
+        // 浏览器底层却把DOM和JS独立实现，使得能被其他语言或技术共享，但导致它们之间必须通过昂贵的桥进行连接
+        // 尽可能减少过桥数，努力待在JS岛屿上
+
+        /*
+                DOM(渲染引擎)           JS
+        IE       Trident            JScript
+      Safari   WebKit WebCore     JavScriptCOre
+      Chrome   WebKit WebCore          V8
+      Firefox     Gecko            TraceMonkey
+
+        */
+
+        function innerHTMLLoop() {
+            for (var count = 0; count < 15000; count++) {
+                document.getElementById('here').innerHTML += 'a';
+            }
+        }
+        /*
+        以上代码问题：
+        每次循环迭代，该元素都被访问两次，一次读取innerHTML属性值，另一次重写它
+        */
+
+        // 更高效率方法：局部变量存储修改中的内容，把运算尽量留在ECMAScript端处理，在循环结束后一次性写入
+        function innerHTMLLoop2() {
+            var content = '';
+            for (var count = 0; count < 15000; count++) {
+                content += 'a';
+            }
+            document.getElementById('here').innerHTML += content;
+        }
+    </script>
+</body>
+
+</html>

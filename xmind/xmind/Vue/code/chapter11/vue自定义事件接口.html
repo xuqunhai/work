@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style></style>
+</head>
+<body>
+    <template id="child">
+        <input type="text" v-model="msg">
+        <button @click="notify">Dispatch Event</button>
+    </template>
+    <div id="app">
+        <p>Messages: {{messages | json}}</p>
+        <child></child>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/1.0.15/vue.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+    <script>
+        Vue.component('child',{
+            template: '#child',
+            data: function(){
+                return {msg: 'hello'}
+            },
+            methods: {
+                notify: function(){
+                    if(this.msg.trim()){
+                        this.$dispatch('child-msg',this.msg);
+                        this.msg = ''
+                    }
+                }
+            }
+        })
+        new Vue({
+            el: '#app',
+            data: {
+                messages: []
+            },
+            events: {
+                'child-msg': function(msg){
+                    this.messages.push(msg)
+                }
+            },
+            methods: {
+                
+            },
+            computed: {
+                
+            },
+            components: {
+
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

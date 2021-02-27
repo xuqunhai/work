@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+
+  var dtElem = document.getElementById("date");
+  var dt = new Date();  //Mon May 01 2017 22:03:44 GMT+0800 (CST)
+  dtElem.innerHTML = "<p>" + dt + "</p>";
+
+  var dt = new Date();
+  var month = dt.getMonth();
+  month++;
+  var day = dt.getDate();
+  var yr = dt.getFullYear();
+  dtElem.innerHTML = "<p>"+month+"/"+day+"/"+yr+"</p>";  // 10/1/2009
+
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var month = dt.getMonth();
+  var monthString = months[month];
+
+</script>
+</body>
+</html>

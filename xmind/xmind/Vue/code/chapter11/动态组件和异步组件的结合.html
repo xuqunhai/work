@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style></style>
+</head>
+<body>
+    <div id="app">
+        <input type="radio" id="one" value="fast" v-model="currentView">
+        <label for="one">fast</label>
+        <br>
+        <input type="radio" id="two" value="bus" v-model="currentView">
+        <label for="two">bus</label>
+        <br>
+        <input type="radio" id="three" value="business" v-model="currentView">
+        <label for="three">business</label>
+        <br>
+        <template id="business">
+            <div>{{msg}}滴滴专车</div>
+        </template>
+        <template id="fast">
+            <div>{{msg}}滴滴快车</div>
+        </template>
+        <component :is="currentView" :msg="hello"></component>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/1.0.15/vue.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script> -->
+    <script>
+        var bus = Vue.component('bus',function(resolve, reject){
+            setTimeout(function(){
+                resolve({
+                    props: ['msg'],
+                    template: '<div @click="show">{{msg}} 滴滴巴士</div>',
+                    data: function(){
+                        return {}
+                    },
+                    methods: {
+                        show: function(){
+                            alert('haha')
+                        }
+                    }
+                })
+            },100)
+        })
+        var business = Vue.extend({
+            props: ['msg'],
+            template: '#business',
+            replace: true
+        })
+        var fast = Vue.extend({
+            props: ['msg'],
+            template: '#fast',
+            replace: true
+        })
+        new Vue({
+            el: '#app',
+            data: {
+                currentView: 'fast',
+                hello: 'hi'
+            },
+            methods: {
+                
+            },
+            computed: {
+                
+            },
+            components: {
+                fast: fast,
+                bus: bus,
+                business: business
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

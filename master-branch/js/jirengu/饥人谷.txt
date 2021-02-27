@@ -1,0 +1,349 @@
+动画库 https://easings.net/
+圈点 https://www.yinxiang.com/skitch/
+数据库操作leancloud https://leancloud.cn/dashboard/applist.html#/apps raferxu Xu123456
+高亮插件 prismjs.com
+markdown变成html - marked.js
+
+console.dir(document.body);
+
+delete是把key和value都删除了；
+
+每次开机都会把存在硬盘中的操作系统读取到内存里，因为内存读取速度更快；但是电脑关机后内存数据就会被清除；
+
+对象为什么在堆？
+因为对象后续可以随便增加属性，如果在栈中，每次新增属性都需要添加内存，而内存是需要连续的，所以会导致需要把后续的所有数据都往后移动，以腾出足够的内存给该对象放置新增的属性所需要的内存，这样都在栈中操作的话会很费时；
+所以解决方法就把对象存在堆中，栈中只保留该对象的固定值的引用地址，而堆的特性就是给对象新增属性不会影响到其他对象；
+
+***原理：点运算符“.“的优先级要高于”=“的优先级***
+var a={n:1};
+var b=a;
+a.x=a={n:2};
+a.x; // undefined
+b.x; // {n: 2}
+alert(b.x); // [object Object],alert会调研toString方法
+关键是在a.x=a={n:2};这一步的解析：
+一步一步解析如下：
+var a={n:1};
+// 这个会在堆中申请一个空间，放入对象{n:1},并且命名为如地址addr1,然后把地址addr1赋值给栈中的变量a；
+var b=a;
+// 在栈中申明一个变量b，把a的内容addr1复制一份给b，所以此时b的值为addr1，即指向堆中的地址addr1；
+a.x=a={n:2};
+// 执行这一步时，会先把赋值左边的表达式先解析，即优先确定a.x中的a为栈中的addr1这块内存，接着再执行赋值操作，a={n:2}会把另一个地址addr2赋值给a；最后执行a.x={n:2}，注意此时a.x中的a是解析时的a，即为addr1这块内存，而不是执行后的addr2；因为前面b=a，所以变相的此时a.x={n:2}操作的是b的这块内存；
+所以a.x为undefined，因为对a的实际操作的最后一步是a={n:2}，里面并没有x属性；
+b.x为{n: 2}，因为a和b原本共享一块地方，然后a换了一块新地方，并且对原本共享的地方进行share.x={n:2}这个操作，所以共享的地方有x属性，为{n:2};
+
+“.“运算符的优先级要高于”=“的优先级，所以这里的次序是： 创建了一个x属性，值为undefined，挂在a下。 a的指向被改变，指向了{n:2}。 刚才创建的x属性被赋值为{n:2} 但由于a的指向已经改变，不再指向原有的对象，所以a.x就为undefined。 
+
+
+
+内存图
+var fn=function(){}
+document.body.onclick=fn; // 引用同一个堆中的内存fff
+fn=null; // 改变fn的指向，不再指到堆中的内存fff
+document.body.onclick; // 但是它还是指向内存fff -> function(){}
+
+
+公有属性——原型
+所有对象都可以使用toString方法，因为它们可以通过原型链找到顶级的对象Object.prototype，它自身就有toString方法；
+不过有些对象的自身类型原型本身就有toString方法，所以该对象从自身类型原型取toString方法后就会继续往上一次找了；
+var n=new Number(1);
+n.__proto__===Number.prototype;
+n.__proto__.__protp__===Object.prototype;
+
+原型
+任何对象都有__proto__属性，它指向对应函数的prototype：
+对象.__proto__===函数.prototype;
+因为函数也是对象，所以
+Function.__proto__===Function.prototype;
+所有函数(Function,String,Number,Boolean)的原型都指向顶级Object.prototype;
+所以Function.prototype.__proto__===Object.prototype;
+
+
+修改commit注解：
+git commit --amend -v .
+
+鼠标hover有下拉菜单时，会出现下拉菜单宽度很小，这是因为浮动元素宽度一定会压缩到最小，而绝对定位元素宽度也是会压缩到最小，解决方法就是给li设置不换行；
+
+找下一个兄弟节点：
+一般不用nextElementSibling，因为兼容问题，都用：
+if(!("nextElementSibling" in document.documentElement)){
+  Object.defineProperty(Element.prototype, "nextElementSibling",{
+    get: function() {
+      var e=this.nextSibling;
+      while(e&&1!==e.nodeType){
+        e=e.nextSibling;
+      }
+      return e;
+    }
+  })
+}
+
+获取a标签href的值不能用a.href，因为它会自动加上协议，应该使用getAttribute，用户写什么他就能获取什么；
+getBoundingClientRect方法获取的是相对于视口的，而offsetTop获取的是相对于文档，
+js模拟锚点定位问题：
+let top = element.offsetTop;
+window.scrollTo(0, top-80); // window.scrollY指的是当前已经滚动的距离
+
+平滑滚动js动画
+tween插件
+function animate(time){
+  requestAnimationFrame(animate);
+  TWEEN.update(time);
+}
+requestAnimationFrame(animate);
+a.onClick=function(x){
+  x.preventDefault();
+  let a=x.currentTarget;
+  let href=a.getAttribute('href');
+  let elemtnt=document.querySelector(href);
+  let top=element.offsetTop;
+  let n=25;
+  let duration=500;
+  let currentTop=window.scrollY;
+  let targetTop=top-80;
+  /*
+  // 不加插件版本
+  let distance=(targetTop-currentTop)/n;
+  let i=0;
+  let id = setInterval(()=>{
+    if(i===n){
+      window.clearInterval(id)
+      return;
+    }
+    i=i+1;
+    window.scrollTo(0,currentTop+distance*i);
+  },duration)
+  */
+  let s=targetTop-currentTop;
+  let coords={y:currentTop};
+  let t=Math.abs((s/100)*300);
+  if(t>500){t=500}
+  let tween=new TWEEN.Tween(coords)
+    .to({y:targetTop},t)
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .onUpdate(function(){
+      window.scrollTo(0,coords.y)
+    })
+    .start()
+}
+
+滚动页面时对应锚点高亮：
+window.onscroll=function(){
+  if(window.scrollY>0){
+    topNavBar.classList.add('sticky')
+  }else{
+    topNavBar.classList.remove('sticky')
+  }
+  let minIndex=0;
+  for(let i=1;i<len;i++){
+    if(Math.abs(ele.offsetTop-window.scrollY)<Math.abs(minIndex.offsetTop-window.scrollY)){
+      minIndex=i;
+    }
+  }
+  xxx.classList.remove('active')
+  xxx[minIndex].classList.add('active')
+}
+
+element.parentNode.children
+
+Function和new Function的作用一样，它们最后一个参数都是字符串，会把该字符串当作代码执行；
+Function是全局对象，function是js关键字；
+var a=function b(){} // 这里的b全局访问不到，只能在函数b内部能访问；
+let a=()=>{}; // 当入参只有一个时左边括号可省略，当只有一句返回值，且不是对象时，右边中括号可以省略；
+
+函数的name属性：
+function f(){}
+f.name; // "f"
+var a=function(){}
+a.name; // "a"
+var b=function c(){}
+b.name; // "c"
+var e=new Function()
+e.name; // "anonymous"
+
+f=function(){
+ console.log(this)
+ console.log(this===window)
+}
+f(); // Window, true
+
+f=function(){
+  'use strict'
+ console.log(this)
+ console.log(this===window)
+}
+f(); // undefined, false
+
+f.call(this, arguments); // 这么设计是因为历史原因，这样写会类似java写法；有关new的用法也是一样的，要像java。。。
+
+arguments不是数组，因为它原型不指向Array.prototype;
+
+函数作用域是在定义时决定：
+var a=1;
+function f1(){
+ var a=2;
+ f2();
+}
+function f2(){
+ console.log(a)
+}
+f1(); // 1
+
+点击弹层消失：
+btn.addEventListener('click',function(){
+  dialog.show();
+  setTimeout(function(){
+    document.one('click',function(){
+      dialog.hide();
+    })
+  },0)
+})
+
+当前tab被切换时，默认该tab的定时器会‘偷懒’，也就是切换后一直都不执行，暂存起来，等切换回去的时候一次性展示，所以会出现很快执行的动画bug，解决方法：
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden){
+
+  }else{
+
+  }
+})
+
+无缝滚动
+......
+let $lastCopy=$img.eq($img.length-1).clone(true);
+$slides.append($firstCopy)
+$slides.prepend($lastCopy)
+$button.eq(0).on('click',function(){
+  if(current==2){
+    console.log('说明你是从最后一张到第一张');
+    $slides.css({transform 'translateX(-1600px)':})
+      .one('transitionend',function(){
+        $slides.hide()
+          .offset(); // 必须触发一次回流，不然直接先hide后show会直接show；
+        $slides.css({transform: 'translateX(-400px)'})
+          .show();
+      })
+  }else{
+    $slides.css({transform:'translateX(-400px)'})
+  }
+  current=0;
+})
+...
+
+
+DOM事件模型
+onclick等是DOM 0级；html的onclick相当于eval，这是和js的onclick是不一样的:
+<div id="div" onclick="do()">do</div> // 这里需要加(),onclick触发时会执行eval("do()")
+div.onclick=do; // 这里不加()，因为它需要等onclick触发后才调用；
+DOM 1级是W3C标准，所以把之前浏览器统一的都成为0级；
+当前最流行的是DOM 2级，包括addEventListener（队列）；
+注意通常都是先捕获后冒泡，但是目标对象不一样，针对目标对象，谁先写就先执行；
+
+
+创建img标签，赋值src后就会发请求，而创建script标签，赋值src后还需要append到body才会发请求；
+
+jsonp：
+let script = document.createElement('script');
+let functionName = 'raferxu'+parseInt(Math.random()*10000,10);
+window[functionName] = function(result){
+  if(result==='success'){
+    a.innerText = a.innerText-1;
+  }
+}
+script.src='xx/pay?callback='+functionName;
+document.body.appendChild(script);
+script.onload=function(e){
+  e.currentTarget.remove();
+  delete window[functionName];
+}
+jsonp为什么不能有post？
+因为jsonp是通过动态创建script实现的，而script标签只能用get请求；
+
+promise = function(fn){
+  ...
+  return {
+    then: function(fn){
+      return {
+        then...
+      }
+    }
+  }
+}
+
+jq如果后台返回请求头为application/json的话，会自动将后台返回的json字符串转成json；
+
+后台第一次返回一个Set-Cookie的响应头，后续请求时浏览器会带上Cookie；
+Cookie不能跨域，不能跨浏览器；
+
+Session是一个hash表（占内存），出现原因是Cookie可以被篡改，而如果Cookie设为手机号，然后通过手机号查找密码的话就会很危险，而Session做法是：维护一套手机号的映射，把随机数作为Cookie发送给用户，一个手机号对应固定随机数，这样因为用户只知道随机数，所以很难破解；
+
+8000000个汉字大小：8000000*16/1024/1024=122M
+清除localStorage只能手动清除，Mac浏览器按住cmd+shift+delete;
+
+curl -L http://xxx.com/1.js >> ./js/main.js
+
+服务器设置响应头Cache-Control,值为毫秒；
+它是Expires的升级版，Expires值为格林威治时间，如new Date().toGMTString();
+Etag是把响应通过md5函数后发送给浏览器，下次浏览器请求时，服务器获取请求头If-None-Match，然后和响应进行md5后进行对比，一致的话返回304；
+
+http-server -c-1
+
+sass和scss都是ruby发明的，但是scss兼容css，而sass是没有大括号和分号的，所以只在ruby中使用，css只使用scss；
+sass demo:
+body
+  p
+    color: red
+scss demo:
+body {
+  p {
+    color: red;
+  }
+}
+
+
+webpack
+全局安装
+which http-server
+/usr/local/bin/http-server
+
+./node_modules/.bin/http-server -c-1
+每次都需要输入上一行，太麻烦，所以有了npx：
+npx http-server -c-1
+
+git remote set-url origin git@github.com:Raferxu/test.git
+git push -u origin master
+
+
+axios模拟mock（无需服务器）
+axios.interceptors.response.use(function(response){
+  let config=response.config;
+  let {method,url,data}=config;
+  if(url==='/books/1' && method==='get'){
+    response.data={
+      "name": "raferxu"
+    }
+  }
+  return response;
+})
+axios.get('/books/1').then((response)=>{
+  console.log(response);
+})
+
+let config=response.config;
+let {method,url,data}=config;
+上面两行等价于：
+let {config: {method,url,data}}=response;
+
+
+MVC
+view（el、template、render定义）
+model（定义ajax、update、data初始化）
+controller（调用view.render，事件绑定、调用model.ajax然后再次调用view.render）
+
+
+encodeURI和encodeURIComponent区别：
+http://a.com?key=http://b.com?x=1&y=2
+上一行网站有个歧义，参数y到底是a网站还是b网站的？
+         encodeURI方法不会对下列字符编码 ASCII字母、数字、~!@#$&*()=:/,;?+'
+encodeURIComponent方法不会对下列字符编码 ASCII字母、数字、~!*()'
+也就是encodeURIComponent编码的范围更广，会将http://XXX中的//也编码，会导致URL不可用。

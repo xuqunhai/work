@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box {
+            position: absolute;
+            top: 300px;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+    </style>
+</head>
+
+<body style="height: 1999px;">
+    <div id="box"></div>
+    <script>
+        const winH = document.documentElement.clientHeight;
+        const boxH = box.offsetHeight;
+        window.onscroll = function () {
+            let scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+            let boxTop = (winH - boxH) / 2 + scrollTop // 这里有除以2，所以可能会有小数点
+            // move(boxTop + 0.5) // 模拟有小数点情况，此时如target为1.5，那么最后会在0和1之间循环跳动，解决方法就是parseInt一下
+            move(parseInt(boxTop))
+        }
+        let timer = null
+        function move(target) {
+            clearInterval(timer)
+            timer = setInterval(() => {
+                let speed = (target - box.offsetTop) / 8
+                // 10+0.5=10.5 -》 10 和没加一样，所以需要把0.5进成1 -》 11
+                // -10-0.5=-10.5 -》 -10 和没减一样，所以需要把-0.5变成-1 -》-11
+                // 加法时向上取整，减法时向下取整
+                speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed)
+                if (target === box.offsetTop) {
+                    clearInterval(timer)
+                } else {
+                    box.style.top = box.offsetTop + speed + 'px'
+                }
+                document.title = `${target}, ${box.style.top}`
+            }, 16)
+        }
+    </script>
+</body>
+
+</html>

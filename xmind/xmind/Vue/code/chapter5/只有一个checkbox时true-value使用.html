@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style></style>
+</head>
+<body>
+    <div id="app">
+        <input type="checkbox" v-model="toggle" :true-value="a" :false-value="b">
+        <div>{{toggle}}</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                toggle: 'init',
+                a: 'james',
+                b: 'kevin'
+            },
+            methods: {
+                
+            },
+            computed: {
+                
+            },
+            components: {
+
+            },
+            created () {
+                
+            },
+            mounted(){
+                
+            }
+        })
+    </script>
+</body>
+</html>

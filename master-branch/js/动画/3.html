@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrap {
+            position: relative;
+            height: 300px;
+        }
+
+        #rect1 {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            background: red;
+        }
+
+        #p1 {
+            position: absolute;
+            left: 500px;
+            top: 0;
+            height: 300px;
+            width: 1px;
+            background: black;
+        }
+
+        #p2 {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 300px;
+            width: 1px;
+            background: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <p id="p2"></p>
+        <button id="btn1">running</button>
+        <button id="btn2">running back</button>
+        <div id="rect1"></div>
+        <p id="p1"></p>
+    </div>
+
+    <script>
+        let timer = null
+        let speed = 50
+        const target = 500
+        // btn1.onclick = doing3.bind(null, 500, 500)
+        btn1.onclick = doing4.bind(null, 500, 500)
+        function doing1(target) {
+            clearInterval(timer)
+            clearInterval(timer2)
+            timer = setInterval(() => {
+                const l = rect1.offsetLeft
+                if (l === target) {
+                    clearInterval(timer)
+                } else {
+                    rect1.style.left = Math.ceil(l + speed) + 'px'
+                    speed = (target - l) / 10
+                }
+                document.title = `${rect1.style.left}, ${speed}`
+            }, 16)
+        }
+        const target2 = 0
+        let speed2 = -50
+        let timer2 = null
+        btn2.onclick = doing4.bind(null, target2, speed2)
+        function doing2(target2) {
+            clearInterval(timer)
+            clearInterval(timer2)
+            timer2 = setInterval(() => {
+                const l = rect1.offsetLeft
+                if (l === target2) {
+                    clearInterval(timer2)
+                } else {
+                    rect1.style.left = Math.floor(l + speed2) + 'px'
+                    speed2 = (target2 - l) / 10
+                }
+                document.title = `${rect1.style.left}, ${speed2}`
+            }, 16)
+        }
+
+        let timer3 = null
+        function doing3(target3, speed3) {
+            clearInterval(timer3)
+            timer3 = setInterval(() => {
+                const l = rect1.offsetLeft
+                if (l === target3) {
+                    clearInterval(timer3)
+                } else {
+                    rect1.style.left = (speed3 > 0 ? Math.ceil(l + speed3) : Math.floor(l + speed3)) + 'px'
+                    speed3 = (target3 - l) / 10
+                }
+                document.title = `${rect1.style.left}, ${speed3}`
+            }, 16)
+        }
+
+        function doing4(target3, speed3) { // better
+            clearInterval(timer3)
+            timer3 = setInterval(() => {
+                let speed3 = (target3 - rect1.offsetLeft) / 10
+                speed3 = (speed3 > 0 ? Math.ceil(speed3) : Math.floor(speed3))
+                const l = rect1.offsetLeft
+                if (l === target3) {
+                    clearInterval(timer3)
+                } else {
+                    rect1.style.left = l + speed3 + 'px'
+                }
+                document.title = `${rect1.style.left}, ${speed3}`
+            }, 16)
+        }
+
+        /*
+        3不好地方，一开始速度为传入值，后面才等于根据距离等分，坏处就是
+        1、如果speed一开始很大或很小，那第一次speed和第二次根据距离等分得到的speed会有不可预知的差值
+        2、如果一开始speed大于等于距离，那就是秒到
+        所以用4，因为4的speed始终都是根据距离等分等到的
+        */
+    </script>
+</body>
+
+</html>
