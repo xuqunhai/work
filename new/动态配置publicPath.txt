@@ -1,0 +1,43 @@
+常规配置
+// webpack.config.js
+module.exports = {
+  entry: './main.js',
+    output: {
+      path: './build', // This is where images AND js will go
+      publicPath: 'https://mysite.com/', // This is used to generate URLs to e.g. images
+      filename: 'bundle.js',
+      library: 'myApp',
+      libraryTarget: 'umd' //loaded via commonjs, amd or globally
+  },
+  module: {
+    loaders: [
+      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }, // inline base64 URLs for <=8k images, direct URLs for the rest
+      { test: /\.css$/, loader: 'style-loader!css-loader' }, // loader for css, imgs will be loaded
+      { test: /\.html$/, loader: 'html-loader' } // loader for html, imgs src attrs will be loaded
+    ]
+  }
+};
+
+小于8k的会转成base64打包进bundle.js里面，其他会请求output.publicPath + image.
+如 https://mysite.com/myBigImg.jpg
+
+但是如果另一个网址https://myfriendsite.com 也想使用这个app，
+但是通过相同代码构建后会发现请求的图片地址还是 https://mysite.com/myBigImg.jpg
+如果想变成当前域名，则需要用到 __webpack_publicPath__
+
+具体如下：
+// This is the app entry "main.js". I'm using a CommonJS syntax but you can use what you want 
+module.exports = {
+  load: function(publicPath){
+    if(publicPath) __webpack_publicPath__ = publicPath;
+    // else the one in the webpack.config.js will be used.
+    
+    // continue loading the app
+  }
+}
+
+var app = require('myApp'); // output.library config in webpack.config.js
+app.load('https://myfriendsite.com/'); // this can be absolute or relative
+// do whatever you want with the app
+
+这样请求就变成 https://myfriendsite.com/myBigImg.jpg

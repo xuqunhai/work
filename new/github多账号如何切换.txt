@@ -1,0 +1,26 @@
+首先，看一下gloabal和system的config：
+
+git config --global -l
+git config --system -l
+
+主要是看有没有credential.helper把账号密码存起来了
+如果存的是A账户，那在repoB里push的时候肯定就会permission denied。
+所以看看global或者system哪个设置了保存就unset一下：
+
+git config --global --unset credential.helper
+git config --system --unset credential.helper
+第二个命令可能需要权限吧。
+
+接下来就是对本地仓库的config设置了。比如进入本地仓库repoA之后，看一下url：
+
+git remote -v
+
+然后在https://和http://github.com之间加上用户名@ ，用set-url设置就好：
+
+git remote set-url origin https://UserA@github.com/UserA/repoA.git
+当然默认是origin分支，要设置其他分支也一样。@ 前的用户名和仓库权限的拥有者要对应起来。
+改好之后，这时候push，就要输入一下用户A的密码，然后就能push上去了。对于repoB也是一样。
+
+每次push都需要输入密码了。那么为了避免麻烦，针对每一个本地仓库，设置一下local的credential.helper：
+
+git config --local credential.helper store
