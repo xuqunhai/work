@@ -1,8 +1,0 @@
-去掉首尾空格
-.replace(/^\s+|\s+$/g, '')
-
-删除指定值
-.replace(new RegExp('(\\s|^)' + token + '(\\s|$)'), ' ')
-
-是否包含指定值
-new RegExp('(\\s|^)' + token + '(\\s|$)').test
