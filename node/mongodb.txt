@@ -1,0 +1,186 @@
+mongoose.connect('mongodb://127.0.0.1:27017/users',()=>{})
+运行后在4.0以后会报警告：
+current URL string parser is deprecated...
+需要改成
+mongoose.connect('mongodb://127.0.0.1:27017/users', {useNewUrlParser: true}, ()=>{})
+useNewUrlParser属性会在url识别用户所需db，如上例的users，4.0以后版本需要指定；
+
+注意定义表结构mongoose.Schema中S是大写，而定义模型mongoose.model中m是小写；
+如果表结构定义时没有的字段，后续新增数据时会忽略，
+如表结构只定义a和b，但是你插入数据时有abcd，那么最后查询时也只会显示ab；
+mongoose.model(a,b,c)
+a首字母要大写，且不传第三个参数，默认操作a转成小写后加s的集合，否则操作第三个参数集合；
+如mongoose.model('User', UserSchema)写法和以下一样：
+mongoose.model('User', UserSchema, 'users')
+
+通过Schema定义表数据结构可用模式修饰符：
+mongoose.Schema({
+    name: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        uppercase: false,
+        set(val) {
+            return val;
+        },
+        // 查询速度优化
+        // unique: true // 唯一索引
+        // index: true // 普通索引
+    }
+})
+
+静态方法
+UserSchema.statics.findByMyid=function(){}
+实例方法
+UserSchema.methods.print=function(){}
+
+find
+findById
+findByIdAndDelete
+findByIdAndRemove
+findByIdAndUpdate
+findOne
+findOneAndDelete
+findOneAndRemove
+findOneAndUpdate
+deleteOne
+deleteMany
+updateOne
+updateMany
+replaceOne
+
+校验参数
+required
+max
+min
+// 下面四个必须用在string
+maxlength
+minlength
+enum // 值必须在enum数组元素里面
+match // 正则
+自定义校验
+validate函数
+validate: function(val){
+    return val >= 10;
+}
+
+聚合管道：$lookup必须版本>=3.2,低版本可用populate实现
+查询某订单的所有商品:
+OrderModel.aggregate([
+    {
+        $lookup: {
+            from: "order_item",
+            localField: "order_id",
+            foreignField: "order_id",
+            as: "items"
+        }
+    },
+    {
+        $match: {
+            "all_price": {
+                $gte: 90
+            }
+        }
+    }
+])
+通过order_id关联order_item表，
+并筛选价格大于等于90的，
+把查询结果放在items字段里；
+
+查询某商品对应订单号和订单价格:
+OrderItemModel.aggregate([
+    {
+        $lookup: {
+            from: "order",
+            localField: "order_id",
+            foreignField: "order_id",
+            as: "order_info"
+        }
+    },
+    {
+        $match: {
+            _id: mongoose.Types.ObjectId("xxx")
+        }
+    }
+])
+
+查询某篇文章的分类和作者
+ArticleModel.aggregate([
+    {
+        $lookup: {
+            from: "articlecate",
+            localField: "cid",
+            foreignField: "_id",
+            as: "cate"
+        }
+    },
+    {
+        $lookup: {
+            from: "user",
+            localField: "author_id",
+            foreignField: "_id",
+            as: "user"
+        }
+    }
+])
+
+将数据库koa导出到桌面koaDb文件夹
+mongodump -h 127.0.0.1 -d koa -o C:\Users\Administrator\Desktop\koaDb
+将桌面koaDb文件夹中koa数据导入到数据库koademo
+mongorestore -h 127.0.0.1 -d koademo C:\Users\Administrator\Desktop\koaDb
+
+非关系型数据库，基于文档，方便新增字段，
+NoSQL（Not only SQL）结构化查询语言增强；
+输入mongod启动mongodb服务器，保存数据；
+输入mongo连接mongodb，增删改查操作数据；
+
+db.user.find().count()/length()
+db.user.update({},{
+    $set: {
+        xxx: 2
+    },
+    // $unset: {} // 删除某属性
+}, {
+    multi: true // 默认为false
+})
+
+remove默认删除一个，类似deleteOne;
+要达到deleteMany效果，传递第二参数为true即可删除多个；
+remove要删除所有必须传空对象，不传参数会报错；
+不过上面效率会很低，直接删除集合更好：删除集合db.user.drop();
+
+db.users.find({"hobby.movies":"hero"})注意hobby.movies必须加引号，而且是匹配值为hero或数组中有hero的，
+即可以匹配
+{
+    username: 'tangseng',
+    hobby: {
+        movies: ['hero', 'xxx']
+    }
+}
+向movies属性数组添加xxx：
+db.users.update({username: 'tangseng'}, {
+    // $push: { "hobby.movies": "xxx" // 如果数组已经存在，还是会继续添加 },
+    $addToSet: { "hobby.movies": "xxx" // 如果数组已经存在，则不会添加 }
+})
+
+向numbers插入20000条数据：
+const arr=[]
+for(let i=1;i<=20000;i++){
+    arr.push({num: i})
+}
+db.numbers.insert(arr); // 插入操作应该能少则少，这样性能更高
+
+查询numbers中num大于500的文档：
+db.numbers.find({num: {$gt:500}}) // 大于等于$gte,小于$lt;
+
+显示前10条
+db.numbers.find().limit(10)
+显示11-20条数据
+db.numbers.find().skip(10).limit(10)
+顺序不重要，因为mongodb会自动调整skip和limit位置；
+
+工资小于1000或大于3000:
+db.emp.find({$or: [{sal:{$lt:1000}},{sal:{$gt:3000}}]})
+
+工资低于1000的增加400:
+db.emp.updateMany({sal:{$lte:1000}},{$inc:{sal:400}})
