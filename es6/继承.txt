@@ -1,0 +1,86 @@
+function Grand(grand){
+ this.grand='grand';
+}
+Grand.prototype.eat=function(){
+ console.log('I can eat');
+}
+var grand = new Grand();
+function Father(father){
+ this.father='father';
+}
+Father.prototype=grand;
+Father.prototype.run=function(){
+ console.log('I can run');
+}
+var son = new Father();
+
+son.father;  //”father"
+son.grand;  //“grand"
+会继承这个原型链，太多了！
+
+function Grand(grand){
+ this.grand='grand';
+}
+Grand.prototype.eat=function(){
+ console.log('I can eat');
+}
+var grand = new Grand();
+function Father(father){
+ this.father='father';
+}
+Father.prototype=grand;
+Father.prototype.run=function(){
+ console.log('I can run');
+}
+function Son(){
+ Father.call(this);
+}
+var son=new Son();
+son.father;  //”father"
+son.grand;  //undefined
+son.run();  //Uncaught TypeError: son.run is not a function;
+可以看见call方法可以只继承父级东西，而不是整个原型链；但是问题是它连父级的原型里的东西都无法继承；
+
+共享原型:
+function Father(father){
+ this.father='father';
+}
+Father.prototype.run=function(){
+ console.log('I can run');
+}
+function Son(){};
+Son.prototype=Father.prototype;
+var son2=new Son();
+son2.father;  //undefined;
+son2.run();  //I can run;
+上面通过共享原型，继承了Father.prototype里的东西；但是当我们只想给Son.prototype添加属性时，会发现由于Son和Father共享的是同一个原型，所以给Son加就是相当于Father也同时加了；
+
+解决方法就是加一个’中介’：
+function Father(father){
+ this.father='father';
+}
+Father.prototype.run=function(){
+ console.log('I can run');
+}
+function Son(){};
+function F(){};
+F.prototype=Father.prototype;
+Son.prototype=new F();
+var son3 = new Son();
+
+但是上面方法仍然有个问题，就是Son.prototype.constructor会指向function father(){};
+因为Son.prototype原本是一个包含constructor属性，且值为Son的对象，但是Son.prototype=new F();这一句重写了Son.prototype，使得Son.prototype变成了一个(因为new关键字就是在内部隐式声明了一个this={__proto__: F.prototype}的对象,并且最后返回了这个对象);而虽然F.prototype的默认constructor属性是指向F，但是F.prototype=Father.prototype;这句话也重写了F.prototype，导致此时的constructor属性是指向Father；所以Son.prototype.constructor通过原型链查找到的是Father；
+所以需要手动进行设置为Son,即Son.prototype.constructor=Son;
+同时为了标记一下到底是从哪里继承的，最好加上一句：Son.prototype.uber=Father.prototype;
+
+
+圣杯
+var inherit = (function(){
+ var F = function(){};  //此时F成为了私有化变量，闭包作用；
+ return function(Target,Origin){
+  F.prototype=Origin.prototype;
+  Target.prototype=new F();
+  Target.prototype.constructor=Target;
+  Target.prototype.uber=Origin.prototype;
+ }
+}());

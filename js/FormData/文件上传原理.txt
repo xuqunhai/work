@@ -1,0 +1,437 @@
+FormData(最大优点是可以异步上传二进制文件)
+所有主流浏览器的较新版本都已经支持这个对象了，比如Chrome 7+、Firefox 4+、IE 10+、Opera 12+、Safari 5+。
+在XMLHttpRequest2中定义的，是为序列化表单及创建与表单格式相同的数据(用于XHR传输)；
+
+创建formData对象实例几种方式
+1创建一个空对象实例：var formData=new FormData();
+此时可以调用append()方法添加数据；
+
+var oMyForm = new FormData();
+ 
+oMyForm.append("username", "Groucho");
+oMyForm.append("accountnum", 123456); // 数字123456被立即转换成字符串"123456"
+ 
+// fileInputElement中已经包含了用户所选择的文件
+oMyForm.append("userfile", fileInputElement.files[0]);
+ 
+var oFileBody = "<a id="a"><b id="b">hey!</b></a>"; // Blob对象包含的文件内容
+var oBlob = new Blob([oFileBody], { type: "text/xml"});
+ 
+oMyForm.append("webmasterfile", oBlob);
+ 
+var oReq = new XMLHttpRequest();
+oReq.open("POST", "http://foo.com/submitform.php");
+oReq.send(oMyForm);
+字段 "userfile" 和 "webmasterfile" 的值都包含了一个文件。通过 FormData.append() 方法赋给字段 "accountnum" 的数字被自动转换为字符（字段的值可以是一个 Blob 对象，File对象或者字符串，剩下其他类型的值都会被自动转换成字符串）
+
+2选择已有表单初始化一个对象实例：
+var form=document.getElementById(‘myForm’);//获取表单
+var formData=new FormData(form);//用表单初始化
+var name=formData.get(‘name’);//通过name来访问获取名字
+
+添加一些不想让用户编辑的固定字段,然后再发送.
+formData.append(‘psw’,’asanas’);//添加其他数据
+oReq.send(formData);  //var oReq = new XMLHttpRequest();
+
+一对key／value组成一条数据，key是唯一的，一个key可能对应多个value；表单字段HMTML name属性即为key值，value属性即为value值；
+
+获取值：
+formData.get(‘name’);//获取key为name的第一个值
+formData.getAll(’name’);//返回一个数组，获取key为name的所有值；
+
+添加数据：
+.append(key,value);
+//不存在key则新增一条数据，key存在则添加到数据末尾；
+
+设置修改数据：
+.set(key,value);
+//指定key不存在则新增一条，key存在则修改对应的value值；
+
+判断是否有该数据：
+.has(key);
+formData.has(key);//true or false;
+
+删除所有数据：
+.delete(key);
+
+遍历：
+var i = formData.entries();
+i.next();// {done:false,value:[‘k1’:’v1’]}
+i.next();// {done:false,value:[‘k2’:’v2’]}
+i.next();// {done:true,value:undefined}
+每调用一次next()返回一条数据，数据的顺序由添加的顺序决定
+返回的是一个对象，当其done属性为true时说明已经遍历完所有数据
+
+发送数据：
+通过xhr发送数据：
+var xhr=new XMLHttpRequest();
+xhr.open(‘post’,’login’);
+xhr.setRequestHeader(‘Content-Type’,’application/x-www-form-urlencoded’);
+xhr.send(formData);
+
+
+使用FormData对象发送文件
+<form enctype="multipart/form-data" method="post" name="fileinfo">
+  <label>Your email address:</label>
+  <input type="email" autocomplete="on" autofocus name="userid" placeholder="email" required size="32" maxlength="64" /><br />
+  <label>Custom file label:</label>
+  <input type="text" name="filelabel" size="12" maxlength="32" /><br />
+  <label>File to stash:</label>
+  <input type="file" name="file" required />
+</form>
+<div id="output"></div>
+<a href="javascript:sendForm()">Stash the file!</a>
+
+下面的代码来异步的上传用户所选择的文件
+function sendForm() {
+  var oOutput = document.getElementById("output");
+  var oData = new FormData(document.forms.namedItem("fileinfo"));
+ 
+  oData.append("CustomField", "This is some extra data");
+ 
+  var oReq = new XMLHttpRequest();
+  oReq.open("POST", "stash.php", true);
+  oReq.onload = function(oEvent) {
+    if (oReq.status == 200) {
+      oOutput.innerHTML = "Uploaded!";
+    } else {
+      oOutput.innerHTML = "Error " + oReq.status + " occurred uploading your file.<br \/>";
+    }
+  };
+ 
+  oReq.send(oData);
+}
+
+可以不借助 HTML 表单，直接向 FormData 对象中添加一个 File 对象或者一个 Blob 对象：
+data.append("myfile", myBlob);
+
+还可以使用 jQuery 来发送 FormData，但必须要正确的设置相关选项：
+var fd = new FormData(document.getElementById("fileinfo"));
+fd.append("CustomField", "This is some extra data");
+$.ajax({
+  url: "stash.php",
+  type: "POST",
+  data: fd,
+  processData: false,  // 告诉jQuery不要去处理发送的数据
+  contentType: false   // 告诉jQuery不要去设置Content-Type请求头
+});
+
+
+
+<a id="sendForm" href="javascript:;">Stash the file!</a>
+$("#sendForm").click(function(){
+    var fd = new FormData(document.forms.namedItem("fileinfo")); 
+    var request = $.ajax({ 
+        url: "test.json", 
+        type: "POST", 
+        data: fd, 
+        processData: false,  // 告诉jQuery不要去处理发送的数据   
+        contentType: false   // 告诉jQuery不要去设置Content-Type请求头 
+    });
+
+    request.done(function(json){
+        console.log("a");
+    });
+
+    request.fail(function(){
+        console.log("b");
+    });
+
+});
+
+jquery的ajax也可以支持到的，关键是设置：processData 和 contentType 。
+var formData = new FormData();
+var name = $("input").val();
+formData.append("file",$("#upload")[0].files[0]);
+formData.append("name",name);
+$.ajax({  
+        url : Url,  
+        type : 'POST',  
+        data : formData,  
+        // 告诉jQuery不要去处理发送的数据
+        processData : false, 
+        // 告诉jQuery不要去设置Content-Type请求头
+        contentType : false,
+        beforeSend:function(){
+               console.log("正在进行，请稍候");
+                },
+        success : function(responseStr) { 
+            if(responseStr.status===0){
+                console.log("成功"+responseStr);
+            }else{
+                console.log("失败");
+            }
+        },  
+        error : function(responseStr) { 
+            console.log("error");
+        }  
+    }); 
+
+
+
+
+
+
+
+
+
+
+
+文件上传原理：
+<input type=“file” name=“file1”>
+用表单上传时form标签必须加上enctype=“multipart/form-data”(不对字符编码)，否则浏览器无法将文件内容上传到服务器；但是这种方式页面会刷新；
+
+2.form+iframe
+如果需要无刷新上传文件，只需要新建一个隐藏的iframe，对form标签新增一个target属性设置成iframe的name即可；form有个target属性，规定在何处打开action，可能的值有 _blank/_self/_parent/_top/framename;
+<iframe name=“targetfr” style=“display:none”></iframe>
+<form action=“” method=“” enctype=“” target=“targetfr”></form>;
+将页面放在iframe里处理就不用担心刷新的问题，然后再设置一个回调就可以处理服务器返回的参数；
+<script type="text/javascript">
+        var form = $("#uploadForm");
+            form.on("submit",function(){
+                var seed = Math.floor(Math.random()*1000),
+                id = "uploader-iframe" + seed,
+                callback = "uploader-cb" + seed,
+                iframe = $("<iframe id='"+id+"' name='"+id+"' style='display:none'></iframe>"),
+                url = form.attr("action");
+                form.attr("target",id).append(iframe).attr("action",url+"?iframe="+callback);
+                window[callback]=function(data){
+                    iframe.remove();
+                    form.removeAttr("target");
+                    form.attr("action",url);
+                    window[callback] = undefined;
+                }
+            })
+</script>
+拿数据的方法，不通过后端回调
+iframe.on("load",function(){
+       var ifr =$(this).contents() //jq对象document
+        //ifr = this.contentDocument || this.document//兼容ie
+})
+form+iframe这种伪异步的提交方式对文件的处理还是无力，不能想删就删，预览图片只有先传给后台，后台再返回一个线上的地址
+
+3.HTML5之FormData、FileReader
+利用FormData模拟表单数据，通过ajax进行提交，FileReader的readAsDataURL方法拿到base64地址来预览（完美，注意兼容性）
+$.ajax({
+    url: '/upload',
+    type: 'POST',
+    cache: false,
+    data: new FormData($('#uploadForm')[0]),
+    processData: false,
+    contentType: false
+}).done(function(res) {
+}).fail(function(res) {});
+* processData设置为false。因为data值是FormData对象，不需要对数据做处理。
+* <form>标签添加enctype="multipart/form-data"属性。
+* cache设置为false，上传文件不需要缓存。
+* contentType设置为false。因为是由<form>表单构造的FormData对象，且已经声明了属性enctype="multipart/form-data"，所以这里设置为false。
+
+通过FormData对象append方法来添加
+formData.append('file', $('#file')[0].files[0]);
+
+FileReader获取DataUrl
+var reader = new FileReader();
+reader.onload=function(e){
+    //e.target.result为$("#file")[0].files[0]的base64地址
+}
+reader.readAsDataURL($("#file")[0].files[0])
+
+
+URL.createObjectURL() 静态方法会创建一个 DOMString，它的 URL 表示参数中的对象。这个 URL 的生命周期和创建它的窗口中的 document 绑定。这个新的URL 对象表示着指定的 File 对象或者 Blob 对象。
+objectURL = URL.createObjectURL(blob);
+blob是用来创建 URL 的 File 对象或者 Blob 对象 
+
+FileReader接口
+把文件读入内存并读取文件中数据
+方法：
+.readAsBinaryString(file);//将文件读取为二进制编码；
+.readAsText(file[,encoding]);//将文件读取为文本；
+.readAsDataURL(file);//将文件读取为DataURL；
+.abort();//中断读取操作；
+方法并不会返回读取结果，结果存储在result属性中；
+
+事件：
+捕获读取文件时状态，
+onload成功读取
+unloaded读取完成，无论成功失败
+
+1. <script type="text/javascript">  
+2. var result=document.getElementById("result");  
+3. var file=document.getElementById("file");  
+4.   
+5. //判断浏览器是否支持FileReader接口  
+6. if(typeof FileReader == 'undefined'){  
+7.     result.InnerHTML="<p>你的浏览器不支持FileReader接口！</p>";  
+8.     //使选择控件不可操作  
+9.     file.setAttribute("disabled","disabled");  
+10. }  
+11.   
+12. function readAsDataURL(){  
+13.     //检验是否为图像文件  
+14.     var file = document.getElementById("file").files[0];  
+15.     if(!/image\/\w+/.test(file.type)){  
+16.         alert("看清楚，这个需要图片！");  
+17.         return false;  
+18.     }  
+19.     var reader = new FileReader();  
+20.     //将文件以Data URL形式读入页面  
+21.     reader.readAsDataURL(file);  
+22.     reader.onload=function(e){  
+23.         var result=document.getElementById("result");  
+24.         //显示文件  
+25.         result.innerHTML='<img src="' + this.result +'" alt="" />';  
+26.     }  
+27. }  
+28.   
+29. function readAsBinaryString(){  
+30.     var file = document.getElementById("file").files[0];  
+31.     var reader = new FileReader();  
+32.     //将文件以二进制形式读入页面  
+33.     reader.readAsBinaryString(file);  
+34.     reader.onload=function(f){  
+35.         var result=document.getElementById("result");  
+36.         //显示文件  
+37.         result.innerHTML=this.result;  
+38.     }  
+39. }  
+40.   
+41. function readAsText(){  
+42.     var file = document.getElementById("file").files[0];  
+43.     var reader = new FileReader();  
+44.     //将文件以文本形式读入页面  
+45.     reader.readAsText(file);  
+46.     reader.onload=function(f){  
+47.         var result=document.getElementById("result");  
+48.         //显示文件  
+49.         result.innerHTML=this.result;  
+50.     }  
+51. }  
+52. </script>  
+53. <p>  
+54.     <label>请选择一个文件：</label>  
+55.     <input type="file" id="file" />  
+56.     <input type="button" value="读取图像" onclick="readAsDataURL()" />  
+57.     <input type="button" value="读取二进制数据" onclick="readAsBinaryString()" />  
+58.     <input type="button" value="读取文本文件" onclick="readAsText()" />  
+59. </p>  
+60. <div id="result" name="result"></div>
+
+
+
+1. <script type="text/javascript">  
+2. var result=document.getElementById("result");  
+3. var file=document.getElementById("file");  
+4.   
+5. //判断浏览器是否支持FileReader接口  
+6. if(typeof FileReader == 'undefined'){  
+7.     result.InnerHTML="<p>你的浏览器不支持FileReader接口！</p>";  
+8.     //使选择控件不可操作  
+9.     file.setAttribute("disabled","disabled");  
+10. }  
+11.   
+12. function readAsDataURL(){  
+13.     //检验是否为图像文件  
+14.     var file = document.getElementById("file").files[0];  
+15.     if(!/image\/\w+/.test(file.type)){  
+16.         alert("看清楚，这个需要图片！");  
+17.         return false;  
+18.     }  
+19.     var reader = new FileReader();  
+20.     //将文件以Data URL形式读入页面  
+21.     reader.readAsDataURL(file);  
+22.     reader.onload=function(e){  
+23.         var result=document.getElementById("result");  
+24.         //显示文件  
+25.         result.innerHTML='<img src="' + this.result +'" alt="" />';  
+26.     }  
+27. }  
+28.   
+29. function readAsBinaryString(){  
+30.     var file = document.getElementById("file").files[0];  
+31.     var reader = new FileReader();  
+32.     //将文件以二进制形式读入页面  
+33.     reader.readAsBinaryString(file);  
+34.     reader.onload=function(f){  
+35.         var result=document.getElementById("result");  
+36.         //显示文件  
+37.         result.innerHTML=this.result;  
+38.     }  
+39. }  
+40.   
+41. function readAsText(){  
+42.     var file = document.getElementById("file").files[0];  
+43.     var reader = new FileReader();  
+44.     //将文件以文本形式读入页面  
+45.     reader.readAsText(file);  
+46.     reader.onload=function(f){  
+47.         var result=document.getElementById("result");  
+48.         //显示文件  
+49.         result.innerHTML=this.result;  
+50.     }  
+51. }  
+52. </script>  
+53. <p>  
+54.     <label>请选择一个文件：</label>  
+55.     <input type="file" id="file" />  
+56.     <input type="button" value="读取图像" onclick="readAsDataURL()" />  
+57.     <input type="button" value="读取二进制数据" onclick="readAsBinaryString()" />  
+58.     <input type="button" value="读取文本文件" onclick="readAsText()" />  
+59. </p>  
+60. <div id="result" name="result"></div>
+
+
+检测浏览器对FileReader的支持：
+if(window.FileReader){
+    var fr=new FileReader();
+    …
+}else{
+    alert(‘Not supported by your browser!’);
+}
+
+调用FileReader对象的方法：
+将文件读取为文本.readAsText(file[,encoding]);第二个参数是文本的编码方式，默认为utf－8；
+将文件读取为二进制字符串.readAsBinaryString(file)，通常将它送到后端，后端可以通过这段字符串存储文件；
+readAsDataURL(file);将文件读取为一段以data：开头的字符串，实质就是Data URL(一种将小文件，如图像或html格式的文件直接嵌入文档的方案);
+
+处理事件用于捕获读取文件时的状态，一旦开始读取，无论成功或失败，实例的result属性都会被填充，如果读取失败，则result的值为null；否则即时读取的结果；成功读取文件时候抓取这个值的代码：
+fr.onload=function(){this.result;}
+
+
+Properties:
+FileReader.error
+FileReader.readyState
+ 0  empty  // no data loaded
+ 1  loading  //  data is being loaded
+ 2  done  //  read request has been completed
+FileReader.result
+ is only valid after the read operation is complete and format depends on the methods used to initiate the read operation.
+
+Event handlers
+  FileReader.onprogress: event is triggered while reading a Blob content.
+
+
+限定上传文件的类型：
+if(!/img\/\w+/.test(file.type)){
+    alert(‘请选择正确的图像类型’);
+    return false;
+}
+增加一个进度条可以使用HTML5的progress标签
+<label>读取进度：</label><progress id=“Progress” value=“0” max=“100”></progress>
+reader.onprogress=me.onProgress;
+onProgress: function(e){
+  var me=h;
+  me.loaded+=e.loaded;
+  me.progress.value=(me.loaded/me.total)*100;
+}
+
+
+http://www.360doc.com/content/14/0214/18/1457948_352511645.shtml
+FileReader读取文件内容
+ 常见应用
+  预览本地图片
+  预览文本文件
+分段读取文件内容
+FileReader进度条
+
+https://segmentfault.com/a/1190000004538728
+

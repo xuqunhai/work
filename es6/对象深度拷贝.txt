@@ -1,0 +1,13 @@
+function clone(origin,target){
+ var target = target || {},toStr=Object.prototype.toString,arrStr='[object Array]';
+ for(var p in origin){  //for in可以遍历原型上的自定义属性，所以需要排除
+  if(origin[prop]!==“null” && typeof origin[p]==‘object’){  //需要先排出null,typeof null;   //“object"
+    target[p] = (toStr.call(origin[p])==arrStr) ? [] : {};
+    clone(origin[p],target[p])
+  }else{
+   target[p] = origin[p];
+  }
+  }
+ }
+ return target;
+}

@@ -1,0 +1,62 @@
+探索 babel 和 babel 插件是怎么工作的
+http://www.sohu.com/a/224466639_283613
+babel 是什么？  转换成浏览器识别的代码
+Babel · The compiler for writing next generation Java
+6to5
+你在 npm上可以看到这样一个包名字是6to5（https://www.npmjs.com/package/6to5），光看名字可能会让人感觉到很诧异，名字看起来可能有点奇怪，其实 babel在开始的时候名字就是这个。简单粗暴 es6->es5，一下子就看懂了 babel是用来干啥的，但是很明显这不是一个好名字
+
+babel is the new jQuery
+redux的作者曾说过这样一句话，可以换一种理解为
+	•	babel : AST :: jQuery : DOM
+babel对于 AST就相当于 jQuery对于 DOM, 就是说 babel给予了我们便捷查询和修改 AST的能力。 AST->AbstractSyntaxTree抽象语法树 
+
+为什么要用babel转换代码
+我们之前做一些兼容都会都会接触一些 Polyfill的概念，比如如果某个版本的浏览器不支持 Array.prototype.find方法,但是我们的代码中有用到 Array的 find函数，为了支持这些代码，我们会人为的加一些兼容代码。
+对于这种情况做兼容也很好实现，引入一个 Polyfill文件就可以了，但是有一些情况我们使用到了一些新语法，或者一些其他写法：
+	•	// 箭头函数
+	•	var a = () => {}
+	•	// jsx
+	•	var Component = () => <div />
+这种情况靠 Polyfill，因为一些浏览器根本就不识别这些代码,这时候就需要把这些代码转换成浏览器识别的代码。 babel就是做这个事情的。
+
+babel做了哪些事情
+
+为了转换我们的代码， babel做了三件事：
+	•			Parser 解析我们的代码转换为 AST。
+	•			Transformer 利用我们配置好的 plugins/presets把 Parser生成的 AST转变为新的 AST。
+	•			Generator 把转换后的 AST生成新的代码
+从图上看 Transformer占了很大一块比重，这个转换过程就是 babel中最复杂的部分,我们平时配置的 plugins/presets就是在这个模块起作用
+
+
+
+Parser 解析
+解析步骤接收代码并输出 AST,这其中又包含两个阶段词法分析和语法分析。词法分析阶段把字符串形式的代码转换为 令牌（tokens）流。语法分析阶段会把一个令牌流转换成 AST的形式,方便后续操作。
+Generator 生成
+代码生成步骤把最终（经过一系列转换之后）的 AST 转换成字符串形式的代码，同时还会创建源码映射（source maps）。代码生成其实很简单：深度优先遍历整个 AST，然后构建可以表示转换后代码的字符串。
+babel的核心内容
+看起来 babel的主要工作都集中在把解析生成的 AST经过 plugins/presets然后去生成 新的AST这上面了。
+
+
+
+AST抽象语法树
+	•	var a = 1 + 1
+	•	var b = 2 + 2
+
+想象一下要表示上述代码应该是什么样子，首先必须有东西可以表示这些具体的 声明, 变量, 常量的具体信息，比如 （这棵树上肯定有二个变量，变量名是a和b,肯定有两个运算语句，操作符是+）,有了这些信息还不够，我们必须建立起它们之间的关系，比如 一个声明语句，声明类型是var,左侧是变量,右侧是表达式。有了这些信息我们就可以还原这个程序，这也是把代码解析成 AST时候所做的事情，对应上面我们说的 词法分析和 语法分析。
+上面程序整体就是一个节点 Program节点(所有的 AST 根节点都是 Program 节点)，因为它下面有两条语句所以它的 body属性上就两个声明节点 VariableDeclaration。
+
+
+用图形简易的分析下它的结构：
+	•	function square (n) {
+	•	return n * n
+	•	}
+
+
+
+节点遍历
+经过一番努力我们终于了解了 AST以及其中内容的含义，但是这一部分基本不需要我们做什么， babel会借助Babylon帮我们生成我们需要的 AST结构。我们更多要去做的是去修改和改变 Babylon生成的这个抽象语法树。
+
+babel会遍历节点组成的抽象语法树，每一个节点都会有自己对应的 type,比如变量节点 Identifier等。我们需要给 babel提供一个 visitor对象，在这个对象上面我们以这些节点的 type做为 key，已一个函数作为值，
+
+Paths
+我们通过 visitor可以在遍历到对应节点执行对应的函数，可是要修改对应节点的信息，我们还需要拿到对应节点的信息以及节点和所在的位置 （即和其他节点间的关系）, visitor在遍历到对应节点执行对应函数时候会给我们传入 path参数，辅助我们完成上面这些操作。注意 Path是表示两个节点之间连接的对象,而不是当前节点，

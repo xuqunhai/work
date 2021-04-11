@@ -1,0 +1,78 @@
+which ruby
+ruby --version
+
+安装brew
+/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
+重启命令行或者输入 source /Users/xuqunhai/.zprofile
+
+查看安装路径
+where brew
+// /usr/local/bin/brew
+
+查看安装版本
+brew --version             
+// Homebrew 3.0.11-152-g6359af5-dirty
+
+安装vscode
+brew install visual-studio-code
+
+其他安装
+brew install wget 
+brew install google-chrome
+
+brew安装mongodb
+brew install mongodb
+提示 Error: No available formula with the name “mongodb”
+大致原因是在 homebrew 里找不到 mongodb 这个名字，mongodb 在 brew 核心库里面删除了，也可以
+brew search mongodb 一下，果然没有。
+MongoDB不再是开源的了，并且已经从自制内核#43770中移除。要安装它，请检查MongoDB项目提供的选项:https://github.com/mongodb/homebrew-brew
+根据这个github主页的提示，我们安装一下
+brew tap mongodb/brew
+brew install mongodb-community
+安装成功后文件路径
+配置文件：/usr/local/etc/mongod.conf
+日志目录路径：/usr/local/var/log/mongodb
+数据目录路径：/usr/local/var/mongodb
+启动&停止
+brew services start mongodb-community
+brew services stop mongodb-community
+手动启动 mongod
+mongod --config /usr/local/etc/mongod.conf
+注意：如果不包括–config选项具有配置文件的路径，则MongoDB服务器没有默认配置文件或日志目录路径，并且将使用 /data/db.
+关机mongod手动启动，请使用admin数据库和运行db.shutdownServer():
+mongo admin --eval "db.shutdownServer()"
+
+如果有一天你发现你的数据库突然启动不了了，可能是你为正常关闭导致的，
+你可以删除掉/data/db文件夹中的mongod.lock文件，然后重新启动，
+如果还是不可以，你可以查看一下进程，然后杀掉：
+然后根据进程ID杀掉进程，最后重启mongodb
+查看进程占用
+lsof -i tcp:8080 
+该命令会显示占用8080端口的进程，有其 pid ,可以通过pid关掉该进程
+杀死进程
+kill pid
+
+使用brew卸载软件
+brew uninstall soft_name
+
+显示使用brew安装的软件列表
+brew list
+
+查看哪些软件需要更新
+brew outdated
+
+查找软件
+// 当你记不清软件的名字的时候，你可以使用search，只需要写去几个字母，他就会帮你联想，并把所有可能的结果输出给你
+brew search mongodb
+==> Casks
+gcollazo-mongodb
+mongodb-compass
+mongodb-compass-isolated-edition
+mongodb-compass-readonly
+mongodb-realm-studio
+mongodbpreferencepane
+nosqlbooster-for-mongodb
+homebrew/cask-versions/mongodb-compass-beta
+
+查看使用brew安装的东西，安装在哪里
+brew --cache

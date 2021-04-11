@@ -146,7 +146,7 @@ var reg=new RegExp('\\bis\\b','gi');
 
 
 RegExp.prototype.test(str)
-为什么正则有时候匹配结果不一致？当执行test方法且有全局匹配时reg.lastIndex在作怪 var reg1=/\w/;
+为什么正则有时候匹配结果不一致？当执行test方法且有全局匹配时reg.lastIndex在作怪var reg1=/\w/;
 var reg2=/\w/g;
 r1 = reg1.test('a')
 r2 = reg2.test('a')
@@ -303,9 +303,9 @@ mode 是 webpack 4 中新增加的参数选项，其有两个可选值：produc
 
 更新对应模块
 
-html-webpack-plugin => npm i -D html-webpacl-plugin  
-webpack-dev-server或者改为webpack-serve => npm i -D webpack-dev-server/npm i -D webpack-serve  
-vue-loader => npm i -D vue-loader  
+html-webpack-plugin => npm i -D html-webpacl-plugin 
+webpack-dev-server或者改为webpack-serve => npm i -D webpack-dev-server/npm i -D webpack-serve 
+vue-loader => npm i -D vue-loader 
 extract-text-webpack-plugin@next => npm i -D extract-text-webpack-plugin@next 
 
 删除了一些常用内置插件：
@@ -443,7 +443,7 @@ vue用法
 
 动态路由传参只能用params，不能用query；
 {
- Path: ‘/List/List/:id’,  component: List
+ Path: ‘/List/List/:id’, component: List
 }
 属性id可以在$route.params.id中获取，
 Let {id} = this.$route.params;
@@ -617,7 +617,7 @@ res.cookie()设置cookie
 res.clearCookie()清除cookie
 res.download(path [, filename] [, options] [, fn])下载附件
 res.download('/report-12345.pdf', 'report.pdf', function (err) {})
-res.end([data][.encoding])结束响应 res.format(object)可根据客户端不同Accept头返回不同响应；
+res.end([data][.encoding])结束响应res.format(object)可根据客户端不同Accept头返回不同响应；
 res.get()设置响应头
 res.json(obj)将obj转成字符串
 res.location()重定向
@@ -674,7 +674,7 @@ var admin=express()
 app.use(‘/admin’, admin) // admin作子应用，可完全独立开发
 
 express编程模型：
-use((req,res,next)=>{  读req，写res，next表示做完了，给下一个use })
+use((req,res,next)=>{ 读req，写res，next表示做完了，给下一个use})
 由于use是窜行的，而res.send只能调用一次，否则会报错，所以一般都用res.write，即用流方式，使用write不用res.end的话浏览器会接受显示不全，而curl测试却可以接受全，所以一般最后用一个use单独处理end响应结束；
 
 
@@ -892,9 +892,9 @@ html规定table只能有4个直接子元素thead、tbody、tfoot、colgroup；
 
 
 CSS
-.clearfix::after{  content: ‘’;
+.clearfix::after{ content: ‘’;
  display: block;
- clear: both; }
+ clear: both;}
 给li里面的a添加padding后会发现a的宽度比li大，解决方法是把a设成块级；
 
 
@@ -932,9 +932,9 @@ https://vuese.github.io/vuese-explorer/
 
 
 clientHeight、offsetHeight、scrollHeight
-scrollHeight: 就是container内部的总高度 这里内部元素就是large_block，large_block所撑开的高度(2000 + 40（上下padding） + 40（上下margin）) = 2080px，然后加上自身container上下各10px的padding,因此一共是2100px
-clientHeight: 就是container内部可见高度 + 自身padding。 内部可见高度为600 - 17(滚动条高度) padding为上下各10，因此一共是600 - 17 + 20 = 603
-offsetHeight: 也是container自己本身的可见高度 + 自身padding + 自身border + 滚动条 与clientHeight不同的就是要加上自身border以及滚动条的高度，因此是603 + 20 + 17 = 640
+scrollHeight: 就是container内部的总高度这里内部元素就是large_block，large_block所撑开的高度(2000 + 40（上下padding） + 40（上下margin）) = 2080px，然后加上自身container上下各10px的padding,因此一共是2100px
+clientHeight: 就是container内部可见高度 + 自身padding。内部可见高度为600 - 17(滚动条高度)padding为上下各10，因此一共是600 - 17 + 20 = 603
+offsetHeight: 也是container自己本身的可见高度 + 自身padding + 自身border + 滚动条与clientHeight不同的就是要加上自身border以及滚动条的高度，因此是603 + 20 + 17 = 640
 
 
 
@@ -1537,7 +1537,7 @@ Flex弹性布局8个li，上下各4个，此时应对li设置flex: 1 0 20%;
 
 移动端1px：
 给父元素相对定位，增加伪元素，
-&::before {  position: absolute;
+&::before { position: absolute;
  Left: 0;
  Top: 0;
  content: ‘ ’;
@@ -1545,7 +1545,7 @@ Flex弹性布局8个li，上下各4个，此时应对li设置flex: 1 0 20%;
  Height: 200%;
  Border-bottom: 1px solid;
  Transform: scale(0.5, 0.5);
- Transform-origin: left top; }
+ Transform-origin: left top;}
 
 sass移动端1px
 @mixin border1px($bd-color: #ccc, $top: 1, $right: 0, $bottom: 1, $left: 0) {
@@ -1676,14 +1676,14 @@ div.scrollTop = div.scrollHeight;
 
 当xhr为同步请求时，有如下限制：
 	•			xhr.timeout必须为0
-	•			xhr.withCredentials必须为 false 
-	•			xhr.responseType必须为”“（注意置为”text”也不允许） 
+	•			xhr.withCredentials必须为 false
+	•			xhr.responseType必须为”“（注意置为”text”也不允许）
 若上面任何一个限制不满足，都会抛错，而对于异步请求，则没有这些参数设置上的限制。
 
 
-在上传或者下载比较大的文件时，实时显示当前的上传、下载进度是很普遍的产品需求。  我们可以通过onprogress事件来实时显示进度，默认情况下这个事件每50ms触发一次。需要注意的是，上传过程和下载过程触发的是不同对象的onprogress事件：
-	•			上传触发的是xhr.upload对象的 onprogress事件 
-	•			下载触发的是xhr对象的onprogress事件 
+在上传或者下载比较大的文件时，实时显示当前的上传、下载进度是很普遍的产品需求。 我们可以通过onprogress事件来实时显示进度，默认情况下这个事件每50ms触发一次。需要注意的是，上传过程和下载过程触发的是不同对象的onprogress事件：
+	•			上传触发的是xhr.upload对象的 onprogress事件
+	•			下载触发的是xhr对象的onprogress事件
 
 xhr.onprogress = updateProgress;
 xhr.upload.onprogress = updateProgress;
@@ -1695,10 +1695,10 @@ function updateProgress(event) {
 
 
 xhr.send(data)中data参数的数据类型会影响请求头部content-type的默认值：
-	•			如果data是 Document 类型，同时也是HTML Document类型，则content-type默认值为text/html;charset=UTF-8;否则为application/xml;charset=UTF-8； 
-	•			如果data是 DOMString 类型，content-type默认值为text/plain;charset=UTF-8； 
-	•			如果data是 FormData 类型，content-type默认值为multipart/form-data; boundary=[xxx] 
-	•			如果data是其他类型，则不会设置content-type的默认值 
+	•			如果data是 Document 类型，同时也是HTML Document类型，则content-type默认值为text/html;charset=UTF-8;否则为application/xml;charset=UTF-8；
+	•			如果data是 DOMString 类型，content-type默认值为text/plain;charset=UTF-8；
+	•			如果data是 FormData 类型，content-type默认值为multipart/form-data; boundary=[xxx]
+	•			如果data是其他类型，则不会设置content-type的默认值
 
 
 xhr.withCredentials与 CORS 什么关系

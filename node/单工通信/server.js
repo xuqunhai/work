@@ -10,6 +10,7 @@ const net = require('net');
 const server = net.createServer(socket => {
     socket.on('data', function (buffer) {
         console.log(buffer, buffer.toString());
+        // <Buffer 67 6f 6f 64 20 6d 6f 72 6e 69 6e 67 20 67 65 65 6b 62 61 6e 67> good morning geekbang
     });
 });
 server.listen(4000);

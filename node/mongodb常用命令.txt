@@ -1,0 +1,30 @@
+1、查询库、查询表
+
+show dbs  //查询所有的数据库
+show collections   //查询当前数据库下的所有数据表
+
+2、建库和删库
+
+use myDbs  //建立一个名为myDbs的数据库，当这个库存在时则是切换到这个数据库中去
+use myDbs
+db.dropDatabase();  //这两句是删除这个数据库
+
+3、建表和删表
+
+//表操作都是要先到一个数据库中去，通过use方法
+db.myTable.insert({name:’hf’,age:20});  //在mongodb中在插入数据时即创建了改表，此时创建的是名为myTable的数据表
+db.myTable.drop();  //删除myTable这个数据表
+//如果没有指定数据库，表会创建在mongdb默认数据库test里
+
+
+4、单表的增删改
+
+db.myTable.insert({name:’hahaha’,age:12});  //新增
+db.myTable.update({name:’hf’},{$set:{age:25}})  //修改
+db.myTable.remove({name:’hf'});  //删除
+
+5、查询
+
+db.myTable.find();  //查询myTable中的所有数据
+db.myTable.find().sort({age:1})  //根据age升续
+db.myTable.find().count();  //查询

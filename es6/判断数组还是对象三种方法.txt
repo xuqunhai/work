@@ -1,0 +1,23 @@
+Object.prototype.toString.call(x);
+Object.prototype.toString.call({})
+"[object Object]"
+Object.prototype.toString.call([])
+"[object Array]"
+
+x instanceof 构造函数;
+[] instanceof Array
+true
+var o={};
+o instanceof Array
+false
+
+x.constructor;
+[].constructor.name
+"Array"
+var o={};
+o.constructor.name
+"Object"
+
+其中toString方法最好，因为它没有跨域判断问题，
+也就是说用了iframe的页面在父页面里判断子页面的对象或数组会有问题，
+即子页面的数组在父页面里用[] instanceof Array会返回false；

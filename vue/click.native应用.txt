@@ -1,0 +1,13 @@
+组件调用构造器的方法要用click.native=“add”
+var btn={
+ template: `<button @click.native=“add”>button</button>`
+};
+var app=new Vue({
+ el: ‘#app’,
+ methods: {
+  add(){}
+ },
+ components: {
+  “btn”: btn
+ }
+});

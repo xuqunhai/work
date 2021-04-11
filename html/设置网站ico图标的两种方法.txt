@@ -1,0 +1,7 @@
+设置网站ico图标的两种方法
+
+方法一：    直接在站点根目录下放入名为：favicon.ico 的图标文件（必须要为 ICO 文件，BMP 及其他格式的图片文件不行）。还有将 favicon.ico 中的 favicon 命名为你网站域名的名称也可以，例如：你网站的域名为：xll.com，你可以将该 ICO 文件命名为：xll.ico 。其IE地址栏图标绝对地址就可以为：http://www.timeshi.com/favicon.ico和http: //www.timeshi.com/timeshi.ico
+方法二：
+   1. 在网页的 <head>...</head> 区加入代码：<link rel="shortcut icon" href="favicon.ico" />，如果用这一种方法的话，其中 ICO 文件的文件名就不一定要用 favicon.ico了，可以用任意的名字来命名，如：aoul.ico，你甚至可以使每一个目录下的每一个网页文件的IE地址栏图标都不同，但前提是 必须做到图标文件的链接地址要正确。还有，在 <head>...</head> 区加入代码：<link rel="bookmark" href="favicon.ico" />，就可以在收藏夹中显示你网页链接的自定义图标。
+ 
+2. 在网站首页的源文件<head> </head>之间插入下面的斜体部分代码<head> ……<link rel="shortcut icon" href="favicon.ico"></head>3.动态ico图标的实现方法，先把做好的gif动态图标命名为favico.gif <head></head>之间加上： <link rel="icon" href="favicon.gif" type="image/gif" >
