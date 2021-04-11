@@ -1,0 +1,5 @@
+一、查看全局包位置
+npm root -g
+
+二、修改全局包位置
+npm config set prefix '目标目录'

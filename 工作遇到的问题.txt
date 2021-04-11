@@ -1,0 +1,30 @@
+工作遇到的问题：
+
+SyntaxError: Unexpected keyword 'const'. Const declarations are not supported in strict mode.
+引用的插件easytable里的es6代码未编译成es5；
+如果把easytable代码全部编译，又报错，找到是module.exports is undefined
+原因会被babel-loader处理, 而且还开了transform-runtime的polyfill (默认开), 如果有Object.assign这类静态方法的话会被以import方式引入polyfill的方法, 所以这个模块就这样莫名其妙变成了esm. webpack 2.2.0之后有很多限制, 其中一条就是module.exports为undefined且只读, 所以会报这个错.
+
+
+
+QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to add something to storage that exceeded the quota.
+发现是safari开启了无痕模式，对于localstorage来说，一旦保存，就会以文件形式保存在本地，清除浏览器记录也不会清除掉localstorage，除非手动的去清除，不然会永远存在。这肯定不是我们所需要的，这会对我们以后的内容更新等各方面有很大的影响。浏览器隐私模式下，数据没办法保存到localstorage中，但是我们不可能因为这一个浏览器不能使用就抛弃这个东西，那么我们只能选择平稳退化，在不影响其他浏览器表现形式的情况下，保证在该模式下运行的正常。所以根据这些问题特征我们可以判断当前环境是否支持localstorage的设置，现在暂知的就是在Safari隐私模式下，选择是使用localstorage还是最原始的环境来获取数据。
+
+// Safari, in Private Browsing Mode, looks like it supports localStorage but all calls to setItem
+// throw QuotaExceededError. We're going to detect this and just silently drop any calls to setItem
+// to avoid the entire page breaking, without having to do a check at each usage of Storage.
+if (typeof localStorage === 'object') {
+    try {
+        localStorage.setItem('localStorage', 1);
+        localStorage.removeItem('localStorage');
+    } catch (e) {
+        Storage.prototype._setItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function() {};
+        alert('Your web browser does not support storing settings locally. In Safari, the most common cause of this is using "Private Browsing Mode". Some settings may not save or some features may not work properly for you.');
+    }
+}
+
+
+neo update ts
+
+https://github.com/ElemeFE/element/commit/3b378ad58f0b3bed89af00fd8facc9d9e915f4af#diff-d14a8022b085f9ef19d479cbdd581127

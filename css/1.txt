@@ -1,0 +1,141 @@
+##############################.    Element.scrollLeft
+读取或设置元素滚动条到元素左边的距离
+//设置滚动条滚动了多少像素
+element.scrollLeft = 10;
+* 如果元素不能滚动（比如：元素没有溢出），那么scrollLeft 的值是0。
+* 如果给scrollLeft 设置的值小于0，那么scrollLeft 的值将变为0。
+* 如果给scrollLeft 设置的值大于元素内容最大宽度，那么scrollLeft 的值将被设为元素最大宽度。
+
+
+
+
+##############################.   margin:0 auto；在不同场景下生效条件如下：
+
+        块级元素：给定要居中的块级元素的宽度。
+
+        行内元素：①设置display:block；②给定要居中的行内元素的宽度。（行内元素设置成块级元素后可以对其宽高进行设置）
+
+        行内块元素：设置display:block。（如input、button、img等元素，自带宽度可以不用设置其宽度）
+
+
+
+
+##############################.   linear-gradient()
+/* 渐变轴为45度，从蓝色渐变到红色 */
+linear-gradient(45deg, blue, red);
+
+/* 从右下到左上、从蓝色渐变到红色 */
+linear-gradient(to left top, blue, red);
+
+/* 从下到上，从蓝色开始渐变、到高度40%位置是绿色渐变开始、最后以红色结束 */
+linear-gradient(0deg, blue, green 40%, red);
+
+to top, to bottom, to left 和 to right这些值会被转换成角度0度、180度、270度和90度。
+<angle>
+用角度值指定渐变的方向（或角度）。角度顺时针增加。 
+
+
+
+############################## 盒子bfc
+
+正常渲染时每个盒子都是同一套规则，但是触发bfc后盒子渲染规则就有些变化，通常这些变化没什么用，但是它改变的规则恰好能解决一些奇怪问题，如父子元素的垂直方向的margin塌陷等；
+触发bfc：父级绝对定位、变成行内块、浮动、溢出隐藏；
+兄弟的垂直margin重叠，触发bfc也能解决，但是需要给每个或其中一个嵌套父级元素，这种随便添加html结构是不推荐的，所以选择不解决；
+
+浮动元素看不到块级元素，而文本、图片等和触发bfc的元素是会和浮动元素同一层；
+
+浮动后元素会影响后续元素，所以一般需要在浮动后的最后一个元素添加清除浮动，但是无端端在html结构上加一个标签是不合理的，此时可用父级伪元素::after进行清除浮动，需要设置三个属性content: ‘’/display: block;/clear: both;
+
+设置绝对定位或浮动后系统会给该元素设为行内块元素；
+
+P标签不能嵌套div；
+A标签不能嵌套a；
+
+图标为背景图时，要使背景图不显示时有文字可点击的话，可用padding+overflow：hidden；背景图在padding上，而文字在内容区域；
+
+
+有inline的元素都是文本类元素，都能被分隔符分隔，所以两个图片有间距就是因为它是文本类元素；
+
+
+行内块里没东西时，会和文字底对齐；如span设置display为inline-block；行内块有文字时，文字会和外部文字底对齐；对行内块设置vertical-align可让它和外部文字进行对齐，vertical-align可设px；
+
+
+字体font-size设置的是字体高而不是宽；
+
+
+
+
+
+
+##############################  张鑫旭CSS ############################## 
+
+行高是两个基线的距离；
+内联元素的高度是由行高决定，而不是内容撑开！
+实例
+{line-height: 36px; font-size: 0;}
+{line-height:  0; font-size: 36px;}
+
+高度的表现不是行高，是内容区域高度+行间距，恰好：
+内容区域高度+行间距=行高
+
+内容区域高度只与字号和字体有关，内区域高度就是鼠标选中文字时的高度，内容区域高度只有当字体为宋体时才和fontSize一样；
+
+行高默认值是normal，但是不同浏览器表现不同，所以需要重置，通常都是对body进行行高重置，然后其子元素都会继承；但表单元素行高默认值是normal，所以也需要单独对表单控件进行重置；
+
+
+区别line-height: 1.5和line-height:150%/1.5em;
+前者的所有可继承子元素会根据自身fontSize计算行高；后者计算出当前元素行高后，把这个固定值都应用到子元素身上；
+
+body全局数值行高使用经验
+以阅读为主，如博客，一般1.5或1.6；
+网页开发，一般以行高20位基准，如
+{font-size: 14px; line-height: 20px/14px=1.4286}
+
+{font: 14px/1.4286 ‘microsoft yahei’;}
+
+
+行高会不会影响图片实际占据高度？不会。
+行高增大会感觉图片底部会被撑开，实际上是基线对齐原因，文字和图片要基线对齐，但是文字行高又要增大，所以只能上下间距不断撑开；
+消除图片底部间隙方法：
+1 图片变块，因为vertical-align对块状元素无效；
+2 图片底线对齐，vertical-align:middle;
+3 行高足够小，如0，使基线位置上移；当行高为数字或百分比时，可设置fontSize为0，从而变相使行高为0；
+
+
+小图片和文字：高度受行高控制，图文的vertical-align垂直对齐;
+
+
+图片垂直居中：
+外层line-height，图片vertical-align: middle；IE8+
+
+多行文本垂直居中：
+外层行高，文本变行内块元素，且重置行高为normal；IE8+
+
+常用{line-height: 36px; height: 36px;}  其实height是多余的；
+
+
+
+vertical-align
+只支持行内或行内块或table-cell元素，如默认img、span、strong、input、button、td；
+只对img设置vertical-align是不起作用的，需要加上行高；
+对图片的父元素同时设置display: table-cell和vertical-align: middle也可以；
+
+支持以下值：
+inherit、
+baseline、top、middle、bottom
+text-top、text-bottom
+sub、super
+数字百分比类（支持负值）在baseline基础上上下偏移；百分比值是相对于元素自身的行高计算的，IE6、7百分比值不支持行高为小数；
+所以下面等价
+{line-height: 30px; vertical-align: -10%;}
+{line-height: 30px; vertical-align: -3px;}
+
+
+css支持负值有margin、letter-spacing、word-spacing、vertical-align
+
+左边文字、右边图片的对齐：
+首先文字设置行内块，然后对图片和文字同时设置vertical-align即可；
+
+
+容器行高为0+元素vertical-align为top；
+

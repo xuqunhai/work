@@ -1,0 +1,146 @@
+Git
+
+github高级搜索
+查看git学习资料
+输入框输入
+git 最好 学习 资料
+默认不会查readme的；
+所以应输入(搜索readme中包含的，而且星数大于1000的)
+git 最好 学习 资料 in:readme stars:>1000
+
+配置user信息
+$ git config --global user.name ‘xuqunhai’
+$ git config --global user.email ‘raferxu@163.com’
+
+查看是否生效
+$ git config --list --global
+
+其他参数
+--global 对当前用户所有仓库有效
+--local  对某个仓库有效
+--system 对系统所有登录的用户有效
+
+vscode / git
+
+
+###############################.              Git             ###########################
+
+
+
+【git branch -d -r branchName】删除远程分支； 
+【git branch -D branchName】强制删除branchName分支； 
+【git branch -av】查看所有分支信息； 
+【git branch -m oldbranch newbranch】重命名分支； 
+
+
+Git第一次和远程建立连接时，出现下面错误：
+permission denied (publickey)
+原因是因为ssh key过期失效或者没有ssh key。
+检查SSH key是否已经存在
+ls ~/.ssh/
+如果存在，就不用生成一个新的SSH key了，直接跳到下面的第3步。
+不存在，生成一个新的SSH key
+先
+cd /Users/your_user_name/.ssh 
+再
+ssh-keygen -t rsa -b 2048 -C "your_email@example.com"
+直接回车，会将key保存到默认文件中。
+输入一个密码，以及确认密码，这个密码在你提交代码到Github时会用到
+到这一步，你会发现 /Users/your_user_name/.ssh/id_rsa.pub 文件已经生成了。
+将ssh key添加到git
+把ssh 添加到keychain中，解决每次都需要输入密码
+如果去git clone代码，会让你输入密码，如果一个还好说，如果关联了很多的话，那就比较麻烦了，这个时候的解决方法就是添加到keychain中：
+ssh-add -K /Users/youre_user_name/.ssh/id_rsa 
+
+
+
+git问题:Please make sure you have the correct access rights and the repository exists.
+
+ssh-keygen -t rsa -C "fangcaiwen",//fangcaiwen是你git操作的账号。
+cat /Users/lianyu02/.ssh/id_rsa.pub    //这个路劲在你上面不断回车里可以找到
+将ssh key添加到git
+
+
+
+
+
+
+
+
+
+###############################.              vscode            ##########################
+
+多行转一行：Ctrl+J
+
+拆分编辑框：Ctrl+\
+
+保存后自动格式化代码(vscode)
+解决:
+其实对于vscode来说, 实现这一点很容易. 我们只需要修改两个属性即可.
+"editor.formatOnType": true, "editor.formatOnSave": true
+
+
+vscode编码技巧
+emmet语法
+(li.pro-item>(a[href=javascript:]>img[src=../img/a.jpg])+h3{商品$})*4
+
+
+推荐的源码阅读插件
+TODO Tree
+你看完代码加了下面这个注释 ：// TODO 以后会扩展这部分功能；
+这个插件能帮你组织和管理TODO 注释，你在代码中注释的带 TODO 的标签会统一在侧边栏显示出来，
+
+
+Bookmarks
+看到哪个位置想加个书签就按快捷键 Ctrl + Alt + K ，多按一次就是删除；
+
+调试js代码插件code runner，调出控制台，按ctrl+options+N即可输出打印，不过由于是在node环境而不是在浏览器，所以像window这种是没有的；
+Bracket Pair Colorizer插件，我管它叫彩虹括号插件。
+koroFileHeader插件，这个插件主要用于自动的插入头文件开头的说明和函数的说明。
+shellman 插件是 Linux shell 脚本辅助工具。
+
+
+Mac 键盘符号说明
+* ⌘ == Command 
+* ⇧ == Shift 
+* ⇪ == Caps Lock 
+* ⌥ == Option 
+* ⌃ == Control 
+* ↩ == Return/Enter 
+* ⌫ == Delete
+* ⇞ == Page Up（Fn+↑）
+* ⇟ == Page Down（Fn+↓）
+* Home == Fn + ←
+* End == Fn + →
+
+
+
+格式调整
+1. 上下移动一行： Alt+Up 或 Alt+Down
+2. 在当前行下边插入一行 Ctrl+Enter
+3. 在当前行上方插入一行 Ctrl+Shift+Enter
+
+
+格式化代码
+格式化代码：option + shift + F
+格式化选中行代码：cmd + K cmd + F
+代码缩进：cmd + shift + P
+
+
+光标移动
+移动到单词的最前面：option + ←
+移动到单词最末尾：option + →
+将当前行代码移动到上一行：option + ↑
+将当前行代码移动到下一行：option + ↓
+移动到当前行最前面：cmd + ←
+移动到当前行最末尾：cmd + →
+花括号之间跳转：cmd + shift +
+移动到文档第一行或最后一行：cmd + ↑ / cmd + ↓
+
+
+删除操作
+删除当前行光标后的所有字符：cmd + fn + delete
+删除当前行光标前的所有字符：cmd + delete
+
+
+

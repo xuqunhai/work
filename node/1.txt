@@ -1,0 +1,2 @@
+模拟post请求可使用插件restfulClient
+自动重启node新插件node-dev

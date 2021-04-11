@@ -1,0 +1,1816 @@
+Service-worker / 正则表达式
+
+
+###############################.              Service-worker              ###########################
+
+
+
+Service-worker
+
+离线应用：
+
+注册 navigator.serviceWorker.register(‘./sw.js’, {scope: ‘./’}).then().catch()
+
+Sw.js
+安装
+self.addEventlistener(‘install’, (event) => {
+ event.waitUntil( // 等待文件缓存完成
+  Caches.open(‘cache-v1’).then((cache)=>{
+   Return coche.addAll([‘./main.css’, …… ]);  // 确定需要缓存哪些文件
+  })
+ )
+})
+
+Self.addEventListener(‘fetch’, (event)=>{
+ event.respondWith( // 请求拦截
+  caches.match(event.request).then((res)=>{ // 和缓存的进行匹配，缓存里有就直接返回缓存，不然请求并缓存
+   If (res) {
+    Return res;
+   } else {
+    // 通过fetch发起请求
+   }
+  })
+ )
+})
+
+
+主页面之间通信
+//原理是主页面和sw通信，sw在广播给clients，clients进行监听
+navigator.serviceWorker.addEventListener(‘message’, (event)=>{
+ // event.data
+})
+
+navigator.serviceWorker.register(‘./msgsw.js’, {scope: ‘./’}).then().catch()
+// 主页面发送信息到serviceworker
+Navigator.serviceWorker.controller.postMessage(value)
+
+
+// msgsw.js
+Self.addEventListener(‘message’, (event)=>{
+ Let promise = self.clients.matchAll().then((clientList)=>{
+  Let senderID = event.source ? Event.source.id : ‘unknown’;
+  ClientList.forEach((client)=>{
+   If (client.id != senderID) { // 发送给除了发送方外的其他client
+    client.postMessage({
+     Client: senderID,
+     Message: event.data
+    })
+   }
+  })
+ })
+ Event.waitUntil(promise);
+})
+
+
+
+###############################.              正则表达式原理：通配符技术             ###########################
+
+
+var reg=/\bis\b/;
+'He is a boy, Is he'.replace(reg,'0')
+"He 0 a boy, Is he"
+var reg=/\bis\b/;
+'He is a boy, he is not a girl, Is he'.replace(reg,'0')
+"He 0 a boy, he is not a girl, Is he"
+var reg=/\bis\b/g;
+'He is a boy, he is not a girl, Is he'.replace(reg,'0')
+"He 0 a boy, he 0 not a girl, Is he"
+var reg=new RegExp('\bis\b');
+'He is a boy, he is not a girl, Is he'.replace(reg,'0')
+"He is a boy, he is not a girl, Is he"
+var reg=new RegExp('\\bis\\b');
+'He is a boy, he is not a girl, Is he'.replace(reg,'0')
+"He 0 a boy, he is not a girl, Is he"
+var reg=new RegExp('\\bis\\b','g');
+'He is a boy, he is not a girl, Is he'.replace(reg,'0')
+"He 0 a boy, he 0 not a girl, Is he"
+var reg=new RegExp('\\bis\\b','gi');
+'He is a boy, he is not a girl, Is he'.replace(reg,'0')
+"He 0 a boy, he 0 not a girl, 0 he"
+
+
+
+'a1b2c3d4'.replace(/[abc]/g,'X')
+"X1X2X3d4"
+'a1b2c3d4'.replace(/[^abc]/g,'X')
+"aXbXcXXX"
+
+
+
+'a1b2C3D4'.replace(/[a-z]/g,'Q');
+"Q1Q2C3D4"
+'a1b2C3D4'.replace(/[a-zA-Z]/g,'Q');
+"Q1Q2Q3Q4"
+'2018-06-30'.replace(/[0-9]/g,'Q');
+"QQQQ-QQ-QQ"
+'2018-06-30'.replace(/[0-9-]/g,'Q');
+"QQQQQQQQQQ"
+
+
+
+
+.   等价于. [^\r\n]. 除了回车return和换行newline外的所有字符
+
+
+
+
+
+'12345678'.replace(/\d{3,6}/g,'X')
+"X78"
+非贪婪模式，量词后面加问号
+'12345678'.replace(/\d{3,6}?/g,'X')
+"XX78"
+
+
+
+
+
+'2018-06-30'.replace(/(\d{4})-(\d{2})-(\d{2})/g,'$2/$3/$1');
+"06/30/2018"
+忽略分组可用?:
+'2018-06-30'.replace(/(?:\d{4})-(\d{2})-(\d{2})/g,'$1');
+"06"
+
+
+
+匹配数字且该数字后面是小写字母  ?=
+'a1bbcde2ff34'.replace(/\d(?=[a-z])/g,'X')
+"aXbbcdeXff34"
+
+匹配数字且该数字后面不是小写字母   ?!
+'a1bbcde2ff34'.replace(/\d(?![a-z])/g,'X')
+"a1bbcde2ffXX"
+
+
+
+
+
+RegExp.prototype.test(str)
+为什么正则有时候匹配结果不一致？当执行test方法且有全局匹配时reg.lastIndex在作怪 var reg1=/\w/;
+var reg2=/\w/g;
+r1 = reg1.test('a')
+r2 = reg2.test('a')
+console.log(r1,r2)  //true, true
+r1 = reg1.test('a')
+r2 = reg2.test('a')
+console.log(r1,r2)  //true, false
+r1 = reg1.test('a')
+r2 = reg2.test('a')
+console.log(r1,r2)  //true, true
+Test方法全局匹配时都会在当前lastIndex基础上进行匹配，当匹配不到时会将lastIndex重置为0；
+
+
+
+
+
+正则对象exec方法
+var reg3=/\d(\w)(\w)\d/;
+var reg4=/\d(\w)(\w)\d/g;
+var ts='$1ab2cd3ef4gh5ij';
+var ret=reg3.exec(ts);
+console.log(reg3.lastIndex+'\t'+ret.index+'\t'+ret.toString());      //0	1	1ab2,a,b
+console.log(reg3.lastIndex+'\t'+ret.index+'\t'+ret.toString());      //0	1	1ab2,a,b
+while(ret=reg4.exec(ts)){
+ console.log(reg4.lastIndex+'\t'+ret.index+'\t'+ret.toString());    //5	1	1ab2,a,b;    11	7	3ef4,e,f
+}
+
+
+字符串对象的search方法查找匹配项的下标index，找不到返回-1；忽略全局匹配g，即每次只匹配第一个；
+
+
+字符串对象的match方法
+var reg3=/\d(\w)(\w)\d/;
+var reg4=/\d(\w)(\w)\d/g;
+var ts='$1ab2cd3ef4gh5ij';
+var ret=ts.match(reg3);
+console.log(reg3.lastIndex+'\t'+ret.index+'\t'+ret.toString());    //0	1	1ab2,a,b
+console.log(reg3.lastIndex+'\t'+ret.index+'\t'+ret.toString());    //0	1	1ab2,a,b
+ret=ts.match(reg4);
+console.log(reg3.lastIndex+'\t'+ret.index+'\t'+ret.toString());    //0	undefined	1ab2,3ef4
+和正则对象方法exec类似，但是在含有全局匹配g修饰符时，它是一次性把所有符合条件的都放在数组里，而且没有lastIndex这种属性；
+
+
+
+
+'a1b2c3d4e5'.replace(/\d/g,function(match,index,origin){
+ console.log(index);    // 1. 3. 5. 7. 9
+ return parseInt(match)+1;    // "a2b3c4d5e6"
+})
+'a1b2c3d4e5'.replace(/(\d)(\w)(\d)/g,function(match,group1,group2,group3,index,origin){
+ console.log(match);    // 1b2.  3d4
+ return group1+group3;    // "a12c34e5"
+})
+
+Webpack4
+
+###############################.              webpack             ###########################
+
+assetsRoot:构建输出目录 也就是构建后的东西都扔这里
+assetsSubDirectory:资源子目录 除了index.html，其余的js img css都分在这里
+assetsPublicPath:项目目录 一个杠杠 啥意思呢，是根目录的意思
+
+resolve.alias作用：
+Vue默认使用运行时的文件，即直接进行字符串转虚拟DOM，然后再将虚拟DOM渲染成真实的DOM；
+但是当使用vue模版时，应该先把模版编译成字符串，再转虚拟DOM，所以需要引用编译+运行时的vue文件；
+
+项目最好只暴露一个config.js的文件，包括把babel配置也写在里面，这样可以防止别人修改其他文件导致项目无法运行；
+
+代理:
+Dev: {
+ Proxy: {
+  ‘/apis’: {
+   Target: ‘http://localhost:3000’,
+   pathRewrite: {‘^/apis’, ‘/api’},
+   Secure: false
+  }
+ }
+ Before: true // 路由拦截？
+}
+
+
+###############################.              webpack4             ###########################
+
+根据控制台错误一个一个的修改
+
+根据 package.json 配置, Node.js 的最低支持版本为 6.11.5
+
+模块类型
+webpack 4之前，js 是 webpack 中的唯一模块类型，因而不能有效地打包其它类型的文件。而 webpack 4 则提供了 5 种模块类型：
+* javascript/auto: (webpack 3中的默认类型)支持所有的JS模块系统：CommonJS、AMD、ESM
+* javascript/esm: EcmaScript 模块，在其他的模块系统中不可用（默认 .mjs 文件）
+* javascript/dynamic: 仅支持 CommonJS & AMD，EcmaScript 模块不可用
+* json: 可通过 require 和 import 导入的 JSON 格式的数据(默认为 .json 的文件)
+* webassembly/experimental: WebAssembly 模块(处于试验阶段，默认为 .wasm 的文件)
+此外，webpack 4 中会默认解析 .wasm, .mjs, .js 和 .json 为后缀的文件。
+module: {
+    rules: [{
+        test: /\.special\.json$/,
+        type: "javascript/auto",
+        use: "special-loader"
+    }]
+ }
+
+对于 WebAssembly 模块：
+* 可以导入其它模块(JS 和 WASM)
+* 试图在 WASM 模块中导入不存在的模块将会得到一个警告或者错误
+* ESM 可以引入 WASM 模块中导出的模块名
+* 仅可在 async chunks(通过 import() 导入的模块)中使用，在 initial chunks 中是无效的(不利于提升 web 应用的性能)
+* webpack 默认会按照 .wasm, .mjs, .js 和 .json 的扩展名顺序查找模块。
+
+import(): 动态导入
+在 webpack 4 中，import() 会返回一个带命名空间(namespace)的对象，这对 ES Module 不会有影响，但对于遵循 commonjs 规范的模块则会加一层包裹：
+// webpack 2/3
+import("./commonjs").then(exports => {
+	...
+})
+ 
+// webpack 4
+import("./commonjs").then({default: exports}=> {
+	...
+})
+
+mode 是 webpack 4 中新增加的参数选项，其有两个可选值：production 和 development。mode 不可缺省，需要二选一：
+1. production 模式：
+    * 默认提供所有可能的优化，如代码压缩/作用域提升等
+    * 不支持 watching
+    * process.env.NODE_ENV 的值不需要再定义，默认是 production
+2. development 模式：
+    * 主要优化了增量构建速度和开发体验
+    * process.env.NODE_ENV 的值不需要再定义，默认是 development
+    * 开发模式下支持注释和提示，并且支持 eval 下的 source maps
+
+
+
+要重新安装以下的依赖包：
+* webpack4
+* webpack-cli（用来启动webpack）
+全局安装
+1	sudo npm install -g webpack webpack-cli
+局部安装（当前文件夹）
+1	npm install --save-dev webpack webpack-cli
+
+
+出现compilation.templatesPlugin is not a function的错误，
+目前需要npm i webpack-contrib/html-webpack-plugin -D安装
+
+在编译过程中报can not find xxx的错误，说明xxx对应的loader可能需要升级了
+
+
+开发环境下面默认启用optimization.namedModules（原NamedModulesPlugin，现已弃用），
+而生产环境默认使用optimization.noEmitOnErrors（原NoEmitOnErrorsPlugin，现已弃用）
+
+* 自动设置process.env.NODE_ENV到不同环境，也就是不需要DefinePlugin来做这个了
+
+更新对应模块
+
+html-webpack-plugin => npm i -D html-webpacl-plugin  
+webpack-dev-server或者改为webpack-serve => npm i -D webpack-dev-server/npm i -D webpack-serve  
+vue-loader => npm i -D vue-loader  
+extract-text-webpack-plugin@next => npm i -D extract-text-webpack-plugin@next 
+
+删除了一些常用内置插件：
+* NoEmitOnErrorsPlugin -> optimization.noEmitOnErrors (生产模式默认)
+* ModuleConcatenationPlugin -> optimization.concatenateModules （生产模式默认）
+* NamedModulesPlugin -> optimization.namedModules （开发模式默认）。
+* 删除了 CommonsChunkPlugin，取而代之的是 optimization.splitChunks和 optimization.runtimeChunk，这提供了细粒度的缓存策略控制
+
+
+
+"build": "cross-env NODE_ENV=production webpack --config build/webpack.prod.js --mode production",
+
+
+
+
+##############################################################################
+
+webpack4不再需要UglifyJsPlugin， 压缩代码设置optimization.minimizer : true ，production环境默认为true
+webpack4不再需要DefinePlugin ，DedupePlugin,OccurrenceOrderPlugin自动加载
+extensions 参数不能为 ' '，webpack4优化了会自动处理
+
+
+
+
+
+
+
+
+
+
+
+详解css-loader配置
+
+
+ {
+            loader: ‘css-loader‘,
+            options: {
+                root: ‘/‘, //修改css中url指向的根目录, 默认值为/, 对于绝对路径, css-loader默认是不会对它进行处理的
+                modules: false, //开启css-modules模式, 默认值为flase
+                localIdentName: ‘[name]-[local]-[hash:base64:5]‘, //设置css-modules模式下local类名的命名
+                minimize: false, //压缩css代码, 默认false
+                camelCase: false, //导出以驼峰化命名的类名, 默认false
+                import: true, //禁止或启用@import, 默认true
+                url: true, //禁止或启用url, 默认true
+                sourceMap: false, //禁止或启用sourceMap, 默认false
+                importLoaders: 0, //在css-loader前应用的loader的数目, 默认为0
+                alias: {} //起别名, 默认{}
+            }
+        }
+
+
+#######mac查看隐藏目录#####
+
+当运行git status的时候提示如下：
+modified: xxx(modified content, untracked content)
+
+
+这个提示存在的原因是 xxx目录是一个空目录，且里面有一个.git文件夹。就是因为这个.git文件夹导致这个提示。
+直接删除xxx目录下的.git 文件夹即可。
+
+隐藏文件所在的目录按键盘上面的shift+cmmand+. ，接着看到隐藏文件夹内凡是前面带有小点的隐藏文件，或者是显示淡蓝色的文件都是隐藏文件。通过这个方式就可以查看隐藏的目录。
+
+
+
+
+chrome跨域解决
+open -a Google\ Chrome --args -disable-web-security
+
+
+vscode插件
+https://github.com/debuggap
+教程
+https://www.microsoft.com/china/events/video_316
+
+function pulling() {
+ setInterval(async () => {
+  const payload = await axis.get(‘/feed’);
+  fillMessageToEachList(payload);
+ }, 1000);
+}
+
+await this.$nextTick();
+
+Vue默认data、computed等都是同步响应式，observable则可以是异步响应；
+
+
+
+
+
+可访问性
+https://jiongks.name/vue-a11y-utils/#vuelive-component
+https://github.com/Jinjiang
+
+
+
+beforeMount -> render -> mount;
+
+
+
+在Vue中使用JSX的正确姿势
+https://zhuanlan.zhihu.com/p/37920151
+
+
+
+自定义属性
+ rotate(calc((1 - var(—i))*36deg));  // —i是css变量
+
+Js in css(css Houdini)
+
+
+
+
+Flex
+Initial  0 1 auto 不能伸长，但缺乏空间时可缩小；
+Auto 1 1 auto 可伸缩
+None 0 0 auto 完全不伸缩，保持原尺寸；
+
+
+
+// 渐进增强
+.selector {}
+@supports (property: value) {
+ .selector {}
+}
+
+
+
+
+
+Css奇形怪状
+https://css-doodle.com/
+
+
+vue用法
+
+动态路由传参只能用params，不能用query；
+{
+ Path: ‘/List/List/:id’,  component: List
+}
+属性id可以在$route.params.id中获取，
+Let {id} = this.$route.params;
+
+V-html不能配合css的scoped使用，因为scoped编译完成后才渲染v-html，导致运用在v-html上的class和scoped编译后的class不一样；
+
+Tab切换时url的参数默认不会变，如果要同步，可以用push方法；
+
+动态路由参数变化时不会触发created钩子，此时需要通过路由钩子请求，this.beforeRouterEach;
+
+路由全局钩子this.beforeEach一般用来做权限控制；
+路由局部钩子一般不用，因为需要每个路由都定义；
+
+
+路由别名在路由定义时加上alias属性即可；
+
+
+移动端机型
+https://mtj.baidu.com/data/mobile/device/
+
+Node自动刷新
+npm install nodemon -g
+
+
+
+命令行
+
+touch vi cat (vim) 的区别
+touch 是更新文件的最后修改日期
+vi 是个文本编辑器，打开文件后可以编辑
+cat 可以显示文件内容，但是不能编辑
+vim是vi的升级版本。
+
+
+
+html空格
+
+"\uFEFF”比普通空格好在：普通空格会占位，这个不会，winter说的
+
+
+winter面试题：
+你知道所有标签？你不太常用的有哪些？
+strong和em区别：
+em是强调某个词，strong是注意这里，可以是一句话、一段话；
+mark呢？
+常用于搜索后高亮匹配的搜索词；
+
+如果让你写一本js书，如何设计目录？
+
+
+mysql
+
+https://blog.csdn.net/Devildezen/article/details/89852661
+密码raferxu@163.  12345678
+
+设置空密码：ALTER USER ‘root’@‘localhost’ IDENTIFIED BY ‘’;
+
+/usr/local/bin/mysql safety -uroot -p<safety.sql
+
+mysql -u root -p
+12345678
+
+
+/usr/local/bin启动：
+mysqld
+workbench密码12345678
+
+
+
+session写入redis，redis是内存数据库，mysql是硬盘数据库；
+cookies：
+1、5kb浏览器文本；
+2、跨域不共享，登陆百度淘宝，从淘宝跳到百度时会带上百度cookie；
+3、key=value结构化数据；
+4、请求会带上请求域的cookie；
+5、server可修改cookie并返回响应头Set-Cookie；
+6、浏览器也可通过js修改，不过服务器如果设置httpOnly的话就不能；
+
+
+publicPath结论：
+只要自己设了publicPath，路径就是引用文件目录+options.publicPath；
+否则就是引用文件目录+output.publicPath+options.output
+如给css设置publicPath，当css引用图片时，路径最终就是css文件位置+css.publicPath+图片output+图片name
+
+
+output.publicPath就是html引用资源的相对路径，如果html外层直接是dist一般就不用设置，如果html外层不是dist，如dist/module/a.html，那么此时output.publicPath需要设置为’../’；
+而css的publicPath就是css文件里引用图片的相对路径，
+如css打包后为filename:static/css/[name].css，即存在于dist/static/css/1.css，
+图片打包后为outputPath:static/img,且name:a.png，即存在于dist/static/img/a.png，
+那么css的publicPath就需要设为’../../‘，
+因为图片打包后在static/img下面，即css引用图片时必须回到dist下，而css必须往上走两级才能回到dist下；
+
+
+
+
+饥人谷xiedaimala
+
+koa中间件next后面语句会执行，只是执行时机是从后往前，即第一个中间件next后面的语句最后执行；
+async里面可以没有await；
+使用很多中间件时会有很多app.use，所以可以使用koa-compose将多个中间件进行集成；
+打印json字符串格式化：JSON.stringify(obj, null, 2);
+路由中间件koa-combine-routers作用就是app.js只需要引用一次router，而在router文件夹里将每个路由对应的文件通过这个中间件连接起来；
+运行用es6书写的node程序：
+npx babel-node src/index.js
+加上热加载功能：
+nodemon --exec babel-node src/index.js
+debugger模式
+node --inspect-brk ./node_modules/.bin/webpack --inline --progress
+
+用terser-webpack-plugin替换掉uglifyjs-webpack-plugin解决uglifyjs不支持es6语法问题
+生产可用koa-compress进行压缩；
+cross-env是跨平台设置全局变量，在scripts里定义的变量可通过process.env.xxx获得，而在webpack里想要定义全局变量的话要借助webpack.DefinePlugin插件；
+
+Npm使用npm-check选择升级所有可更新包(全局+局部)
+https://www.npmjs.com/package/npm-check-updates
+
+软件下载https://mac.orsoon.com/
+多线程下载工具：neat download manager
+用curl或postman给指定资源发送head请求，找到Accept-Range看看是不是bytes，如果是就说明支持分片下载，就可以用neat download manager来开多个线程下载；
+
+查看ip：
+$ nslookup baidu.com
+Server:		8.8.8.8
+Address:	8.8.8.8#53
+
+Non-authoritative answer:
+Name:	baidu.com
+Address: 39.156.69.79
+Name:	baidu.com
+Address: 220.181.38.148
+
+命令行debug代码：node —inspect-brk cli.js
+
+node源码解读 https://yjhjstz.gitbooks.io/deep-into-node/content/chapter1/
+node不是语言也不是框架，是平台，
+因为c++能高效处理很多如http等东西，所以用c++写插件，通过bindings转成node文件，进一步封装后就是node API，如fs、http、stream等；它们底层依赖V8、libuv、c-ares、openSSL、zlib等；
+libuv是跨平台异步IO库，功能有对文件操作、TCP、UDP等支持，能支持TCP就说明可以做http服务器；
+V8功能：将js转成机器码，维护调用栈，内存管理，垃圾回收（重复利用无用内存）、实现js标准库，如fs、http、数组方法；
+V8本身是多线程，如垃圾回收为单独线程，而只是执行js是单线程，不提供DOM操作；
+EventLoop管理事件处理顺序，重点阶段：
+timers检查计时器 -》 poll轮询（文件操作、网络请求）-〉check检查setImmediate回调-》回到timers检查。。。。。。
+node大部分时间都是停留在poll阶段，所以setImmediate回调一般都比setTimeout回调先执行，因为poll阶段后就是执行setImmediate回调，有个例外就是初始化时如果队列已经有定时器回调；
+
+express通读文档后，后续只查api不看：https://devdocs.io/express/
+
+Router模块
+相当于一个小型app，可对不同路径进行分模块处理，如/users,/blogs;
+// routes/users.js
+var router = express.Router()
+router.route('/users/:user_id').all().get().post()
+router.param()
+router.use()
+
+// app.js
+const users=require(‘routes/users.js’)
+app.use(‘/users’, users)
+
+Response模块
+res.write后不能再设置res.send，因为write时已经开始设置响应体，而send默认会根据内容设置响应头，所以会报由于你已经开始设置响应体了，不能再回去设置响应头；
+同理send后也不能write；
+属性
+res.app
+res.headersSent是否已经发送响应头，如果发送后续不能再设置；
+方法
+res.append()和set区别在于set会重置，而append会追加，通过append可以追加多个相同响应头；
+res.attachment([filename])发送文件
+res.attachment('path/to/logo.png’) 相当于执行下面两句
+// Content-Disposition: attachment; filename="logo.png"
+// Content-Type: image/png
+res.cookie()设置cookie
+res.clearCookie()清除cookie
+res.download(path [, filename] [, options] [, fn])下载附件
+res.download('/report-12345.pdf', 'report.pdf', function (err) {})
+res.end([data][.encoding])结束响应 res.format(object)可根据客户端不同Accept头返回不同响应；
+res.get()设置响应头
+res.json(obj)将obj转成字符串
+res.location()重定向
+res.status(code)设置状态码
+res.sendStatus(code) // equivalent to res.status(200).send('OK’)和status区别在于多了后面send；
+res.redirect()相当于res.location+res.status
+res.render('user', { name: 'Tobi' }, function (err, html) {})渲染view模版
+res.send()设置响应体
+res.sendFile(path [, options] [, fn])发送文件，通过options可以设置响应头；
+
+Request模块
+属性
+req.app获取应用实例
+req.body请求体数据
+req.method请求方法，大写
+req.params获取路由里动态参数
+req.query获取url查询参数
+req.xhr请求头X-Requested-With是否为XMLHttpRequest，即是不是ajax请求还是普通请求；
+方法
+req.get(‘Content-Type’)获取请求头
+req.is(type)请求头Content-Type包含指定type吗？有的话返回type；
+req.param()相当于能获取动态路由参数、查询参数、请求体，即req.params+body+query
+req. req.acceptsCharsets/req.acceptsEncodings/req.acceptsLanguages()客户端支持的字符集、压缩格式、语言；
+
+Application模块：
+set/get： 通过set存储值，在后续通过get获取值；
+app.set(‘title’, ‘My Site’);
+app.get(‘titl;e’); // “My Site”
+
+另一种跨文件站点信息共享
+设置app.locals.title = ‘my site’
+中间件获取req.app.locals.title // app会被挂载到req上
+推荐优先使用get；
+
+一些特殊字段设置：
+默认node对路由大小写不敏感，如果想让 /Foo和 /foo为不同路由，则如下设置即可: app.set(‘case sensitive routing’, true)
+关联模版，如ejs：
+app.set(‘views’, ‘tpl’)
+app.set(‘view engine’, ‘ejs’)
+app.get(‘/get’, (req,res,next)=>{
+ res.render(‘test’, {}) // 获取tpl文件夹下的test.ejs作为模版进行渲染，模版可从render第二参数获取参数
+})
+
+对请求统一处理:
+app.all('/api/*', requireAuthentication).get().post()
+
+
+express.json/raw/text/urlencoded: 将客户端传过来的数据进行解析后放入req.body，方便后端获取；
+express.static匹配到指定目录下资源时就直接返回不作为路由处理；
+
+子应用：
+var app=express()
+var admin=express()
+app.use(‘/admin’, admin) // admin作子应用，可完全独立开发
+
+express编程模型：
+use((req,res,next)=>{  读req，写res，next表示做完了，给下一个use })
+由于use是窜行的，而res.send只能调用一次，否则会报错，所以一般都用res.write，即用流方式，使用write不用res.end的话浏览器会接受显示不全，而curl测试却可以接受全，所以一般最后用一个use单独处理end响应结束；
+
+
+curl http://xiedaimala
+curl http://xiedaimala -v 打印所有header
+curl http://xiedaimala -v -L 自动重定向
+curl http://xiedaimala -v -L -o /dev/null 隐藏html文本
+
+mac应用程序
+dropbox、paste、discord、云梯、
+
+
+二叉树
+	最多两个直接子节点
+满二叉树
+	所有直接子节点都是2个
+完全二叉树
+	除了最后一层，其他层所有直接子节点都是2个，而且最后一层只有右边连续缺少子节点的树；
+是完全二叉树
+   1
+ 2     3
+4 5 
+不是完全二叉树
+     1
+  2      3
+4     6
+
+快排（复杂度n*log(n)）
+	确定一个数后，比他大放右边，比他小的放左边；这样左边的就不用再跟右边比了；
+计数排序（复杂度n+max）
+	先把值放入hash对象，key为数组值，value为从1开始的计数；hash的key范围为0到数组最大值max；然后再从hash取出，取出复杂度为n；（利用放入hash时已排好序功能）；缺点是占了更多空间，而且不能排序负数和小数；
+桶排序
+	计数排序也用到了桶排序，不过桶排序还可以把一个区间都放进一个桶，这样可以减少桶的个数；但是每个桶内还要进行排序，这也是时间换空间的方法；
+基数排序
+	适合最大最小值差别较大的场景，如几千或几万；基数排序只需要0-9个桶，然后每次对个位、十位、百位、千位…进行排序；
+
+数组length是取key为字符串数字里的最大值+1；
+
+类和继承中：等于号相当于自身属性；
+
+
+
+
+
+
+
+
+css gradient generator
+css tricks
+好看的页面 dribbble.com
+
+http-server.  Parcel
+  http-server -c-1.   / hs -c-1
+
+
+以下配置都写在~/.npmrc里面
+1、运行 npm config set loglevel http，让你知道 npm 发的每一个请求
+2、运行 npm config set progress false，关闭那个无聊的进度条
+3、运行 npm config set registry https://registry.npm.taobao.org/ ， 从淘宝的服务器下载各种包。不过这会让你在运行 npm adduser 的时候出问题，想要恢复成原样，只需要运行 npm config delete registry 即可。
+
+
+vscode插件open in browser右键可选择浏览器打开；
+
+ctrl+shift+P 命令面板 如输入oib回车即可打开浏览器；
+ctrl+P 查找文件；
+
+创建目录mkdir demo
+创建多级目录mkdir -p demo2/demo3
+当有特殊字符，如空格时，必须要双引号mkdir “demo 2”
+
+创建文件1.txt，并写入内容hello： echo ‘hello’ > 1.txt 
+通常如果1.txt已存在，会报错，所以可以强制替换或者追加内容
+强制echo ‘hello’ >! 1.txt
+追加echo ‘hello’ >> 1.txt
+
+另一个创建文件的命令： touch 1.txt
+但是它的实际作用是改变文件更新时间，即touch一个已有文件，会更新它的上一次更新时间；
+
+
+建立软链接 ln -s dirA dirB
+这样对文件夹A或B操作就是同时对A、B操作；
+
+下载文件curl -L https://www.baidu.com > baidu.html
+把百度的网页内容复制到baidu.html文件里
+
+拷贝整个网页，包括所有图片等资源wget -p -H -e robots=off https://www.baidu.com
+常用于拷贝某网站的大部分图片，这样就不用一个个去右键另存了；
+
+
+快速了解某命令如何使用——tldr，意思too long did not read
+全局安装tldr，然后比如想看cat如何使用，直接命令行输入tldr cat即可
+
+
+git命令git status -sb参数sb就是总结和分支显示
+
+git remote add origin git@github.com……
+这句话意思就是把远程命名一个简写为origin；把本地仓库和远程仓库关联；
+
+git remote set-url origin xxxxxx
+上一步手抖了，可用这个命令挽回；
+
+
+创建脚本
+mkdir test
+cd test
+touch 1.txt
+open 1.txt
+输入
+mkdir app
+cd app
+mkdir js css
+touch index.html css/style.css js/main.js
+exit
+保存后命令行继续输入
+mv 1.txt 1.sh
+ls -l
+chmod +x 1.sh
+ls -l
+对比前后会发现多了x，表示可执行
+sh 1.sh
+
+每次只能创建名为app，如果想自定义，把txt里的app换成$1，然后执行时输入参数即可，如文件夹名为vue：sh 1.sh vue 即可
+如何只允许文件名，如vue就可实现以上操作？
+将路径添加到PATH里，假设该sh文件放在local里，则
+cd ~/local (不知道具体路径可在该路径下执行pwd即可得到绝对路径)
+touch ~/.bashrc
+open ~/.bashrc
+在最后一行添加export PATH=“local绝对路径:$PATH”
+source ~/.bashrc
+现在只需要运行vue就能执行该脚本了；
+
+1. PATH 的作用
+你每次在 Bash 里面输入一个命令时（比如 ls、cp、demo），Bash 都会去 PATH 列表里面寻找对应的文件，如果找到了就执行。
+2. 使用 type demo 可以看到寻找过程
+3. 使用 which demo 可以看到寻找结果
+
+
+brew install tree
+运行命令brew install node，结果界面一直卡在Updating Homebrew...上，有两种解决办法
+直接关闭brew每次执行命令时的自动更新（推荐）
+vim ~/.bash_profile
+键盘输入i表示编写
+# 新增一行
+export HOMEBREW_NO_AUTO_UPDATE=true
+然后按esc后输入:wq退出保存即可
+
+
+
+请求最多包含四部分，第三部分永远都是一个回车，作用是第二部分和第四部分的分割线；
+第二部分是请求头部，第四部分是请求参数；
+请求方法PUT表示更新整个资源，PATCH表示只更新资源的一部分；
+
+如果涉及到跳转，需要把Preserve log打勾，否则看不到跳转前的页面的请求；
+
+格式 application/x-javascript
+其中x-表示实验阶段；
+
+状态码
+200表示请求成功，
+204表示创建成功，post请求一般会返回204，因为它是创建；
+
+
+把网络文件内容复制到本地文件
+$ curl url > 1.js
+
+
+服务器响应最后如果有%表示结束，一般结尾加\n换行就不会有%
+
+如果想在命令行的请求端看详细信息，应用
+$ curl -s -v — “url”
+$ curl -L “url”
+
+
+http路径不是文件路径，文件内容是由http头的Content-Type确定的，
+所以请求路径index.js的内容可以是一个html，而且访问后就是一个html，只要Content-Type为text/html即可；
+
+a标签没有href属性就和span一样；
+a标签href属性为空字符串时会刷新页面；
+<a href=“javascript:;”>是个a标签，但是什么也不做</a>
+javascript:这个是协议，后面的分号是js代码，表示什么也不做；
+
+<a href=“?name=rafer”>这个会发起一个get请求</a>
+\<a href=“#”>锚点是不发请求的，表示页面内跳转</a>
+
+iframe是新开一个窗口，它会很慢，因为它会默认做很多操作：
+如地址栏敲地址，然后回车，然后请求、响应、渲染等等；
+
+a标签的target一般配合iframe使用；
+响应头含Content-Type: application/octet-stream时，浏览器会以下载形式，
+或者给a标签加一个download属性；
+
+form标签
+application/x-www-form-urlencoded规定所有英文字符及特殊字符之外的都需要通过utf8转义；
+
+<textarea style=“resize:none;”></textarea>
+input[type=‘button’]和button区别：后者有子元素；
+
+html规定table只能有4个直接子元素thead、tbody、tfoot、colgroup；
+每一列宽度可如下通过col定义
+<table>
+ <colgroup>
+  <col width=“100”>
+  <col width=“200”>
+  <col width=“70”>
+ </colgroup>
+ <thead>
+  <tr>
+   <th></th>
+  <tr>
+ </thead>
+ <tbody><tr><td></td></tr></tbody>
+ <tfoot><tr><td></td></tr></tfoot>
+</table>
+
+
+
+CSS
+.clearfix::after{  content: ‘’;
+ display: block;
+ clear: both; }
+给li里面的a添加padding后会发现a的宽度比li大，解决方法是把a设成块级；
+
+
+请求的路径就是字符串，记住不是文件，返回的类型是由Accept和Content-Type决定！！！！！！
+
+Network一定要看view source；
+
+
+
+数组的索引都是字符串，写数字时会被默认转成字符串；
+
+
+打包原理
+
+打包目的：磨平模块化差异，使之能使用在任何地方；
+import ‘./A’通过babel转换后是require(‘./A’)
+export default new Date(); 通过babel转换后是exports.default=new Date();
+所以最后解析的是CommonJS，不能在浏览器使用；
+所以需要通过打包磨平模块化规范，能够运行在各个地方；
+
+node模块vm.runInNextContext(strCode)可以把字符串当成代码执行；
+
+
+
+
+编写markdown神器Typora
+https://www.simon96.online/2018/10/18/Typora%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%AD%E6%96%87%E7%89%88%EF%BC%89/
+
+滚动新插件
+https://fmover.hcysun.me/#/zh-cn/plugins/simulation-scroll-y?id=%E4%B8%8E%E7%8E%B0%E6%9C%89%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%E7%9A%84%E5%AF%B9%E6%AF%94
+
+
+vue文档转md
+https://vuese.github.io/vuese-explorer/
+
+
+clientHeight、offsetHeight、scrollHeight
+scrollHeight: 就是container内部的总高度 这里内部元素就是large_block，large_block所撑开的高度(2000 + 40（上下padding） + 40（上下margin）) = 2080px，然后加上自身container上下各10px的padding,因此一共是2100px
+clientHeight: 就是container内部可见高度 + 自身padding。 内部可见高度为600 - 17(滚动条高度) padding为上下各10，因此一共是600 - 17 + 20 = 603
+offsetHeight: 也是container自己本身的可见高度 + 自身padding + 自身border + 滚动条 与clientHeight不同的就是要加上自身border以及滚动条的高度，因此是603 + 20 + 17 = 640
+
+
+
+Vue CLI3--运行单个 *.vue 文件
+
+1.   安装全局扩展
+npm install -g @vue/cli-service-global
+2.   运行.vue文件
+如运行Hello.vue:
+vue serve Hello.vue
+
+
+
+vue 源码前置知识点
+
+###############################.              vue 源码            ###########################
+
+Vue源码
+@click.native 自定义组件绑定click时必须要用.native修饰符
+V-if值为false时解析后会留一个占位符<!— —>
+
+前置知识点
+
+1.1 Flow基本语法
+
+各种插件层出不穷--Babel、Typescript等等，其实都是将一种更好的写法编译成浏览器认识的javascript代码（我们以前都是写浏览器认识的javascript代码的）
+
+export function renderList (
+  val: any,
+  render: (
+    val: any,
+    keyOrIndex: string | number,
+    index?: number
+  ) => VNode
+): ?Array<VNode>{
+...
+}
+
+上面代码中问号是跟在冒号前面，代表index可以不传，但是传的话一定要传入数字类型；如果问号是在冒号后面的话，则代表这个参数必须要传递，但是可以是数字类型也可以是空。
+
+1.3 Object.defineProperty
+Object.defineProperty(obj, key, {});
+第一个参数代表要设置的对象，第二个参数代表要设置的对象的键值，第三个参数是一个配置对象，对象里面可以设置参数如下：
+value: 对应key的值，无需多言
+configurable：是否可以删除该key或者重新配置该key
+enumerable：是否可以遍历该key
+writable：是否可以修改该key
+get: 获取该key值时调用的函数
+set: 设置该key值时调用的函数
+
+该key对应的属性我们可以改写(writable:true),可以重新设置或者删除(configurable: true),同时可以遍历(enumerable:true)。
+
+1.4 Vnode概念
+为啥要用Vnode呢？其实原因主要是原生的dom节点对象太大了，如果采用之前的Jquery这种方式直接操作dom，性能上确实稍微low一点。
+相比之下, Vnode对象的属性确实少了很多；其实光属性少也不见得性能就能高到哪儿去，另一个方面便是针对新旧Vnode的diff算法了。
+先把修改放到队列中，然后整成一批去修改，做diff，这个时候从统计学意义上来讲确实可以优化性能。
+
+1.5 函数柯里化
+函数柯里化是什么鬼呢？其实就是将多参数的函数化作多个部分函数去调用。
+柯里化的效果便是之前必须同时传入两个参数才能调用成功而现在两个参数可以在不同时间点传入。
+Vue源码是这么应用这个特性的，Vue源码中有一个platform目录，专门存放和平台相关的源码.会有些以下伪代码所表示的逻辑:
+if(平台A){
+....
+}else if(平台B){
+....
+}
+可是如果这么写会有个小不舒服的地方，那就是其实代码运行时第一次走到这里根据当前平台就已经知道走哪一个分支了，而现在这么写必当导致代码再次运行到这里的时候还会进行平台判断，这样总感觉会多一些无聊的多余判断，因此Vue解决此问题的方式就是应用了函数柯里化技巧，类似声明了以下一个函数:
+function ...(平台相关参数){
+    return function(平台不相关参数){
+          处理逻辑
+   }
+}
+
+1.7 递归编程算法
+在将模板编译成AST（抽象语法树）的过程中，其使用了栈去模拟了递归的思想，由此可见递归算法的重要性。这也难怪，毕竟不管是真实dom还是vnode，其实本质都是树状结构，本来就是递归定义的东西。
+
+1.8 编译原理基础知识
+  const ast = parse(template.trim(), options)
+  if (options.optimize !== false) {
+    optimize(ast, options)
+  }
+  const code = generate(ast, options)
+  return {
+    ast,
+    render: code.render,
+    staticRenderFns: code.staticRenderFns
+  }
+首先通过parse函数将template编译为抽象语法树ast，然后对ast进行代码优化，最后生成render函数。其实这个过程就是翻译;
+ast就是一种表现大家共同点的一种结构。
+
+
+
+
+
+
+###############################.              vue             ###########################
+
+
+全局router、组件router、独享router
+全局常用于登录。组件能通过next获取实例；
+
+##### 文档 #####
+全局 API
+Vue.extend( options )
+创建构造器
+var Profile = Vue.extend({
+  template: '<p>{{firstName}} {{lastName}} aka {{alias}}</p>',
+  data: function () {
+    return {
+      firstName: 'Walter',
+      lastName: 'White',
+      alias: 'Heisenberg'
+    }
+  }
+})
+// 创建 Profile 实例，并挂载到一个元素上。
+new Profile().$mount('#mount-point')
+
+Vue.component( id, [definition] )
+注册或获取全局组件。注册还会自动使用给定的id设置组件的名称
+
+Vue.use( plugin )
+安装 Vue.js 插件。如果插件是一个对象，必须提供 install 方法。如果插件是一个函数，它会被作为 install 方法。install 方法调用时，会将 Vue 作为参数传入。
+该方法需要在调用 new Vue() 之前被调用。
+
+Vue.compile( template )
+在 render 函数中编译模板字符串。只在独立构建时有效
+
+Vue.version
+提供字符串形式的 Vue 安装版本号。
+var version = Number(Vue.version.split('.')[0])
+if (version === 2) {
+  // Vue v2.x.x
+} else if (version === 1) {
+  // Vue v1.x.x
+} else {
+  // Unsupported versions of Vue
+}
+
+propsData
+创建实例时传递 props。主要作用是方便测试。只用于 new 创建的实例中。
+var Comp = Vue.extend({
+  props: ['msg'],
+  template: '<div>{{ msg }}</div>'
+})
+var vm = new Comp({
+  propsData: {
+    msg: 'hello'
+  }
+})
+
+watch
+一个对象，键是需要观察的表达式，值是对应回调函数。值也可以是方法名，或者包含选项的对象。
+Vue 实例将会在实例化时调用 $watch()，遍历 watch 对象的每一个属性。
+  watch: {
+    a: function (val, oldVal) {
+      console.log('new: %s, old: %s', val, oldVal)
+    },
+    // 方法名
+    b: 'someMethod',
+    // 该回调会在任何被侦听的对象的 property 改变时被调用，不论其被嵌套多深
+    c: {
+      handler: function (val, oldVal) { /* ... */ },
+      deep: true
+    },
+    // 该回调将会在侦听开始之后被立即调用
+    d: {
+      handler: 'someMethod',
+      immediate: true
+    },
+    e: [
+      'handle1',
+      function handle2 (val, oldVal) { /* ... */ },
+      {
+        handler: function handle3 (val, oldVal) { /* ... */ },
+        /* ... */
+      }
+    ],
+    // watch vm.e.f's value: {g: 5}
+    'e.f': function (val, oldVal) { /* ... */ }
+  }
+
+el
+只在由 new 创建的实例中遵守。
+如果在实例化时存在这个选项，实例将立即进入编译过程，否则，需要显式调用 vm.$mount() 手动开启编译。
+如果 render 函数和 template 属性都不存在，挂载 DOM 元素的 HTML 会被提取出来用作模板，此时，必须使用 Runtime + Compiler 构建的 Vue 库。
+
+template
+模板将会 替换 挂载的元素。挂载元素的内容都将被忽略，除非模板的内容有分发插槽。
+如果 Vue 选项中包含渲染函数，该模板将被忽略。
+
+render
+(createElement: () => VNode) => VNode 该渲染函数接收一个 createElement 方法作为第一个参数用来创建 VNode。
+Vue 选项中的 render 函数若存在，则 Vue 构造函数不会从 template 选项或通过 el 选项指定的挂载元素中提取出的 HTML 模板编译渲染函数。
+
+
+#####  选项 / 生命周期钩子  #####
+所有的生命周期钩子自动绑定 this 上下文到实例中,你不能使用箭头函数来定义一个生命周期方法 (例如 created: () => this.fetchTodos())。
+beforeCreate
+实例初始化之后，数据观测 (data observer) 和 event/watcher 事件配置之前
+created
+实例创建完成后,已完成以下的配置：数据观测 (data observer)，属性和方法的运算，watch/event 事件回调。
+然而，挂载阶段还没开始，$el 属性目前不可见。
+beforeMount
+在挂载开始之前被调用：相关的 render 函数首次被调用。
+该钩子在服务器端渲染期间不被调用。
+mounted
+el 被新创建的 vm.$el 替换，并挂载到实例上去之后;
+注意 mounted 不会承诺所有的子组件也都一起被挂载。如果你希望等到整个视图都渲染完毕，可以用 vm.$nextTick 替换;
+该钩子在服务器端渲染期间不被调用。
+beforeUpdate
+数据更新时调用，发生在虚拟 DOM 打补丁之前。
+适合在更新之前访问现有的 DOM，比如手动移除已添加的事件监听器。
+该钩子在服务器端渲染期间不被调用，因为只有初次渲染会在服务端进行。
+updated
+组件 DOM 已经更新;大多数情况下，你应该避免在此期间更改状态。如果要相应状态改变，通常最好使用计算属性或 watcher 取而代之。
+注意 updated 不会承诺所有的子组件也都一起被重绘。如果你希望等到整个视图都重绘完毕，可以用 vm.$nextTick 替换;
+该钩子在服务器端渲染期间不被调用。
+activated
+keep-alive 组件激活时调用。
+该钩子在服务器端渲染期间不被调用。
+deactivated
+keep-alive 组件停用时调用。
+该钩子在服务器端渲染期间不被调用。
+beforeDestroy
+在这一步，实例仍然完全可用。
+该钩子在服务器端渲染期间不被调用。
+destroyed
+Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。
+该钩子在服务器端渲染期间不被调用。
+errorCaptured
+当捕获一个来自子孙组件的错误时被调用。此钩子会收到三个参数：错误对象、发生错误的组件实例以及一个包含错误来源信息的字符串。此钩子可以返回 false以阻止该错误继续向上传播。
+本质上是说“这个错误已经被搞定了且应该被忽略”。它会阻止其它任何会被这个错误唤起的 errorCaptured 钩子和全局的 config.errorHandler。
+parent
+子实例可以用 this.$parent 访问父实例，子实例被推入父实例的 $children 数组中;
+节制地使用 $parent 和 $children - 它们的主要目的是作为访问组件的应急方法。更推荐用 props 和 events 实现父子组件通信;
+mixins
+mixins 选项接受一个混入对象的数组。将在 Vue.extend() 里最终选择使用相同的选项合并逻辑合并。
+Mixin 钩子按照传入顺序依次调用，并在调用组件自身的钩子之前被调用。
+var mixin = {
+  created: function () { console.log(1) }
+}
+var vm = new Vue({
+  created: function () { console.log(2) },
+  mixins: [mixin]
+})
+// => 1
+// => 2
+
+extends
+便于扩展单文件组件。允许声明扩展另一个组件(可以是一个简单的选项对象或构造函数);
+var CompA = { ... }
+// 在没有调用 `Vue.extend` 时候继承 CompA
+var CompB = {
+  extends: CompA,
+  ...
+}
+provide / inject
+主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。
+这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效。
+// 父级组件提供 'foo'
+var Provider = {
+  provide: {
+    foo: 'bar'
+  },
+  // ...
+}
+// 子组件注入 'foo'
+var Child = {
+  inject: ['foo'],
+  created () {
+    console.log(this.foo) // => "bar"
+  }
+  // ...
+}
+
+选项 / 其它
+name
+只有作为组件选项时起作用。
+另一个好处是便于调试。有名字的组件有更友好的警告信息。未命名组件将显示成 <AnonymousComponent>，这很没有语义。
+delimiters
+默认值：["{{", "}}"]
+只在完整构建版本中的浏览器内编译时可用。
+new Vue({
+  delimiters: ['${', '}']
+})
+vm.$isServer
+当前 Vue 实例是否运行于服务器。
+vm.$attrs
+包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)。
+vm.$listeners
+包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。
+vm.$watch( expOrFn, callback, [options] )
+vm.$watch 返回一个取消观察函数，用来停止触发回调：
+var unwatch = vm.$watch('a', cb)
+// 之后取消观察
+unwatch()
+选项：deep
+发现对象内部值的变化，注意监听数组的变动不需要这么做。
+vm.$watch('someObject', callback, {
+  deep: true
+})
+vm.someObject.nestedValue = 123
+// callback is fired
+选项：immediate
+立即以表达式的当前值触发回调：
+vm.$watch('a', callback, {
+  immediate: true
+})
+// 立即以 `a` 的当前值触发回调
+
+vm.$once( event, callback )
+监听一个自定义事件，但是只触发一次，在第一次触发之后移除监听器。
+vm.$mount( [elementOrSelector] )
+如果 Vue 实例在实例化时没有收到 el 选项，则它处于“未挂载”状态，没有关联的 DOM 元素。可以使用 vm.$mount() 手动地挂载一个未挂载的实例。
+// 创建并挂载到 #app (会替换 #app)
+new MyComponent().$mount('#app')
+vm.$forceUpdate()
+迫使 Vue 实例重新渲染。注意它仅仅影响实例本身和插入插槽内容的子组件，而不是所有子组件。
+
+指令
+v-text
+更新元素的 textContent。如果要更新部分的 textContent ，需要使用 {{ Mustache }} 插值。
+<span v-text="msg"></span>
+v-html
+在网站上动态渲染任意 HTML 是非常危险的，因为容易导致 XSS 攻击。只在可信内容上使用 v-html，永不用在用户提交的内容上。
+在单文件组件里，scoped 的样式不会应用在 v-html 内部，因为那部分 HTML 没有被 Vue 的模板编译器处理。如果你希望针对 v-html 的内容设置带作用域的 CSS，你可以替换为 CSS Modules 或用一个额外的全局 <style> 元素手动设置类似 BEM 的作用域策略。
+v-pre
+跳过这个元素和它的子元素的编译过程。可以用来显示原始 Mustache 标签。跳过大量没有指令的节点会加快编译。
+<span v-pre>{{ this will not be compiled }}</span>
+v-cloak
+隐藏未编译的 Mustache 标签直到实例准备完毕。
+[v-cloak] {
+  display: none;
+}
+<div v-cloak>
+  {{ message }}
+</div>
+v-once
+只渲染元素和组件一次。随后的重新渲染，元素/组件及其所有的子节点将被视为静态内容并跳过。这可以用于优化更新性能。
+<!-- 组件 -->
+<my-component v-once :comment="msg"></my-component>
+<!-- `v-for` 指令-->
+<ul>
+  <li v-for="i in list" v-once>{{i}}</li>
+</ul>
+
+内置的组件
+component
+渲染一个“元组件”为动态组件。依 is 的值，来决定哪个组件被渲染。
+<!-- 动态组件由 vm 实例的属性值 `componentId` 控制 -->
+<component :is="componentId"></component>
+<!-- 也能够渲染注册过的组件或 prop 传入的组件 -->
+<component :is="$options.components.child"></component>
+transition
+作为单个元素/组件的过渡效果。<transition> 只会把过渡效果应用到其包裹的内容上，
+Props：
+* css - boolean，是否使用 CSS 过渡类。默认为 true。如果设置为 false，将只通过组件事件触发注册的 JavaScript 钩子。
+
+<!-- 动态组件 -->
+// appear - boolean，是否在初始渲染时使用过渡。默认为 false
+<transition name="fade" mode="out-in" appear>
+  <component :is="view"></component>
+</transition>
+<!-- 事件钩子 -->
+<div id="transition-demo">
+  <transition @after-enter="transitionComplete">
+    <div v-show="ok">toggled content</div>
+  </transition>
+</div>
+transition-group
+作为多个元素/组件的过渡效果；<transition-group>渲染一个真实的 DOM 元素。默认渲染 <span>，可以通过 tag 属性配置哪个元素应该被渲染。
+注意，每个 <transition-group> 的子节点必须有 独立的 key ，动画才能正常工作
+<transition-group tag="ul" name="slide">
+  <li v-for="item in items" :key="item.id">
+    {{ item.text }}
+  </li>
+</transition-group>
+keep-alive
+主要用于保留组件状态或避免重新渲染。不会在函数式组件中正常工作，因为它们没有缓存实例。
+Props：
+* include - 字符串或正则表达式。只有名称匹配的组件会被缓存。
+* exclude - 字符串或正则表达式。任何名称匹配的组件都不会被缓存。
+* max - 数字。最多可以缓存多少组件实例。一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉。
+<keep-alive :max="10">
+  <component :is="view"></component>
+</keep-alive>
+include 和 exclude 属性允许组件有条件地缓存。二者都可以用逗号分隔字符串、正则表达式或一个数组来表示：匹配首先检查组件自身的 name 选项；
+和 <transition> 相似，<keep-alive> 是一个抽象组件：它自身不会渲染一个 DOM 元素，也不会出现在父组件链中。
+当组件在 <keep-alive> 内被切换，它的 activated 和 deactivated 这两个生命周期钩子函数将会被对应执行。
+<!-- 和 `<transition>` 一起使用 -->
+<transition>
+  <keep-alive>
+    <component :is="view"></component>
+  </keep-alive>
+</transition>
+<keep-alive> 要求同时只有一个子元素被渲染。
+
+##### slot #####
+把 slot 理解成一个占位符，当你在子组件定义好一个 slot 标签，父组件传值时就会替换该标签内容。
+
+props可以将数据从父组件传入子组件，
+slot可以将html从父组件传入子组件。内容应该被放在父组件模板中的子组件中,父组件模板中的内容被分发到子组件中重新组合.
+
+组件的核心是什么？一句话：组件的核心是它能够产出一坨VNode。
+组件的挂载本质就是执行渲染函数并得到要渲染的VNode，
+
+<!-- 父组件模板 -->
+<MyComponent></MyComponent>
+没有为子组件提供任何插槽，最终父组件的模板编译后得到的 render 函数可以表示为：
+render() {
+  return h('MyComponent')
+}
+
+为子组件提供一个普通插槽：
+<!-- 父组件模板 -->
+<MyComponent>
+  <div></div>
+</MyComponent>
+父组件编译后的渲染函数可以表示为：
+render() {
+  return h('MyComponent', {
+    slots: {
+      default: h('div')
+    }
+  })
+}
+
+<!-- 子组件模板 -->
+<section>
+  <slot/>
+</section>
+子组件的模板经过编译后，其渲染函数可以表示为：
+render() {
+  return h('section', this.$slot.default)
+}
+
+
+实际上在 Vue2.6 之前，普通插槽的渲染作用域是在父组件，等到子组件拿到该插槽的时候，已经是渲染完的vnode了，所以是什么就展示什么。作用域插槽和普通插槽的区别在于，子组件拿到它的时候它还是一个函数，只有你执行该函数，它才会返回要渲染的内容(即vnode)，所以就给了你在子组件中传递参数(子组件数据)过去的机会，同时由于该函数也能访问父组件作用域的数据，所以对于作用域插槽来说能同时展示父子组件的数据，这就是为什么我说普通插槽和作用域插槽的区分是一个伪区分，因为当你不给作用域插槽传递参数的时候，那它就是个普通插槽，我们完全可以把普通插槽也编译成函数，只是不传递参数.
+
+
+
+
+
+
+javascript琐碎知识点
+
+
+面试手写xxx
+arr.every关键就是所有都是true才返回true，只要有一个是false就返回false，
+而&&符号正好可以满足，即：
+result = result && fn(arr[i]);
+这样只要fn(arr[i])出现过一次false，result就会一直是false，最后返回的result就是false；
+
+
+######################################## promise返回值  ##############################################
+
+
+案例一：
+new Promise((resolve, reject) => {
+    if (true) {
+console.log('1');
+        resolve();
+
+    } else {
+console.log('2');
+        reject();
+
+    }
+}).then((data) => {
+console.log('3');
+    resolve();  // 手动调用的resolve()方法，这时候Promise已经变成了fulfilled状态了，它不会再自动传递下去;下面的then（第二个then）无法接收不到了，
+    // 如果我们要让then继续传递下去，要手动调用return Promise.resolve()；让它返回一个Promise，后面的then的第一个参数才会收到resolve的数据。
+}, (error) => {
+console.log('4');
+    reject();
+}).then(() => {
+    console.log('resolve');
+}, () => {
+    console.log('reject');
+})
+日志
+1
+3
+reject
+Promise {<resolved>: undefined}
+
+案例二：
+new Promise((resolve, reject) => {
+    if (true) {
+console.log(1);
+        resolve(); // 这里调用resolve时没传任何东西，所以then方法里没有resolve方法
+    } else {
+console.log(2);
+        reject();
+    }
+}).then((data) => {
+console.log(3);
+    resolve(); // 上一个没传resolve，报错
+}, (error) => {
+console.log(4);
+    reject();
+})
+日志
+1
+3
+promise: { 
+  [[promiseStatus]]: 'rejected', 
+  [[promiseValue]]: 'ReferenceError: resolve is not defined at Promise.then'
+}
+正确写法
+new Promise((resolve, reject) => {
+    if (true) {
+        resolve(resolve); // 将resolve传递下去
+    } else {
+        reject();
+    }
+}).then((resolve) => {
+    resolve(); // data接收了resolve函数
+})
+
+案例三：
+new Promise((resolve, reject) => {
+    if (true) {
+console.log('1');
+        resolve();
+    } else {
+console.log('2');
+        reject();
+    }
+}).then((data) => {
+console.log('3');
+    resolve();
+}, (error) => {
+console.log('4');
+    reject();
+}).then(() => {
+    console.log('resolve');
+}, () => {
+    console.log('reject'); // 此时没有return任何东西，所以第二个then返回的是Promise {<resolved>: undefined}
+})
+日志
+1
+3
+reject
+Promise {<resolved>: undefined}
+
+########################################  mock数据  ##############################################
+
+
+mock数据
+安装mock -D
+编写data.json
+新建mock文件夹并在里面新建index.js
+index.js引入mock、引入data.json，调用Mock.mock方法进行接口模拟；
+在src的main.js里引入mock/index.js 运行即可；
+
+
+########################################  图标字体使用  ##############################################
+
+
+图标字体使用：
+https://icomoon.io/app/#/select
+上字体网站挑选图标，选中后右下角生成，
+下载后，打开demo.html查看图标class，然后把css文件和fonts文件夹复制到项目，@import引入css，
+使用所需图标对应的class，编译即可，注意css文件引用图标fonts目录可能需要根据实际情况修改路径。
+
+
+
+########################################  zepto使用教程  ##############################################
+
+
+https://www.jianshu.com/p/5d7f2588deae
+zepto默认是有五个模块的，分别为zepto、event、ajax、form、ie，这五个模块被称为核心模块。
+如果需要其他非核心模块，需要下载github的源码自行编译。
+
+
+########################################  事件穿透  ##############################################
+
+
+事件穿透出现在层叠元素，即使结构上不嵌套，但是通过绝对定位覆盖也会出现点透，而且一个绑定click，另一个绑定tap或touch事件时；所以解决方法
+使用相同绑定事件（最好方法）；
+或者用touchend取代tap，而且在touchend内部阻止事件默认行为；
+或者用fastclick，但是有硬伤；
+
+
+########################################  windows终端程序  ############################################
+
+
+conEmu — Windows下好用的终端程序
+
+
+######################################## Flex弹性布局  ############################################
+
+Flex弹性布局8个li，上下各4个，此时应对li设置flex: 1 0 20%;
+
+
+######################################## 移动端1px  ############################################
+
+
+移动端1px：
+给父元素相对定位，增加伪元素，
+&::before {  position: absolute;
+ Left: 0;
+ Top: 0;
+ content: ‘ ’;
+ Width: 200%;
+ Height: 200%;
+ Border-bottom: 1px solid;
+ Transform: scale(0.5, 0.5);
+ Transform-origin: left top; }
+
+sass移动端1px
+@mixin border1px($bd-color: #ccc, $top: 1, $right: 0, $bottom: 1, $left: 0) {
+ Content: ‘ ’;
+ Width: 200%;
+ Height: 200%;
+ Border: 1px solid $bd-color;
+ position: absolute;
+ Left: 0;
+ Top: 0;
+ Transform: scale(.5, .5);
+ Transform-origin: left top;
+ Box-sizing: border-box;
+ @if $top != 1 {
+  Border-top: none;
+ }
+ @if $left != 1 {
+  Border-left: none;
+ }
+ @if $bottom != 1 {
+  Border-bottom: none;
+ }
+ @if $right != 1 {
+  Border-right: none;
+ }
+}
+
+@inclue border1px(#aaa);
+@inclue border1px(#aaa, 1, 0, 0, 0);
+
+
+
+######################################## 表单enctype属性  ############################################
+
+
+
+规定在发送表单数据之前如何对其进行编码
+默认值：application/x-www-form-urlencoded，表示发送前对所有字符编码；
+但是在使用包含文件上传控件的表单时，必须使用：multipart/form-data，表示不对字符编码；
+
+
+
+######################################## 滚动条在最底部  ############################################
+
+
+//每次页面渲染完之后滚动条在最底部 
+updated:function(){ 
+  this.$nextTick(function(){ 
+    var div = document.getElementById('dialogue_box'); 
+    div.scrollTop = div.scrollHeight; 
+  }) 
+}
+
+document.getElementById('dialogue').scrollTop 值一直是0的原因是，
+页面具有 DTD（或者说指定了 DOCTYPE）时，使用 document.documentElement。 
+页面不具有 DTD（或者说没有指定了 DOCTYPE）时，使用 document.body。 
+vue文件中的 template 不是标准的 HTML 文件，指定 DOCTYPE 也不起作用，所以这里需要使用 document.body.scrollTop 。
+
+watch: {
+    nowMessageList: function() {
+      this.$nextTick(() => {
+        document.body.scrollTop = document.body.scrollHeight;
+        console.log(document.body.scrollTop);
+      });
+    }
+  }
+
+
+滚动条自动滚动到最底部 - 4种方法
+方法一：
+使用锚标记要滚动到的位置，然后通过click方法模拟点击滚动到锚所在位置
+<script language="javascript1.2" type="text/javascript">
+function onGetMessage(context) 
+{
+msg.innerHTML+=context;
+msg_end.click(); 
+} 
+</script>
+<div style="width:500px;overflow:auto">
+<div id="msg" style="overflow:hidden;width:480px;"></div>
+<div><a id="msg_end" name="1" href="#1">&nbsp</a></div>
+</div>
+
+
+
+方法二：
+利用DIV的scrollIntoView方法，将最底端滚动到可视位置
+<script language="javascript1.2" type="text/javascript">
+function onGetMessage(context) 
+{
+msg.innerHTML+=context;
+msg_end.scrollIntoView(); 
+} 
+</script>
+<div style="width:500px;overflow:auto">
+<div id="msg" style="overflow:hidden;width:480px;"></div>
+<div id="msg_end" style="height:0px; overflow:hidden"></div>
+</div>
+
+
+方法三：
+<script type="text/javascript">
+function add()
+{
+var now = new Date();
+var div = document.getElementById('scrolldIV');
+div.innerHTML = div.innerHTML + 'time_' + now.getTime() + '<br />';
+div.scrollTop = div.scrollHeight;
+}
+</script>
+<span class="notice">请点击“插入一行”按钮，插入最新信息，当出现滚动条时，滚动条将自动保持在底部。</span><br />
+
+<div id="scrolldIV" style="overflow:auto; height: 100px; width: 400px; border: 1px solid #999;">
+</div>
+<input type="button" value="插入一行" onclick="add();">
+
+
+方法4：
+这个比较复杂也比较灵活一点，就是利用DIV+JS+图片构造一个滚动条，当然了图片是怎么好看怎么用了。
+主要部分就是外层的DIV加个overflow:hidden属性，通过js代码调整内层DIV的margin-left和margin-top来控制内容的滚动
+
+
+
+
+######################################## xhr和cors  ############################################
+
+
+
+当xhr为同步请求时，有如下限制：
+	•			xhr.timeout必须为0
+	•			xhr.withCredentials必须为 false 
+	•			xhr.responseType必须为”“（注意置为”text”也不允许） 
+若上面任何一个限制不满足，都会抛错，而对于异步请求，则没有这些参数设置上的限制。
+
+
+在上传或者下载比较大的文件时，实时显示当前的上传、下载进度是很普遍的产品需求。  我们可以通过onprogress事件来实时显示进度，默认情况下这个事件每50ms触发一次。需要注意的是，上传过程和下载过程触发的是不同对象的onprogress事件：
+	•			上传触发的是xhr.upload对象的 onprogress事件 
+	•			下载触发的是xhr对象的onprogress事件 
+
+xhr.onprogress = updateProgress;
+xhr.upload.onprogress = updateProgress;
+function updateProgress(event) {
+    if (event.lengthComputable) { //是否知道数据的总大小
+      var completedPercent = event.loaded / event.total;
+    }
+ }
+
+
+xhr.send(data)中data参数的数据类型会影响请求头部content-type的默认值：
+	•			如果data是 Document 类型，同时也是HTML Document类型，则content-type默认值为text/html;charset=UTF-8;否则为application/xml;charset=UTF-8； 
+	•			如果data是 DOMString 类型，content-type默认值为text/plain;charset=UTF-8； 
+	•			如果data是 FormData 类型，content-type默认值为multipart/form-data; boundary=[xxx] 
+	•			如果data是其他类型，则不会设置content-type的默认值 
+
+
+xhr.withCredentials与 CORS 什么关系
+我们都知道，在发同域请求时，浏览器会将cookie自动加在request header中。但大家是否遇到过这样的场景：在发送跨域请求时，cookie并没有自动加在request header中。
+造成这个问题的原因是：在CORS标准中做了规定，默认情况下，浏览器在发送跨域请求时，不能发送任何认证信息（credentials）如”cookies”和”HTTP authentication schemes”。除非xhr.withCredentials为true（xhr对象有一个属性叫withCredentials，默认值为false）。
+所以根本原因是cookies也是一种认证信息，在跨域请求中，client端必须手动设置xhr.withCredentials=true，且server端也必须允许request能携带认证信息（即response header中包含Access-Control-Allow-Credentials:true），这样浏览器才会自动将cookie加在request header中。
+另外，要特别注意一点，一旦跨域request能够携带认证信息，server端一定不能将Access-Control-Allow-Origin设置为*，而必须设置为请求页面的域名。
+
+
+Access-Control-Allow-Headers: X-Test-Cors
+Access-Control-Allow-Methods: POST,PUT,Delete
+Access-Control-Allow-Origin: *
+Access-Control-Max-Age: 1000. //1000秒内无需再发送OPTIONS预请求
+
+
+
+######################################## Object.is  ############################################
+
+
+Object.is()，其行为与===基本一致，不过有两处不同：
+	•	+0不等于-0。
+	•	NaN等于自身。
+
+
+######################################## 缓存头Cache-Control  #########################################
+
+
+
+缓存头Cache-Control
+Public任何地方都可以缓存
+Private只有发起请求的浏览器才可以缓存
+None不能缓存
+
+
+
+
+######################################## 防抖节流  #########################################
+
+
+
+防抖节流
+计时器每一次都重新开始，直到最后满足条件并且等待delay时间后，才开始执行handler函数。
+防抖：
+  场景：实时搜索，拖拽
+
+function debunce（handler，delay）{ 
+   //handler是要传入的进行防抖的函数，delay是等待时间。
+    var timer = null;
+    return function（）{
+        var _self = this，args = arguments; 
+        clearTimeout（timer）;        //每次都要清除这个定时器 
+        timer = setTimeout（function（）{    //重新开启定时器 
+            handler.apply（_self，args）; 
+        }，delay）; 
+    } 
+}
+
+节流：
+即预定一个函数只有在大于等于执行周期时才会执行，周期内不执行
+场景：窗口调整（调整大小），页面滚动（滚动），抢购时疯狂点击（鼠标按下）
+        function throttle（handler，wait）{  //handler是要进行节流的函数，wait是等待时间
+            var lastTime = 0;
+            return function（）{
+                var nowTime = new Date（).getTime（）;    //获取当前时间
+                if（nowTime - lastTime> wait）{
+                    handler.apply（this，arguments）;
+                    lastTime = nowTime;      //更新最后时间
+                }
+            }
+        }
+
+
+
+
+
+######################################## 移动端调试痛点？  #########################################
+
+
+
+
+https://mp.weixin.qq.com/s/d4k0AjEZS9qc-c8H0iCXgw
+vConsole
+在你网页中加一个悬浮的小按钮，可以点击它来打开关闭调试面板，并查看 DOM、Console、Network和 本地存储 等信息。
+使用方法也很简单，通过npm安装或者直接在需要的页面引入 js文件 ，然后 new VConsole() 就可以了。
+
+eruda
+
+Charles
+
+weinre
+通过在本地启动一个 weinre 服务，并向手机网页嵌入一段 js 脚本来实现和电脑的通信，已达到类似浏览器开发工具那样的的调试效果，它的操作界面和 vConsole 差不多，主要包括查看 DOM、Console、Network 等，只不过这一切是在电脑上操作，而不是在手机上。微信web开发者工具的移动调试也是借助于此
+
+Mac+IOS+Safari 
+手上有一台 Mac 电脑和一部苹果手机
+第一步：打开苹果手机 设置 > Safari浏览器 > 高级 > Web检查器
+第二步： 打开 Mac 上的 Safari浏览器 > 偏好设置 > 高级 > 在菜单栏中显示“开发”菜单
+第三步： 用数据线连接你的 Mac 电脑和苹果手机，并选择信任设备。然后在手机的 Safari浏览器 中打开你需要调试的页面，并在电脑上点击下图红框的位置
+
+Chrome+Android
+第一步：打开 Android 手机 设置 > 开发者选项 > USB调试。设置里面没有 开发者选项 的，自行百度。
+第二步：通过数据线连接你的电脑和 Android 手机，会弹出如下界面，点击 确定
+第三步：给你的 Android 手机下载一个手机版的 Chrome浏览器 (各大应用商店自行搜索)，并在手机上的 Chrome浏览器 中打开你需要调试的页面。
+第四步：打开你电脑上的 Chrome浏览器 ，按下图标注顺序，依次点开。我使用的是 小米5，你可以看到左侧有 MI 5 已连接的字样。划线的地方分别是手机上 Chrome浏览器 和自带浏览器 WebView 下打开的页面。
+
+第五步： 每个页面右侧都有一个 Inspect 检查的按钮，点击就会出现你熟悉的画面，后面就不用解释了吧！走你🚀。
+
+
+
+
+
+
+
+
+
+
