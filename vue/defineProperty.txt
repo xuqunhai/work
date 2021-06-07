@@ -1,0 +1,17 @@
+调用Object.defineProperty方法时，如不指定，
+configurable, enumerable, 和writable特性的默认值都是false，
+
+var obj = {}
+Object.defineProperty(obj, 'name', {});
+Object.getOwnPropertyDescriptor(obj, 'name');
+{value: undefined, writable: false, enumerable: false, configurable: false}
+
+var obj = {name: 'test'};
+Object.defineProperty(obj, 'name', {});
+Object.getOwnPropertyDescriptor(obj, 'name');
+{value: "test", writable: true, enumerable: true, configurable: true}
+
+
+用Object.defineProperty先设置writable为false，再设为true为什么会报错？
+因为configurable为false的原因,如果configurable为true是可以的
+

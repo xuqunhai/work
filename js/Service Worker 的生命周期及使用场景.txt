@@ -1,0 +1,21 @@
+Service Worker 的生命周期与 web 页面完全分离。它包括以下几个阶段:
+下载
+安装
+激活
+
+Service Worker 一旦掌控，它将处于以下两种状态之一：
+处理从网页发出网络请求或消息时发生的提取和消息事件
+Service Worker 将被终止以节省内存
+
+
+更新 Service Worker
+当用户访问你的 Web 应用程序时，浏览器试图重新下载包含 Service Worker 代码的 .js 文件，
+这是在后台完成的。
+浏览器将假设 Service Worker 文件已改过，浏览器就会启动新的 Service Worker。
+新的 Service Worker 将启动并且安装事件将被移除。
+然而，在这一点上，旧的 Service Worker 仍在控制你的 web 应用的页面，
+这意味着新的 Service Worker 将进入 waiting 状态。
+一旦你的 Web 应用程序当前打开的页面被关闭，旧的 Service Worker 将被浏览器杀死，
+新 Service Worker 接管了控制权，它的激活事件将被激发
+在激活回调中发生的一个常见任务是缓存管理。
+

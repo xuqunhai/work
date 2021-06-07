@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function scrollAndLoading() {
+            if (window.scrollY > prevY) { // 判断用户是否向下滚动
+                prevY = window.scrollY
+                if (poll.current.getBoundingClientRect().top <= window.innerHeight) {
+                    // 请求下一页数据
+                }
+            }
+        }
+
+        useEffect(() => {
+            // something code
+            const getData = debounce(scrollAndLoading, 300)
+            window.addEventListener('scroll', getData, false)
+            return () => {
+                window.removeEventListener('scroll', getData, false)
+            }
+        }, [])
+
+        let data = [];
+        let curPage = 1;
+        let pageSize = 16;
+        let prevY = 0;
+
+        // other code...
+        // 懒加载的实现主要是通过监听窗口的滚动, 当某一个占位元素可见之后去加载下一个数据,
+        // 通过监听window的scroll事件以及对poll元素使用getBoundingClientRect来获取poll元素相对于可视窗口的距离, 从而自己实现一个懒加载方案.
+        function scrollAndLoading() {
+            if (window.scrollY > prevY) { // 判断用户是否向下滚动
+                prevY = window.scrollY
+                if (poll.current.getBoundingClientRect().top <= window.innerHeight) {
+                    curPage++
+                    setList(searchData.slice(0, pageSize * curPage))
+                }
+            }
+        }
+
+        function debounce(fn, time) {
+            return function (args) {
+                let that = this
+                clearTimeout(fn.tid)
+                fn.tid = setTimeout(() => {
+                    fn.call(that, args)
+                }, time);
+            }
+        }
+
+        const handleSearch = (v) => {
+            curPage = 1;
+            prevY = 0;
+            searchData = data.filter((item, i) => {
+                // 采用正则来做匹配, 后期支持前端模糊搜索
+                let reg = new RegExp(v, 'gi')
+                return reg.test(item.title)
+            })
+            setList(searchData.slice(0, pageSize * curPage))
+        }
+    </script>
+</body>
+
+</html>

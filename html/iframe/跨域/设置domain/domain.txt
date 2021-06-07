@@ -1,0 +1,27 @@
+document.domain作用是获取/设置当前文档的原始域部分，
+同源策略会判断两个文档的原始域是否相同来判断是否跨域。
+这意味着只要把这个值设置成一样就可以解决跨域问题了。
+
+在此我将domain设置为一级域名的值，
+
+a页面url为a.demo.com，a页面中iframe引用的b页面url为b.demo.com，
+
+具体设置为
+document.domain = 'demo.com'
+设置完之后，在a页面的window上挂载使iframe全屏的方法
+
+// a页面
+window.toggleFullScreen = () => {
+    // do something
+}
+在b页面上可以直接获取到a页面的window对象并直接调用
+
+// b页面
+window.parent.toggleFullScreen()
+
+但是这个值的设置也有一定限制，
+只能设置为当前文档的上一级域或者是跟该文档的URL的domain一致的值。
+如url为a.demo.com，那domain就只能设置为demo.com或者a.demo.com。
+因此，设置domain的方法只能用于解决主域相同而子域不同的情况。
+
+

@@ -1,0 +1,22 @@
+初始化方式
+const writable=new Writable({
+    write(){},
+    writev(){},
+    destroy(){},
+    final(){}
+})
+
+const writable=Writable()
+// enc是编码方式
+writable._write=function(data,enc,next){
+    let a=1
+    setTimeout(function(){
+        next()
+    })
+}
+// 用write方法将数据写入可写流内部
+// 用_write方法或者_writev方法进行消费
+writable.write('a1')
+// 调用end方法就预示着写入操作的结束，后续再写入是不会有任何效果的
+writable.end('d7890')
+writable.on('finish',()=>{})

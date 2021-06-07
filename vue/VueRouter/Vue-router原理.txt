@@ -1,0 +1,144 @@
+单页应用是基于路由和组件的，
+路由用于设定访问路径，并将路径和组件映射起来。
+路由的本质就是建立url和页面之间的映射关系。
+
+hash模式是vue-router的默认模式。
+实现原理
+
+改变描点
+可以通过location.hash = "/hashpath"的方式修改浏览器的hash值。
+
+监听描点变化
+可以通过监听hashchange事件监听hash值的变化。
+window.addEventListener('hashchange', () => {
+   const hash = window.location.hash.substr(1)
+   // 根据hash值渲染不同的dom
+})
+
+history模式
+hash模式下，url可能为以下形式：
+http://localhost:8080/index.html#/book?bookid=1
+上面的url中既有#又有?，会让url看上去很奇怪，因此，可以使用history模式，在此模式下，url会如下面所示：
+http://localhost:8080/book/1
+
+实现原理
+
+改变url
+H5的history对象提供了pushState和replaceState两个方法，当调用这两个方法的时候，url会发生变化，浏览器访问历史也会发生变化，但是浏览器不会向后台发送请求。
+// 第一个参数：data对象，在监听变化的事件中能够获取到
+// 第二个参数：title标题
+// 第三个参数：跳转地址
+history.pushState({}, "", '/a')
+
+监听url变化
+可以通过监听popstate事件监听history变化，也就是点击浏览器的前进或者后退功能时触发。
+window.addEventListener("popstate", () => {
+    const path = window.location.pathname
+    // 根据path不同可渲染不同的dom
+})
+
+在history模式下，刷新浏览器就会出现问题。
+如访问http://localhost:8080/book/1时，服务端会查找是否有相应的html能够匹配此路径，
+在单页应用下，服务端只有一个index.html，所以此时匹配不到，会提示404。
+针对这个问题，需要服务端进行history模式支持。
+
+node服务
+在nodejs服务中，可以引入connect-history-api-fallback插件：
+// 导入处理 history 模式的模块
+const history = require('connect-history-api-fallback')
+// 导入 express
+const express = require('express')
+const app = express()
+// 注册处理 history 模式的中间件
+app.use(history())
+// 处理静态资源的中间件，网站根目录 ../web
+app.use(express.static(path.join(__dirname, '../web')))
+
+nginx服务
+在nginx服务中，可以如下方式修改配置文件，添加history模式支持：
+location / {
+    root html;
+    index index.html index.htm;
+    #新添加内容
+    #尝试读取$uri(当前请求的路径)，如果读取不到读取$uri/这个文     件夹下的首页
+    #如果都获取不到返回根目录中的 index.html
+    try_files $uri $uri/ /index.html;
+}
+
+
+
+
+实现自定义VueRouter
+VueRouter核心是，
+通过Vue.use注册插件，在插件的install方法中获取用户配置的router对象。
+当浏览器地址发生变化的时候，
+根据router对象匹配相应路由，获取组件，并将组件渲染到视图上。
+
+有三个重要点：
+
+如何在install方法中获取vue实例上的router属性。
+
+利用Vue.mixin混入声明周期函数beforeCreate，在beforeCreate函数中可以获取到Vue实例上的属性并赋值到Vue原型链上。
+_Vue.mixin({
+   beforeCreate () {
+      if (this.$options.router) {
+        _Vue.prototype.$router = this.$options.router
+      }
+   }
+})
+
+
+如何触发更新
+hash模式下：
+
+通过location.hash修改hash值，触发更新。
+通过监听hashchange事件监听浏览器前进或者后退，触发更新。
+history模式下：
+
+通过history.pushState修改浏览器地址，触发更新。
+通过监听popstate事件监听浏览器前进或者后退，触发更新。
+
+
+如何渲染router-view组件
+
+通过Vue.observable在router实例上创建一个保存当前路由的监控对象current。
+当浏览器地址变化的时候，修改监控对象current。
+在router-view组件中监听监控对象current的变化，当current变化后，获取用户注册的相应component，并利用h函数将component渲染成vnodes，进而更新页面视图。
+
+
+
+为什么要用混入Vue.mixin方式写?
+主要原因是use代码在前，Router实例创建在后，而install逻辑又需要用 到该实例。
+全局混入的目的是为了延迟下面逻辑到router创建完毕并且附加到选项上时才执行
+
+### 挂载`$router`
+当我们发现`vue-router`引入`vue`的时候，
+第一次是在`router/index.js`中使用了`Vue.use(Router)`，
+在这个时候也就会调用了`vue-router`的`install`方法；
+而第二次则是在`main.js`中，创建根组件实例的时候引入`router`,
+即`new Vue({router}).$mount("#app")`。
+也就是说，当调用`vue-router`的`install`方法的时候，项目还没有创建`Vue`的根组件实例。
+因此我们需要在`vue-router`的`install`方法使用全局混入，延迟到`router`创建完毕才执行挂载`$router`。
+/* 挂载$router */
+/*
+* 全局混入
+*   全局混入的目的是为了延迟下面逻辑到router创建完毕并且附加到选项上时才执行
+* */
+Vue.mixin({
+    beforeCreate() {    // 此钩子在每个组件创建实例时都会调用
+        /* this.$options即创建Vue实例的第一个参数 */
+        if(this.$options.router){   // 只在根组件拥有router选项
+            Vue.prototype.$router = this.$options.router; // vm.$router
+        }
+    }
+})
+
+
+
+注意事项：
+当组件存在与mixin对象相同的选项的时候，进行递归合并的时候组件的选项会覆盖mixin的选项
+但是如果相同选项为生命周期钩子的时候，会合并成一个数组，先执行mixin的钩子，再执行组件的钩子
+
+二、使用场景
+在日常的开发中，我们经常会遇到在不同的组件中经常会需要用到一些相同或者相似的代码，这些代码的功能相对独立
+这时，可以通过Vue的mixin功能将相同或者相似的代码提出来

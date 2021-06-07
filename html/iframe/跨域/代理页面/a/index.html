@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Web Server</title>
+</head>
+<body>
+    <h1>Node.js Web Server a</h1>
+    <iframe src="http://localhost:3004/index.html" width="100%" height="300px"></iframe>
+    <script>
+        (function() {
+            window.sessionStorage.setItem('str', 111)
+        })()
+        function excute() {
+            console.log(window.sessionStorage.getItem('str'))
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+vite安装vue项目报错（Error: esbuild: Failed to install correctly）
+
+针对 npm 版本v7以下
+首先确认 ignore-scripts 是否被设置成 true 。
+运行 npm config get ignore-scripts ，如果是 false 则是正确的，否则需要通过运行 npm config set ignore-scripts false 将 ignore-scripts设置为 false 。
+通过设置之后，再次运行调试应该是ok的了。
+————————————————
+
+npm 版本v7以上的
+还需要确认一下 package-lock.json 文件的 lockfileVersion 字段为 1 ，
+或者 hasInstallScript 设置为 true 了。
+如果两者都没有被正确设置，则就是一个已知的BUG。
+解决办法参看后文
+问题的解决办法在【https://github.com/evanw/esbuild/issues/462#issuecomment-771328459】。
+手动运行 node node_modules/esbuild/install.js 来解决esbuild安装问题。
+安装完成之后，再次运行 npm run dev 即可。

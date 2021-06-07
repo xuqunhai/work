@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Service Worker跨窗口通信</title>
+</head>
+<body>
+    <p>
+        Service Worker是web应用做离线存储的一个最佳的解决方案,
+        Service Worker和Web Worker的相同点是
+        在常规的js引擎线程以外开辟了新的js线程去处理一些不适合在主线程上处理的业务,
+        不同点主要包括以下几点:
+        Web Worker式服务于特定页面的,
+        而Service Worker在被注册安装之后能够在多个页面使用
+
+        Service Worker常驻在浏览器中,不会因为页面的关闭而被销毁.
+        本质上,它是一个后台线程,只有你主动终结,或者浏览器回收,这个线程才会结束.
+
+        生命周期,可调用的API也不同
+        我们可以使用Service Worker来进行缓存,
+        用js来拦截浏览器的http请求,并设置缓存的文件,从而创建离线web应用.
+
+    </p>
+    <textarea id="showArea"></textarea>
+    <script src="sw1.js"></script> 
+    <script src="sw2.js"></script> 
+    <script type="text/JavaScript">
+        if('serviceWorker' in window.navigator) {
+            // 对于多个不同scope的多个Service Worker,我们也可以给指定的Service Worker发送消息
+            navigator.serviceWorker.register('./sw1.js', { scope:'./sw1'})
+                .then(function(reg) {
+                    console.log('success', reg);
+                    return new Promise((resolve, reject) => {
+                        const interval = setInterval(function() {
+                            if(reg.active) {
+                                clearInterval(interval);
+                                resolve(reg.active);
+                            }    
+                        }, 1000);
+                    }).then(sw => {
+                        sw.postMessage("this message is from page to sw1");
+                    })
+                    
+                })
+            navigator.serviceWorker.register('./sw2.js', { scope:'./sw2'})
+                .then(function(reg) {
+                    console.log('success', reg);
+                    return new Promise((resolve, reject) => {
+                        const interval = setInterval(function() {
+                            if(reg.active) {
+                                clearInterval(interval);
+                                resolve(reg.active);
+                            }    
+                        }, 1000);
+                    }).then(sw => {
+                        sw.postMessage("this message is from page to sw2");
+
+                    })
+                    
+                });
+                navigator.serviceWorker.addEventListener('message', function (event) {
+                    console.log(event.data);
+                    // 接受数据，并填充在 DOM 中
+                    document.getElementById('showArea').value = event.data ;
+                });
+        }
+    
+    </script>
+</body>
+</html>

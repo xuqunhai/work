@@ -1,0 +1,81 @@
+Vite
+基于ESM的Dev Server + HMR
+基于esbuild的依赖预优化
+基于Rollup的Plugins+Bundle
+SSR
+
+Bundle-Base Dev Server问题
+Dev Server必须等待所有模块构建完成
+应用越大，启动时间越长
+分片的模块也要构建
+
+ESM-Base Dev Server（import请求）
+问题
+Transform性能问题（因为没有Bundle所以需要将请求模块转换）
+非ESM模块兼容（TS/JSX/CSS。。。）
+Broswer ESM不能加载Node模块
+Node模块其他问题
+
+解决方案
+1 模块转换时尽可能使用性能高的工具
+  缓存Transform结果
+2 将非ESM模块转换成ESM（用esbuild转换TS/JSX，代替TSC/Babel）
+3 es-module-lexer扫描import语法
+  magic-string重写Node模块引入路径
+  import {createApp} from 'vue'重写后
+  import {createApp} from '/node_modules/vue/dist/vue.runtime.esm-bundler.js?v=xxx'
+4 Node CJS模块兼容 - 将CJS模块转换成ESM模块
+  Node模块请求数据较多，一个文件一个请求 - 多模块打包成一个文件并缓存
+
+依赖预优化工具 esbuild - 依赖扫描
+
+ESM HMR API例子
+import foo from './foo.js'
+foo()
+
+if(import.meta.hot){
+    import.meta.hot.accept('./foo.js', (newFoo)=>{
+        newFoo.foo()
+    })
+}
+原理
+1构建模块依赖图
+2如模块含有import.meta.hot.accept则标记为boundary
+3文件变更时，依据模块依赖图寻找boundaries
+4boundaries重新加载变更模块并执行更新
+5如果没找到boundaries，页面重新加载
+
+Rollup
+优势
+ESM Bundler
+体积小、速度快
+ESM Tree-Shaking
+成熟稳定生态
+常用来打包library
+缺点
+配置WebApp复杂
+Framework支持度
+
+Vite（基于Rollup的Plugins+Bundle）
+内置常用Plugins
+提供Framework模版
+
+SSR目标
+Dev Bundless
+Node环境加载ESM - 实现Node ESM加载器
+支持HMR+Plugin
+
+
+尤雨溪
+https://sfc.vuejs.org/
+https://cn.vitejs.dev/
+Vue3不再支持IE11
+Vue Devtools 6.0
+Vue2/3双版本支持
+可扩展的Timeling面板
+性能调试面板（可找出渲染比较慢的组件、可被第三方插件扩展，如vuex）
+
+Vscode+Volar
+vue-tsc类型检查
+
+Vue3+Vite=ES2015+原生JS Module

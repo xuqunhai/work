@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js Web Server</title>
+</head>
+<body>
+    <h1>Node.js Web Server b</h1>
+    <button onclick="crossOrigin()">跨域</button>
+    <script>
+        function crossOrigin() {
+            if (!document.getElementById('crossFrame')) {
+                var iframe = document.createElement('iframe')
+                iframe.setAttribute('style', 'position: absolute; left: -9999px; top: -9999px;')
+                iframe.setAttribute('src', 'http://localhost:3003/iframe.html')
+                document.body.appendChild(iframe)
+            } else {
+                document.getElementById('crossFrame').src = 'http://localhost:3003/iframe.html'
+            }
+        }
+    </script>
+</body>
+</html>

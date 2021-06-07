@@ -1,0 +1,449 @@
+获得Redis所有键
+127.0.0.1:6379> keys *
+(empty array)
+
+判断键bar是否存在
+127.0.0.1:6379> exists bar
+(integer) 0
+
+获得Redis所有键
+127.0.0.1:6379> keys *
+1) "a?"
+2) "ab"
+3) "ac"
+4) "a"
+5) "ad"
+
+    通配符1:查找键名为一个字符的键
+    127.0.0.1:6379> keys ?
+    1) "a"
+
+    通配符2:匹配[]之间任一字符
+    127.0.0.1:6379> keys a[b-d]
+    1) "ab"
+    2) "ac"
+    3) "ad"
+
+    通配符3:匹配？要转义符号\
+    127.0.0.1:6379> keys a\?
+    1) "a?"
+
+设置/获取键值/获取类型
+127.0.0.1:6379> set a? 1
+OK
+127.0.0.1:6379> get a?
+"1"
+127.0.0.1:6379> type a?
+string
+
+向指定列表类型键中增加一个元素，键不存在则新建
+127.0.0.1:6379> lpush bar 1
+(integer) 1
+127.0.0.1:6379> type bar
+list
+
+
+Redis基本数据类型
+
+字符串类型
+赋值/取值
+127.0.0.1:6379> set a 2
+OK
+127.0.0.1:6379> get a
+"2"
+
+当存储字符串是整数形式时，
+递增数字incr/递减decr
+127.0.0.1:6379> get a
+"2"
+127.0.0.1:6379> incr a
+(integer) 3
+
+键不存在时会默认值为0，所以递增后结果为1；
+键值不是整数时，会提示错误；
+127.0.0.1:6379> set username rafer
+OK
+127.0.0.1:6379> set username raferxu
+OK
+127.0.0.1:6379> get username
+"raferxu"
+127.0.0.1:6379> incr username
+(error) ERR value is not an integer or out of range
+
+增加指定的整数incrby/减少decrby
+127.0.0.1:6379> get a
+"3"
+127.0.0.1:6379> incrby a 2
+(integer) 5
+127.0.0.1:6379> get a
+"5"
+
+增加指定浮点数
+127.0.0.1:6379> set b 1.1
+OK
+127.0.0.1:6379> incrbyfloat b 1.2
+"2.3"
+
+向字符串尾部追加
+127.0.0.1:6379> get username
+"rafer"
+127.0.0.1:6379> append username xu
+(integer) 7
+127.0.0.1:6379> get username
+"raferxu"
+127.0.0.1:6379> set username rafer
+OK
+127.0.0.1:6379> append username " xu" // 加双引号是因为参数包含空格
+(integer) 8
+127.0.0.1:6379> get username
+"rafer xu"
+
+获取字符串长度
+127.0.0.1:6379> get username
+"rafer xu"
+127.0.0.1:6379> strlen username
+(integer) 8
+
+127.0.0.1:6379> set china 中国
+OK
+127.0.0.1:6379> get china
+"\xe4\xb8\xad\xe5\x9b\xbd"
+127.0.0.1:6379> strlen china
+(integer) 6 //  utf-8编码长度都是3
+
+同时获得/设置多个键值(mget/mset) 
+127.0.0.1:6379> mget a b china
+1) "5"
+2) "2.3"
+3) "\xe4\xb8\xad\xe5\x9b\xbd"
+
+127.0.0.1:6379> mset a a b b china c
+OK
+127.0.0.1:6379> mget a b china
+1) "a"
+2) "b"
+3) "c"
+127.0.0.1:6379> 
+
+位操作
+b对应ascii码是98，对应二进制是1100010，
+因为二进制存储结构是8位，所以前置补0，即01100010，所以
+127.0.0.1:6379> set foo bar
+OK
+127.0.0.1:6379> getbit foo 0
+(integer) 0
+127.0.0.1:6379> getbit foo 1
+(integer) 1
+127.0.0.1:6379> getbit foo 2
+(integer) 1
+127.0.0.1:6379> getbit foo 3
+(integer) 0
+
+将foo值设为aar
+127.0.0.1:6379> get foo
+"bar"
+127.0.0.1:6379> setbit foo 6 0
+(integer) 1
+127.0.0.1:6379> setbit foo 7 1
+(integer) 0
+127.0.0.1:6379> get foo
+"aar"
+
+获取值是1的二进制位个数
+127.0.0.1:6379> get foo
+"aar"
+127.0.0.1:6379> bitcount foo
+(integer) 10
+统计前两个字节的二进制位个数
+127.0.0.1:6379> bitcount foo 0 1
+(integer) 6
+
+对多个字符串类型键值进行位运算(and/or/xor/not)可用bitop命令
+如对bar和aar进行or运算
+127.0.0.1:6379> set foo bar
+OK
+127.0.0.1:6379> set foo2 aar
+OK
+127.0.0.1:6379> bitop or res foo foo2
+(integer) 3
+127.0.0.1:6379> get res
+"car"
+
+使用字符串类型键配合位操作记录用户性别，占用空间和读取性能都会很好；
+
+
+
+散列类型
+解决的问题
+文章列表页，获取文章标题时，必须把整个文章数据字符串取出来反序列化，
+、在传输和处理时造成资源浪费；
+
+字段值只能是字符串，不能嵌套其他数据类型；
+键+类型+值
+car1.name='taxi'
+
+127.0.0.1:6379> hset car price 500
+(integer) 1
+127.0.0.1:6379> hset car name BMW
+(integer) 1
+127.0.0.1:6379> hget car name
+"BMW"
+127.0.0.1:6379> hset car price 5000
+(integer) 0
+插入操作时返回1，更新操作返回0；
+上面car是键，为散列类型，即hset建立的键是散列类型；
+
+同时设置多个字段值：
+127.0.0.1:6379> hmset car color red size big
+OK
+
+获取键中所有字段和字段值时
+127.0.0.1:6379> hgetall car
+1) "price"
+2) "5000"
+3) "name"
+4) "BMW"
+5) "color"
+6) "red"
+7) "size"
+8) "big"
+返回的结果是字段和字段值组成的列表，不过其他语言会进行封装，如node中
+redis.hgetall会返回js对象；
+
+只获取字段名或字段值
+127.0.0.1:6379> hkeys car
+1) "price"
+2) "name"
+3) "color"
+4) "size"
+5) "model"
+127.0.0.1:6379> hvals car
+1) "5000"
+2) "BMW"
+3) "red"
+4) "big"
+5) "C200"
+
+获取字段数量
+127.0.0.1:6379> hlen car
+(integer) 5
+
+判断字段是否存在
+127.0.0.1:6379> hexists car model
+(integer) 0
+存在则返回1，字段甚至键不存在返回0
+
+当字段不存在时赋值
+127.0.0.1:6379> hset car model C200
+(integer) 1
+127.0.0.1:6379> hget car model
+"C200"
+127.0.0.1:6379> hsetnx car model C300
+(integer) 0
+127.0.0.1:6379> hget car model
+"C200"
+如果字段已存在，将不执行任何操作，所以是原子操作，不用担心竞态条件
+
+增加数字
+之前person字段不存在时默认0
+127.0.0.1:6379> hincrby car person 10
+(integer) 10
+127.0.0.1:6379> hincrby car person 10
+(integer) 20
+
+删除一个或多个字段
+127.0.0.1:6379> hincrby car person 10
+(integer) 10
+127.0.0.1:6379> hincrby car person2 10
+(integer) 10
+127.0.0.1:6379> hdel car person person2
+(integer) 2
+
+
+
+列表类型list
+常用操作是向列表两端添加元素或获得列表某一个片段
+向列表左边添加
+127.0.0.1:6379> lpush numbers 1
+(integer) 1
+127.0.0.1:6379> lpush numbers 2 3
+(integer) 3
+127.0.0.1:6379> lrange numbers 0 10
+1) "3"
+2) "2"
+3) "1"
+向列表右边添加元素
+127.0.0.1:6379> rpush numbers 0 -1
+(integer) 5
+
+查看列表所有元素
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "1"
+4) "0"
+5) "-1"
+
+从列表两端弹出元素
+127.0.0.1:6379> lpop numbers
+"3"
+127.0.0.1:6379> rpop numbers
+"-1"
+
+获取列表元素个数
+127.0.0.1:6379> llen numbers
+(integer) 3
+
+获取列表片段，也支持负索引
+127.0.0.1:6379> lrange numbers 0 2
+1) "2"
+2) "1"
+3) "0"
+
+删除列表中指定的值
+lrem key count value
+count大于0时从左边删除前count个值为value的元素
+count小于0时从右边删除前count个值为value的元素
+count等于0时删除所有值为value的元素
+
+从右边开始删除第一个值为2的元素
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "1"
+4) "2"
+5) "1"
+6) "0"
+127.0.0.1:6379> lrem numbers -1 2
+(integer) 1
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "1"
+4) "1"
+5) "0"
+删除所有值为1的元素
+127.0.0.1:6379> lrem numbers 0 1
+(integer) 2
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "0"
+
+获得/设置指定索引的元素值
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "0"
+返回第一个元素
+127.0.0.1:6379> lindex numbers 0
+"3"
+设置最后一个元素为7
+127.0.0.1:6379> lset numbers -1 7
+OK
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "7"
+
+只保留列表指定字段
+记录日志只保留最新100条，每次加入新元素时
+lpush logs $newLog
+ltrim logs 0 99
+
+向列表中插入元素
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "2"
+3) "7"
+在2的后面插入9
+127.0.0.1:6379> linsert numbers after 2 9
+(integer) 4
+在2的前面插入6
+127.0.0.1:6379> linsert numbers before 2 6
+(integer) 5
+127.0.0.1:6379> lrange numbers 0 -1
+1) "3"
+2) "6"
+3) "2"
+4) "9"
+5) "7"
+
+将元素从余个列表转到另一个列表
+127.0.0.1:6379> lpush arr1 a a a
+(integer) 3
+127.0.0.1:6379> lrange arr1 0 -1
+1) "a"
+2) "a"
+3) "a"
+127.0.0.1:6379> lpush arr2 b b b
+(integer) 3
+127.0.0.1:6379> lrange arr2 0 -1
+1) "b"
+2) "b"
+3) "b"
+
+把a的最后一个塞到b的最前面
+127.0.0.1:6379> rpoplpush arr1 arr2
+"a"
+127.0.0.1:6379> lrange arr2 0 -1
+1) "a"
+2) "b"
+3) "b"
+4) "b"
+127.0.0.1:6379> lrange arr1 0 -1
+1) "a"
+2) "a"
+
+
+
+
+集合类型
+无序但唯一性，
+添加或删除元素，判断某个元素是否存在；
+多个集合类型键之间并集、交集和差集运算；
+
+增加/删除元素
+127.0.0.1:6379> sadd letters a
+(integer) 1
+127.0.0.1:6379> sadd letters a b c
+(integer) 2
+// 上面返回2是因为由于a已经存在，所以上一条操作只有b和c添加成功
+127.0.0.1:6379> srem letters c d
+(integer) 1
+// 上面由于d不存在，所以只有删除c成功
+
+获得集合所有元素
+127.0.0.1:6379> smembers letters
+1) "b"
+2) "a"
+
+判断元素是否在集合中
+127.0.0.1:6379> sismember letters a
+(integer) 1
+
+集合间运算
+差集sdiff
+sinter交集
+sunion并集
+
+127.0.0.1:6379> sadd setA 1 2 3
+(integer) 3
+127.0.0.1:6379> sadd setB 3 4
+(integer) 2
+
+A里面有哪几个是B没有的
+127.0.0.1:6379> sdiff setA setB
+1) "1"
+2) "2"
+
+A和B共有哪些
+127.0.0.1:6379> sinter setA setB
+1) "3"
+
+A和B加起来都有啥
+127.0.0.1:6379> sunion setA setB
+1) "1"
+2) "2"
+3) "3"
+4) "4"

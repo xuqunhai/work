@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .one {
+            background: #ddd;
+        }
+        .one p:nth-child(1) {
+            margin-bottom: 13px;
+        }
+
+        .one p:nth-child(2) {
+            margin-top: 87px;
+        }
+        .two {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        .two {
+            margin-top: 13px;
+            margin-bottom: 87px;
+        }
+
+        .two header {
+            margin-top: 87px;
+        }
+
+        .two footer {
+            margin-bottom: 13px;
+        }
+        .three {
+            background: rgba(0, 255, 0, 0.3);
+        }
+
+        .three p {
+            margin: 0;
+        }
+        .three div {
+            margin-top: 13px;
+            margin-bottom: 87px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="http://www.hicss.net/">大佬博客</a>
+    <a href="http://www.hicss.net/do-not-tell-me-you-understand-margin/">margin了解</a>
+    <a href="http://www.hicss.net/i-know-you-do-not-know-the-negative-margin/">应用场景</a>
+    <h1>有三种情况会形成外边距重叠：</h1>
+    <p>注意有设定float和position=absolute的元素不会产生外边距重叠行为。</p>
+    <h2>同一层相邻元素之间</h2>
+    <section class="one">
+        <p>下边界范围会...</p>
+        <p>...会跟这个元素的上边界范围重叠。</p>
+    </section>
+    <h2>没有内容将父元素和后代元素分开</h2>
+    <section class="two">
+        <header>上边界重叠 87</header>
+        <main></main>
+        <footer>下边界重叠 87 不能再高了</footer>
+    </section>
+    <h2>空的块级元素</h2>
+    <section class="three">
+        <p>上边界范围是 87 ...</p>
+        <div></div>
+        <p>... 上边界范围是 87</p>
+    </section>
+</body>
+
+</html>

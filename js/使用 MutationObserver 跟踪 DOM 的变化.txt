@@ -1,0 +1,50 @@
+Mutation Observer API 用来监视 DOM 变动。
+DOM 的任何变动，比如节点的增减、属性的变动、文本内容的变动，
+这个 API 都可以得到通知。
+
+DOM 的变动立刻会触发相应的事件；
+Mutation Observer 则是异步触发
+
+在很多情况下，MutationObserver API 都可以派上用场。例如:
+你希望通知 Web 应用程序访问者，他当前所在的页面发生了一些更改。
+你正在开发一个新的 JavaScript 框架，需要根据 DOM 的变化动态加载 JavaScript 模块。
+也许你正在开发一个所见即所得(WYSIWYG) 编辑器，试图实现撤消/重做功能。
+通过利用 MutationObserver API，你可以知道在任何给定的点上进行了哪些更改，因此可以轻松地撤消这些更改。
+
+
+
+通过传入一个函数来创建一个 MutationObserver 实例，
+每当有变化发生，这个函数将会被调用。
+var mutationObserver = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    console.log(mutation);
+  });
+});
+
+这个被创建的对象有三个方法：
+observe  — 启动监听
+disconnect — 用来停止观察
+takeRecords — 返用来清除变动记录，即不再处理未处理的变动。
+
+// 开始侦听页面的根 HTML 元素中的更改。
+mutationObserver.observe(document.documentElement, {
+  attributes: true,
+  characterData: true,
+  childList: true,
+  subtree: true,
+  attributeOldValue: true,
+  characterDataOldValue: true
+});
+
+
+
+在 MutationObserver 还没出现之前，开发者采用什么方案呢？
+这是几个可用的其他选项：
+轮询（Polling）
+MutationEvents:
+但在 DOM中 的每一次更改都会触发改变事件，这同样会导致性能问题。
+CSS animations:
+创建一个动画，一旦元素被添加到 DOM 中，动画就会被触发。
+动画开始的那一刻，animationstart 事件将被触发:
+如果已经将事件处理程序附加到该事件，那么你将确切地知道元素何时被添加到 DOM 中。
+动画的执行时间周期应该很小，用户几乎看不到它。

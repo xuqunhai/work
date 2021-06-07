@@ -1,0 +1,102 @@
+压缩器就是编译器：源代码转成目标代码
+sourceCode - parser - ast(transform/analysis/optimizations) - codegen - targetCode
+
+babel编译工具链——Babili
+
+历史：
+concat+minify
+
+Bundlers:let's use modules
+作用域分离导致压缩阶段很多优化没法做
+registerModules([
+    function(module,exports){
+        // module 1
+    },
+    function(module,exports){
+        // module 2
+    },
+    // ...
+])
+
+Rollup:use ES module
+bundle.js
+// foo.js
+function foo(){}
+// bar.js
+const bar = 123
+// main.js
+foo(bar)
+即打包后所有元组件模块全部在一起，共享同一作用域，这样压缩器做优化时可以做更多优化，
+如某一天foo(bar)这个调用不需要了，那么编译时就发现foo和bar的定义也已经没用了，
+这些就会把它们也一起去掉，类似Treeshaking；
+
+另一个让代码更小的技巧
+if(process.env.NODE_ENV !== 'production'){}
+这样在编译阶段就会变成
+if('production' !== 'production'){}
+即if(false){}
+此时编译器会发现里面代码永远不会执行，所以会把它去掉，减少代码体积；
+
+让代更快的技巧：
+Svelte消失的框架：编译完就是没有任何依赖的js
+
+prepack:编译时把代码模拟跑一遍，如：
+输入
+(function(){
+    function fib(x){
+        return x <= 1 ? x :fib(x-1) + fib(x-2)
+    }
+    global.x  = fib{10}
+})()
+输出：
+(function(){
+    x = 28657
+})()
+原理就是编译执行代码时发现x的值是可以直接通过fib调用后得出来的，
+于是模拟运行了一下脚本并得到结果，而且此时fib函数也没其他作用了，
+所以只需要保留x的静态结果值即可；
+
+Vue自身迭代中优化：
+Hoisting Static Trees
+模版template
+<div><p class="foo">static</p></div>
+编译后output
+function render(){
+    return this._renderStatic(0)
+}
+// 0代表永远返回同一块虚拟DOM片段，从而跳过比对；
+模版template
+<div><p class="foo">static</p></div>
+编译后output
+return h('div', [
+    h('p', {staticClass: 'foo'},[...])
+])
+foo是静态class永远不会变，所以生成代码时候用staticClass从而在重新渲染时跳过比对；
+
+使用template模版一个好处在于for循环时，通过编译分析可以知道数组的每一项是否有嵌套数组，
+有的话需要flat扁平化，没有就不需要，
+而如果使用jsx语法就必须通过遍历才知道，所以可减少遍历；
+
+ssr中优化虚拟DOM渲染函数，把可以的地方转成字符串拼接
+输入
+<div>
+ <p class="foo">{{ msg }}</p>
+<comp></comp>
+</div>
+输出
+function render(){
+    return h('div', [
+        this._ssrString("<p class=\"foo\">"+this.msg+"</p>"), h('comp')
+    ])
+}
+不能优化的comp保留为虚拟DOM
+
+代码切割后虽然可以异步懒加载，但每次需要先请求main.js后才知道这个页面需要哪些文件，
+这样会导致两次请求；
+服务端渲染编译时客户端和服务端各编译一次，两端都生成manifest，
+而且在进行服务端渲染时除了拿bundle.js外，还把两个manifest文件拿到，
+这样就获得客户端构建和服务端构建的关联信息，通过分析关联就可以在服务端请求时计算出这一次客户端应该需要哪些文件，
+如在进入a页面时，就可以直接知道需要bundle.js和a.js，这样直接把两个连接放到html里，同时保证加载顺序，提高首页加载性能；
+
+渲染当前页面所需要的最少量的css，在组件生命周期调用时获取对应css，直接内连到页面；
+原子类编译CSS Module

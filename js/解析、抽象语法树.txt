@@ -1,0 +1,222 @@
+Babel 插件手册
+https://github.com/jamiebuilds/babel-handbook/blob/master/translations/zh-Hans/plugin-handbook.md
+
+AST
+结构化的方式显示源代码
+在语义分析中，编译器验证程序和语言元素的语法使用是否正确
+使用 AST 来生成实际的字节码或者机器码
+
+AST 程序
+你不需要编写自己的解析器。有许多与 Ecmascript规范完全兼容的开源项目。
+Esprima 和 Acorn 即是黄金搭档，还有许多工具可以帮助解析器生成输出，即 ASTs 
+实现一个将 Python 代码转换为J avaScript 的转换器。
+基本思想是使用Python 转换器生成 AST，然后使用 AST 生成JavaScript代码。
+
+AST 有什么用
+AST 运用广泛，比如：
+代码压缩、
+css预处理器、
+编辑器的错误提示、
+代码格式化、
+代码高亮、
+代码自动补全； 
+elint、pretiier 对代码错误或风格的检查； 
+webpack 通过 babel 转译 javascript 语法；
+并且如果你想了解 js 编译执行的原理，那么你就得了解 AST。
+
+js 执行的第一步是读取 js 文件中的字符流，
+然后通过词法分析生成 token，
+之后再通过语法分析( Parser )生成 AST，
+最后生成机器码执行。
+
+分词：将整个代码字符串分割成最小语法单元数组
+语法分析：在分词基础上建立分析语法单元之间的关系
+JS Parser 是 js 语法解析器，它可以将 js 源码转成 AST，
+常见的 Parser 有 esprima、traceur、acorn、shift 等。
+使用 Acorn 的原因是据我了解在 parser 解析中，Acorn 是公认的最快的。
+并且我们使用的 Webpack 打包工具中 babel 用的也是 Acorn。
+
+词法分析
+调用 next() 方法，一个一个字母的来读取字符，
+然后与定义好的 JavaScript 关键字符做比较，生成对应的Token。
+例如 var 这三个字符，它只能作为一个整体，语义上不能再被分解，因此它是一个 Token。
+除此之外，还会过滤掉源程序中的注释和空白字符（换行符、空格、制表符等。
+最终，整个代码将被分割进一个tokens列表
+
+n * n;
+[
+  { type: { ... }, value: "n",  loc: { ... } },
+  { type: { ... }, value: "*",  loc: { ... } },
+  { type: { ... }, value: "n",  loc: { ... } },
+  ...
+]
+字符串形式的 type 字段表示节点的类型
+（如： “FunctionDeclaration“，”Identifier“，或 “BinaryExpression“）
+
+AST 节点介绍
+Identifier如变量名，函数名，属性名，
+interface Identifier <: Expression, Pattern {
+    type: "Identifier";
+    name: string;
+}
+Literal一个值的字面量，如 1，“hello”, true 这些，还有正则表达式，
+interface Literal <: Expression {
+    type: "Literal";
+    value: string | boolean | null | number | RegExp;
+}
+RegExpLiteral
+interface RegExpLiteral <: Literal {
+  regex: {
+    pattern: string;
+    flags: string;
+  };
+}
+Programs根结点，
+body 属性是一个数组，包含了多个 Statement（即语句）节点。
+interface Program <: Node {
+    type: "Program";
+    body: [ Statement ];
+}
+Functions函数声明或者函数表达式节点。
+interface Function <: Node {
+    id: Identifier | null;
+    params: [ Pattern ];
+    body: BlockStatement;
+}
+在测试过程中，是不会找到 type: "Function" 的节点的，
+但是你可以找到 type: "FunctionDeclaration" 和 type: "FunctionExpression"，
+因为函数要么以声明语句出现，要么以函数表达式出现，
+Statement语句节点
+ExpressionStatement表达式语句节点
+BlockStatement块语句节点
+举个例子：if (...) { // 这里是块语句的内容 }
+块里边可以包含多个其他的语句，所以有一个 body 属性，是一个数组
+interface BlockStatement <: Statement {
+    type: "BlockStatement";
+    body: [ Statement ];
+}
+EmptyStatement
+一个空的语句节点，没有执行任何有用的代码，例如一个单独的分号 ;
+ReturnStatement返回语句节点
+argument 属性是一个表达式，代表返回的内容。
+interface ReturnStatement <: Statement {
+    type: "ReturnStatement";
+    argument: Expression | null;
+}
+LabeledStatement
+loop: for(let i = 0; i < len; i++) {
+    // ...
+    for (let j = 0; j < min; j++) {
+        // ...
+        break loop;
+    }
+}
+这里的 loop 就是一个 label 了，我们可以在循环嵌套中使用 break loop 来指定跳出哪个循环。
+ForStatement for 循环语句节点
+属性 init/test/update 分别表示了初始化值，循环判断条件，每次循环执行的变量更新语句
+Declarations声明语句节点
+FunctionDeclaration函数声明，id 不能为 null
+VariableDeclaration变量声明，kind 属性表示是什么类型的声明var/let/const,
+UnaryExpression
+一元运算表达式节点（++/-- 是 update 运算符，不在这个范畴内），
+operator 表示运算符，prefix 表示是否为前缀运算符。argument 是要执行运算的表达式。
+interface UnaryExpression <: Expression {
+    type: "UnaryExpression";
+    operator: UnaryOperator;
+    prefix: boolean;
+    argument: Expression;
+}
+UnaryOperator
+一元运算符，枚举类型，所有值如下：
+enum UnaryOperator {
+    "-" | "+" | "!" | "~" | "typeof" | "void" | "delete"
+}
+
+BinaryExpression
+二元运算表达式节点，
+left 和 right 表示运算符左右的两个表达式，
+operator 表示一个二元运算符。
+interface BinaryExpression <: Expression {
+    type: "BinaryExpression";
+    operator: BinaryOperator;
+    left: Expression;
+    right: Expression;
+}
+BinaryOperator 二元运算符，所有值如下：
+enum BinaryOperator {
+    "==" | "!=" | "===" | "!=="
+         | "<" | "<=" | ">" | ">="
+         | "<<" | ">>" | ">>>"
+         | "+" | "-" | "*" | "/" | "%"
+         | "|" | "^" | "&" | "in"
+         | "instanceof"
+}
+AssignmentExpression 赋值表达式节点
+interface AssignmentExpression <: Expression {
+    type: "AssignmentExpression";
+    operator: AssignmentOperator;
+    left: Pattern | Expression;
+    right: Expression;
+}
+LogicalExpression 逻辑运算表达式节点，
+逻辑运算符，两种值，即与 或。
+
+MemberExpression表示引用对象成员的语句，
+object 是引用对象的表达式节点，property 是表示属性名称，
+computed 如果为 false，是表示 . 来引用成员，property 应该为一个 Identifier 节点，
+如果 computed 属性为 true，则是 [] 来进行引用，即 property 是一个 Expression 节点，
+interface MemberExpression <: Expression, Pattern {
+    type: "MemberExpression";
+    object: Expression;
+    property: Expression;
+    computed: boolean;
+}
+ConditionalExpression
+条件表达式，通常我们称之为三元运算表达式，即 boolean ? true : false。
+CallExpression 函数调用表达式，即表示了 func(1, 2) 这一类型的语句。
+callee 属性是一个表达式节点，表示函数，
+arguments 是一个数组，元素是表达式节点，表示函数参数列表。
+interface CallExpression <: Expression {
+    type: "CallExpression";
+    callee: Expression;
+    arguments: [ Expression ];
+}
+
+语法分析
+Token 转化成有语法含义的抽象语法树结构。
+同时，验证语法，语法如果有错的话，抛出语法错误。
+
+AST 转化过程
+@babel/parser : 将 js 代码 ------->>> AST 抽象语法树；
+@babel/traverse 对 AST 节点进行递归遍历；
+@babel/types 对具体的 AST 节点进行进行修改；
+@babel/generator : AST 抽象语法树 ------->>> 新的 js 代码；
+
+
+
+编写插件
+三个步骤：
+分析源文件抽象语法树AST
+分析目标文件抽象语法树
+构建Visitor
+3.1 确定访问条件
+3.2 确定转换逻辑
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

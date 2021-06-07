@@ -1,0 +1,156 @@
+<html>
+
+<head>
+
+    <title>Endless scrolling example.</title>
+
+    <!-- Include the MooTools framework. -->
+    <!-- <script type="text/javascript" src="mootools-1.2.4-core-yc.js"></script> -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/mootools/1.6.0/mootools-core-compat.js"></script>
+
+    <!-- Note: we'll use id's to select objects since it's faster. -->
+
+</head>
+
+<body>
+
+    <!-- Scroll up. -->
+    <a href="javascript:void(0);" id="list_up_button">Up!</a>
+
+    <!-- The list (i.e. container). -->
+    <ul id="list_container">
+    </ul>
+
+    <!-- Scroll down. -->
+    <a href="javascript:void(0);" id="list_down_button">Down!</a>
+
+</body>
+
+<!-- Our script. -->
+<script type="text/javascript">
+
+    window.addEventListener('domready', function() {
+
+        // database
+        var list = {};
+
+        // options
+        var list_size = 5000;   // total list size
+        var list_offset = 0;    // initial list position
+        var list_subset = 40;   // the smount of displayed items
+        var scroll_step = 10;    // items to scroll in one step
+        var time_delay = 50;    // time delay between scroll steps
+
+        // make dummy items
+        for (var i = 0; i < list_size; i++) {
+            var red = Math.floor(i * 2) % 256;
+            var green = Math.floor(i * 3) % 256;
+            var blue = Math.floor(i * 4) % 256;
+
+            list[i] = "<span style=\"color:rgb(" + red + ", " + green + ", " + blue + ");\">" +
+                      "My name is 'Object no." + (i + 1) + "'." +
+                      "</span>";
+        }
+
+        // get container
+        var list_container = $('list_container')
+
+        // generate DOM objects
+        for (var i = 0; i < list_subset; i++) {
+            list_container.grab(new Element('li', { html: list[i] }));
+        }
+
+        // Up scroller.
+        function up() {
+
+            // check end
+            if (list_offset <= 0) {
+                return false;
+            }
+
+            // get element
+            var element = list_container.getLast();
+
+            // devance offset
+            list_offset--;
+
+            // re-write element
+            element.set('html', list[list_offset]);
+
+            // move top element to top
+            list_container.grab(element, 'top');
+
+            // success
+            return true;
+        }
+
+        // Down scroller.
+        function down() {
+
+            // check end
+            if (list_offset >= list_size - list_subset) {
+                return false;
+            }
+
+            // get element
+            var element = list_container.getFirst();
+
+            // advance offset
+            list_offset++;
+
+            // re-write element
+            element.set('html', list[list_offset + list_subset - 1]);
+
+            // move top element to bottom
+            list_container.grab(element, 'bottom');
+
+            // success
+            return true;
+        }
+
+        // Repeater function.
+        function repeater(direction) {
+
+            for (var i = 0; i < scroll_step; i++) {
+
+                // scroll
+                if (direction() == false) {
+
+                    // deactivate repeater
+                    $clear(list.scroll_period);
+                }
+            }
+
+        }
+
+        // configure up scroll
+        $('list_up_button').addEvents({
+
+            // activate scroll
+            'mouseenter': function() {
+                list.scroll_period = repeater.periodical(time_delay, null, up);
+            },
+
+            // deactivate scroll
+            'mouseleave': function() {
+                $clear(list.scroll_period);
+            }
+        });
+
+        // configure up scroll
+        $('list_down_button').addEvents({
+
+            // activate scroll
+            'mouseenter': function() {
+                list.scroll_period = repeater.periodical(time_delay, null, down);
+            },
+
+            // deactivate scroll
+            'mouseleave': function() {
+                $clear(list.scroll_period);
+            }
+        });
+
+    });
+
+</script>

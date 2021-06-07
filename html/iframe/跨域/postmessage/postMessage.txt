@@ -1,0 +1,12 @@
+window.postMessage方法可以安全地实现跨源通信，写明目标窗口的协议、主机地址或端口就可以发信息给它。
+// b页面
+parent.postMessage(
+    value,
+    "http://a.demo.com"
+);
+复制代码// a页面
+window.addEventListener("message", function( event ) {
+    if (event.origin !== 'http://b.demo.com') return;
+    toggleFullScreen()
+ });
+复制代码为了安全，收到信息后要检测下event.origin判断是否要收信息的窗口发过来的。

@@ -1,0 +1,21 @@
+获取iframe中的window对象
+
+在同域中
+
+父调子
+因为有兼容问题，一般使用contentWidow属性来获取iframe中的window对象
+<iframe src="http://www.demo.com/index.html" id="ifr"></iframe>
+// js
+var ifrwindow = document.getElementById('ifr').contentWindow;
+
+
+子调父
+window.parent 返回父窗口 ，这里指上一层iframe
+window.top 返回顶层窗口，即浏览器窗口
+
+
+
+document.domain 使用条件 这两个域名必须属于同一个基础域名!而且所用的协议，端口都要一致
+
+window对象有一个name属性，这个属性有个特征：
+在一个window的生命周期内，窗口载入的所有页面都是共享一个window.name，每个页面都是有读写的权利。

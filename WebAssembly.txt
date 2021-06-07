@@ -1,0 +1,11 @@
+许多 3D 游戏都是用 C / C++ 语言写的，如果能将 C / C++ 语言编译成 JavaScript 代码，
+它们不就能在浏览器里运行了吗？
+为此专门做了一个编译器项目 Emscripten。
+这个编译器可以将 C / C++ 代码编译成 JS 代码，但不是普通的 JS，
+而是一种叫做 asm.js 的 JavaScript 变体
+
+开发了一个面向Web的通用二进制和文本格式的项目，那就是WebAssembly。
+asm.js 是文本，WebAssembly 是二进制字节码，因此运行速度更快、体积更小。
+
+WebAssembly 执行速度
+如今 Wasm 运行速度只比原生代码慢 20%

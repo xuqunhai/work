@@ -1,0 +1,22 @@
+app.vue
+<list :items="items">
+    <item slot-scope="{item}" :item="item"></item>
+</list>
+
+list.vue
+<div v-for="item in visibleData" :key="item.id">
+    <slot :item="item"></slot>
+</dov>
+props: {
+    items: Object
+}
+computed: {
+    visibleData() {
+        return this.items
+    }
+}
+
+item.vue
+props: {
+    item: Object
+}

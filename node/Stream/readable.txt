@@ -1,0 +1,113 @@
+Stream是Node模块基础中的基础
+许多其他的模块都继承了它，比如fs、process、http等，
+另外目前很多的构建工具比如gulp等它们的插件都是基于Stream开发的
+
+它有什么作用呢？
+在传输数据时，当遇到数据很大的时候很难一次性传递完成，
+这个时候可以利用流将数据分成一块一块的，分片段传输
+
+Stream分类
+readable/writeable/duplex/transform/passthrough
+
+Stream也继承了Event这个模块，并且实现了一个方法pipe。
+const event=require('events)
+function Stream(){
+    event.call(this)
+}
+Object.setPrototypeOf(Stream.prototype,event.prototype)
+Object.setPrototypeOf(Stream,event)
+Stream.prototype.pipe=function(dest,options){}
+
+如果想要告诉可读流对象数据已经读完，必须push(null)，
+此操作会将内部状态ended置为true，此后再push数据就会无效
+const iterator=function(){
+    return {
+        next: function(){
+            if(n--){
+                return {
+                    done:false,
+                    value:n+''
+                }
+            }
+            return {
+                done: true,
+                value:null
+            }
+        }
+    }
+}
+const readable=new Readable({
+    read(){
+        const res=iterator.next()
+        if(res.done){
+            return this.push(null)
+        }
+        setTimeout(()=>{
+            this.push(res.value, 'utf16le')
+        },0)
+    }
+})
+// 如果push数据是异步的，这种方式就不行了，
+因为数据来不及存进缓存区，从缓存区获取数据的操作就已经结束了！
+针对这种情况，我们可以使用另外一个事件readable
+// 当数据被push进缓存区之后，就会触发readable事件
+readable.on('readable',function(){
+    let data=readable.read()
+    while(data!==null){
+        data=readable.read()
+    }
+})
+
+Readable.prototype.push=function(chunk){
+    if(chunk===null){
+        state.ended=true
+    }else if(async){
+        stream.emit('data',chunk)
+    }else{
+        state.buffer.push(chunk) // 数据存入缓存区
+    }
+    maybeReadMore()
+}
+function maybeReadMore(){
+    while(!state.ended){ // 只要没有结束
+        const len=state.length // 缓存区数据的长度
+        stream.read(0)
+        // 只要读不出数据就跳出循环，这部分是为了兼容同步的情况！
+        if(len===state.length){
+            break;
+        }
+    }
+}
+
+你装一桶水，里面插一个软管，水是不会自动流出来的，必须用嘴巴吸一口，水才会自己流动。
+这个吸一口的动作在这里就是绑定一个data事件
+readable.on('data',data=>{
+    process.stdout.write(data)
+})
+这个绑定事件不仅仅只有一个绑定动作，还有一个开关的逻辑，这个开关逻辑就是resume，
+resume方法会触发一个循环读取逻辑。
+Readable.prototype.on=function(){
+    const res=Stream.prototype.on.call(this,ev,fn)
+    if(ev==='data'){
+        this.resume()
+    }
+}
+// resume是循环读取的开关，但它会在定时器之前就执行完成
+Readable.prototype.resume=function(){
+    stream.emit('resume')
+    while(this.read()!==null)
+}
+Readable.prototype.read=function(){
+    if(!state.ended){
+        this._read()
+    }
+    let ret=fromList() // 把数据从缓存区取出来
+    if(ret!==null){ // 取出的数据只要不为空就会触发data事件
+        this.emit('data',ret)
+    }
+    return ret
+}
+
+如果缓存区数据已经非常多了，超过这个阈值highWaterMark，那就停止向缓存区存数据！
+初始化时可以通过option.highWaterMark设置，默认值为16 * 1024！
+当调用read方法读取的数据数量大于这个阈值，阈值会被自动设置为一个更大的值

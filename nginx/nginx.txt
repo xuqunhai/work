@@ -1,0 +1,21 @@
+// nginx.conf
+// 因为有多个项目会用到nginx服务做端口映射
+// 所以我在nginx的目录下新建了conf.d的文件来存放每个项目的配置.
+// 然后在主配置文件里通过include引入
+
+ http {    
+    # 这里省略了一些你本机电脑上的nginx服务的配置    
+    include conf.d/*.conf; 
+}
+
+
+// testHtml.conf
+server {    
+    listen 9090;    
+    server_name       localhost;
+    location / {        
+        root  C:/Users/hzljie/Desktop/test/testb;  
+        # 这是我的测试页面的存放路径,读者用的时候记得根据自己的来更改奥        
+        index  test.html test.htm;    
+    }
+}

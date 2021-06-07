@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初级工程师的方案</title>
+</head>
+
+<body>
+    <h1>本质上是可以实现基本的需求,但是有明显的缺点,那就是数据一次性渲染到页面中, 数据量庞大将导致页面性能极具降低, 造成页面卡顿.</h1>
+    <script>
+        fetch(`${SERVER_URL}/api/getMock`).then(res => res.json()).then(res => {
+            if (res.state) {
+                data = res.data
+                setList(data)
+            }
+        })
+        const handleSearch = (v) => {
+            let searchData = data.filter((item, i) => {
+                return item.title.indexOf(v) > -1
+            })
+            setList(searchData)
+        }
+        const setList = (list) => {
+            list.map((item, i) => {
+                return <div className={styles.item} key={item.tid}>
+                    <div className={styles.tit}>{item.title} <span className={styles.label}>{item.name}</span></div>
+                    <div>{item.text}</div>
+                </div>
+            })
+        }
+    </script>
+</body>
+
+</html>

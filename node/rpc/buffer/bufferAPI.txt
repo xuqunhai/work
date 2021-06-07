@@ -1,0 +1,52 @@
+Buffer.alloc(size[, fill[, encoding]])
+size代表Buffer的长度
+fill初始化填充的内容
+encoding代表编码
+
+> Buffer.alloc(6,'中文', 'utf8')
+<Buffer e4 b8 ad e6 96 87>
+> Buffer.alloc(1,'中文', 'utf8')
+<Buffer e4>
+> Buffer.alloc(12,'中文', 'utf8')
+<Buffer e4 b8 ad e6 96 87 e4 b8 ad e6 96 87>
+可以看出fill和encoding之间的关系，
+fill先按照encoding编码成二进制，
+然后一个字节一个字节的向此方法生成的Buffer中填充，
+根据长度size，依次循环！
+
+Buffer.from(arrayBuffer[, byteOffset[, length]])
+
+将一个二进制数组[5000, 4000]放入Buffer中
+Buffer实例是Uint8Array的实例，此时相当于把arr放入Uint8Array中，元素一一对应，
+而Uint8Array每个元素都是8位，最大值是256，所以发生了溢出
+> arr=new Uint16Array([5000,4000])
+Uint16Array(2) [ 5000, 4000 ]
+> Buffer.from(arr)
+<Buffer 88 a0>
+这里88是0x88，a0是0xa0，
+而parseInt(0x88)为136，5000%256也为136；
+而parseInt(0xa0)为160，4000%256也为160；
+0x00, 0x11, 0xff 这种格式是十六进制，他们的十进制值分别是 0, 17, 255。
+01, 07, 010, 012 这个是 八进制
+
+如果不想发生溢出，可以使用二进制数组的buffer属性（此时会共享内存）
+> arr=new Uint16Array([5000,4000])
+Uint16Array(2) [ 5000, 4000 ]
+> Buffer.from(arr.buffer)
+<Buffer 88 13 a0 0f>
+> arr.buffer
+ArrayBuffer { [Uint8Contents]: <88 13 a0 0f>, byteLength: 4 }
+
+读字节流
+readUInt8/readInt8读取一个字节的有/无符号的整数
+> b=Buffer.from([0xff,0x01])
+<Buffer ff 01>
+> b.readUInt8(0)
+255
+> b.readInt8(0)
+-1
+readUInt8直接读取一个字节的二进制
+readInt8读取8位有符号的二进制，所以有可能会发生溢出
+readInt16BE/readInt16LE/readUInt16BE/readUInt16LE读取两个字节的有/无符号的整数
+BE代表大端字节序，高位在前，网络就是这种字节序
+LE代表小端字节序，低位在前
