@@ -1,0 +1,15 @@
+https://262.ecma-international.org/11.0/#sec-typeof-operator
+
+typeof运算符
+为什么null返回object？
+因为typeof原理是
+把检测对象转成机器码，如果最后三位为0，就判定为object，
+而null的机器码全部为0；
+
+为什么函数经过typeof后返回function？
+因为js对object对象做了进一步判定，
+如果该对象有[[call]]就判定是function；
+
+instanceOf检测原型，会从原型链里找；
+
+Object.prototype.toString.call([]) // "[object Array]"

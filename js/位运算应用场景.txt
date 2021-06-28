@@ -1,0 +1,81 @@
+
+JavaScript不定义不同类型的数字，比如整数、短、长、浮点等等。
+JavaScript 数字存储为根为10的64（8比特）浮点数。
+整数精度（不使用小数点或指数计数法）最多为15位。
+小数精度的最大位数是17，但是浮点运算并不总是100% 准确。
+位运算直接对二进制位进行计算，位运算直接处理每一个比特位，是非常底层的运算，
+位运算只对整数起作用，如果一个运算数不是整数，会自动转为整数后再运行。
+在JavaScript内部，数值都是以64位浮点数的形式储存，
+但是做位运算的时候，是以32位带符号的整数进行运算的，并且返回值也是一个32位带符号的整数。
+
+// 十进制 => 二进制
+let num = 10;
+console.log(num.toString(2));
+// 二进制 => 十进制
+let num1 = 1001;
+console.log(parseInt(num1, 2)); 
+
+>>>>>>>>>--------------------- 判断一个数的奇偶
+console.log(2 & 1)    // 0 偶数
+console.log(3 & 1)    // 1 奇数
+
+>>>>>>>>>--------------------- 取整
+console.log(~~ 6.83)    // 6
+console.log(6.83 >> 0)  // 6
+console.log(6.83 << 0)  // 6
+console.log(6.83 | 0)   // 6
+// >>>不可对负数取整
+console.log(6.83 >>> 0)   // 6
+
+>>>>>>>>>--------------------- 值交换
+var a = 5
+var b = 8
+a ^= b
+b ^= a
+a ^= b
+console.log(a)   // 8
+console.log(b)   // 5
+
+>>>>>>>>>--------------------- rgb值和16进制颜色值之间的转换
+/**
+ * 16进制颜色值转RGB
+ * @param  {String} hex 16进制颜色字符串
+ * @return {String}     RGB颜色字符串
+ */
+  function hexToRGB(hex) {
+    var hexx = hex.replace('#', '0x')
+    var r = hexx >> 16
+    var g = hexx >> 8 & 0xff
+    var b = hexx & 0xff
+    return `rgb(${r}, ${g}, ${b})`
+}
+
+/**
+ * RGB颜色转16进制颜色
+ * @param  {String} rgb RGB进制颜色字符串
+ * @return {String}     16进制颜色字符串
+ */
+function RGBToHex(rgb) {
+    var rgbArr = rgb.split(/[^\d]+/)
+    var color = rgbArr[1]<<16 | rgbArr[2]<<8 | rgbArr[3]
+    return '#'+ color.toString(16)
+}
+// -------------------------------------------------
+hexToRGB('#ffffff')               // 'rgb(255,255,255)'
+RGBToHex('rgb(255,255,255)')      // '#ffffff'
+
+>>>>>>>>>--------------------- 切换一个值为0或者1
+//普通的写法
+var num = toggle ? 1 : 0;
+// 通过异或我们可以这么写
+num = toggle ^ 1;  //num为true的返回 0， 为 false返回1
+
+>>>>>>>>>--------------------- 元素是否存在数组中
+// 常用判断
+if (arr.indexOf(item) > -1) {
+    // code
+}
+// 按位非    ~-1 = - (-1 + 1)
+if (~arr.indexOf(item)) {
+    // code
+}

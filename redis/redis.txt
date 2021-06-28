@@ -1,3 +1,35 @@
+启动redis：redis-server
+不过这个窗口不能关闭或执行其他命令，更好方式是：
+vim redis.conf后修改daemonize no改为conf后修改daemonize yes保存
+./bin/redis-server ./redis.conf
+查看是否成功启动
+ps -ef | grep -i redis
+停止redis：
+./bin/redis-cli shutdown
+
+Node.js与Redis
+ioredis
+支持hmset命令使用对象作为参数，
+hgetall命令会返回对象；
+
+事务
+redis.multi()
+.set('foo', 'bar')
+.sadd('set', 'a')
+.exec(function(err, replies){
+    // replies是一个数组，依次存放事务队列中命令结果
+})
+
+发布订阅
+const pub=new Redis()
+const sub=new Redis()
+sub.subscribe('chat',()=>{
+    pub.publish('chat', 'h1!')
+})
+sub.on('message', (channel, message)=>{})
+
+
+
 获得Redis所有键
 127.0.0.1:6379> keys *
 (empty array)
@@ -46,7 +78,7 @@ list
 Redis基本数据类型
 
 字符串类型
-赋值/取值
+赋值/取值:get/set/getset/del
 127.0.0.1:6379> set a 2
 OK
 127.0.0.1:6379> get a
@@ -263,7 +295,7 @@ redis.hgetall会返回js对象；
 
 列表类型list
 常用操作是向列表两端添加元素或获得列表某一个片段
-向列表左边添加
+向列表左边添加/lpush lpushx前者不存在时新建，后者不存在时不操作
 127.0.0.1:6379> lpush numbers 1
 (integer) 1
 127.0.0.1:6379> lpush numbers 2 3
@@ -418,6 +450,10 @@ ltrim logs 0 99
 1) "b"
 2) "a"
 
+获取集合中元素个数
+127.0.0.1:6379> scard letters
+(integer) 2
+
 判断元素是否在集合中
 127.0.0.1:6379> sismember letters a
 (integer) 1
@@ -437,13 +473,460 @@ A里面有哪几个是B没有的
 1) "1"
 2) "2"
 
-A和B共有哪些
+sdiffstore和sdiff区别就是会把结果存储在setAB中
+127.0.0.1:6379> sdiffstore setAB setA setB
+(integer) 2
+127.0.0.1:6379> smembers setAB
+1) "1"
+2) "2"
+
+A和B共有哪些 sinter/sinterstore
+应用场景比如买华为的人是一个set，买苹果是另一个set，
+现在需要看看哪些人同时买了华为和苹果，用交集就可以；
 127.0.0.1:6379> sinter setA setB
 1) "3"
 
-A和B加起来都有啥
+A和B加起来都有啥 sunion/sunionstore
 127.0.0.1:6379> sunion setA setB
 1) "1"
 2) "2"
 3) "3"
 4) "4"
+
+随即从集合中获取元素
+127.0.0.1:6379> smembers letters
+1) "d"
+2) "0"
+3) "c"
+4) "b"
+5) "a"
+6) "e"
+获取3个随机不重复的元素
+127.0.0.1:6379> srandmember letters 3
+1) "d"
+2) "b"
+3) "e"
+获取所有元素
+127.0.0.1:6379> srandmember letters 30
+1) "d"
+2) "0"
+3) "c"
+4) "b"
+5) "a"
+6) "e"
+获取12个可重复的元素
+127.0.0.1:6379> srandmember letters -12
+ 1) "e"
+ 2) "e"
+ 3) "a"
+ 4) "0"
+ 5) "0"
+ 6) "0"
+ 7) "a"
+ 8) "d"
+ 9) "0"
+10) "a"
+11) "0"
+12) "a"
+从结果看似乎并不是非常随机，出现这种情况是因为集合类型采用散列吧存储结构造成的；
+散列表使用散列函数将元素映射到不同存储位置（桶），当不同元素散列值一样时会出现冲突，
+Redis使用拉链法来解决冲突，即桶内以链表形式存入同一个桶中；
+如：
+桶0 - a,b,c
+桶1 - 1，2，3，4
+桶3 - d
+先挑桶，再挑桶里元素，所以d被选中概率更大；
+
+从集合中随机选择一个元素弹出，因为集合元素无序
+127.0.0.1:6379> spop letters
+"c"
+
+
+有序集合
+和列表类型相似
+1、有序
+2、可获取某一范围元素
+差异
+列表类型通过链表实现，所以获取两端数据速度快，元素增多后访问中间元素会慢；
+有序集合使用散列表和跳跃表实现，读取很快；
+列表不能调整某个元素位置，而有序集合可以通过改分数实现，
+有序集合更耗费内存。
+
+增加元素
+127.0.0.1:6379> zadd scoreboard 89 Tom 67 Peter 100 David
+(integer) 3 // 返回值是新加入到集合中个数，之前已经存在的会替换，所以会返回0
+127.0.0.1:6379> zadd scoreboard 76 Peter
+(integer) 0
+
+获取元素分数
+127.0.0.1:6379> zscore scoreboard Peter
+"76"
+
+获得排名在某个范围的元素列表（索引从0开始，-1表示最后一个元素）
+127.0.0.1:6379> zrange scoreboard 1 -1
+1) "Tom"
+2) "David"
+同时获取分数
+127.0.0.1:6379> zrange scoreboard 1 -1 withscores
+1) "Tom"
+2) "89"
+3) "David"
+4) "100"
+
+倒序（从大到小）
+127.0.0.1:6379> zrevrange scoreboard 0 -1
+1) "David"
+2) "Tom"
+3) "Peter"
+
+获取指定分数范围的元素/zrangebyscore key min max [withscores] [limit offset count]
+现有元素集合
+127.0.0.1:6379> zrange scoreboard 0 -1 withscores
+ 1) "Peter"
+ 2) "76"
+ 3) "James"
+ 4) "81"
+ 5) "Tom"
+ 6) "89"
+ 7) "Curry"
+ 8) "93"
+ 9) "Kevin"
+10) "96"
+11) "David"
+12) "100"
+
+获取80-100的元素
+127.0.0.1:6379> zrangebyscore scoreboard 80 100
+1) "James"
+2) "Tom"
+3) "Curry"
+4) "Kevin"
+5) "David"
+获取80-100，但是不包括100的元素
+127.0.0.1:6379> zrangebyscore scoreboard 80 (100
+1) "James"
+2) "Tom"
+3) "Curry"
+4) "Kevin"
+分数高于80的元素(-inf表示负无穷,+inf表示正无穷)
+127.0.0.1:6379> zadd scoreboard 120 rafer
+(integer) 1
+127.0.0.1:6379> zrangebyscore scoreboard (80 +inf withscores
+ 1) "James"
+ 2) "81"
+ 3) "Tom"
+ 4) "89"
+ 5) "Curry"
+ 6) "93"
+ 7) "Kevin"
+ 8) "96"
+ 9) "David"
+10) "100"
+11) "rafer"
+12) "120"
+获取90分以上的最低分，limit后面第一个参数是offset偏移，第二参数count表示个数
+127.0.0.1:6379> zrangebyscore scoreboard 90 +inf limit 0 1
+1) "Curry"
+获取0-90之间最高分
+127.0.0.1:6379> zrevrangebyscore scoreboard 90 0 limit 0 1
+1) "Tom"
+
+加减某元素的分数，元素不存在会先创建并将分数设为0，再执行
+127.0.0.1:6379> zincrby scoreboard 4 rafer
+"124"
+127.0.0.1:6379> zincrby scoreboard -4 rafer
+"120"
+127.0.0.1:6379> zincrby scoreboard -8 haha
+"-8"
+
+获取集合中元素数量
+127.0.0.1:6379> zcard scoreboard
+(integer) 8
+获取指定分数范围内的元素个数
+获取90分以上的个数
+127.0.0.1:6379> zcount scoreboard 90 +inf
+(integer) 4
+删除一个或多个元素,返回值是成功删除的数量
+127.0.0.1:6379> zrem scoreboard raferxu rafer
+(integer) 2
+对元素排序后删除指定范围的元素
+127.0.0.1:6379> zadd test1 1 a 2 b 3 c 4 d 5 e 6 f 7 g
+(integer) 7
+127.0.0.1:6379> zremrangebyrank test1 4 5 // start:4, stop:5
+(integer) 2
+127.0.0.1:6379> zrange test1 0 -1
+1) "a"
+2) "b"
+3) "c"
+4) "d"
+5) "g"
+删除分数为2到4（不包括2）的元素
+127.0.0.1:6379> zremrangebyscore test1 (2 4
+(integer) 2
+127.0.0.1:6379> zrange test1 0 -1 withscores
+1) "a"
+2) "1"
+3) "b"
+4) "2"
+5) "g"
+6) "7"
+获得元素从小到大的排名（从0开始）
+127.0.0.1:6379> zrank test1 a
+(integer) 0
+获得元素从大到小的排名
+127.0.0.1:6379> zrevrank test1 a
+(integer) 2
+
+计算有序集合的交集
+集合A和B都有a成员
+求a成员在两个集合的最大、最小值、总分等
+
+
+
+进阶
+
+事务：一组命令集合
+事务中的命令要么都执行，要么都不执行
+示例
+multi // 下面的命令属于事务，先暂存起来，不要执行
+sadd a 2
+sadd b 1
+exec // 依次执行事务队列命令
+如果发送exec前客户端断线了，Redis会清空事务队列
+
+如果事务中命令出错：
+语法错误时会直接返回错误，连语法正确的命令也不会执行；
+运行错误时，如使用散列类型命令操作集合类型键，
+则事务其他命令依然会继续执行，所以需要手动将数据库复原回事务执行前状态；
+
+
+不过，由于事务中命令的执行结果都是最后返回的，
+所以无法将前一条命令的结果作为下一个命令参数，
+所以还是无法防止竞态条件，
+此时需要使用watch命令(watch不能在multi中)：
+
+127.0.0.1:6379> set xu 1
+OK
+127.0.0.1:6379> watch xu
+OK
+127.0.0.1:6379> set xu 666
+OK
+127.0.0.1:6379> multi
+OK
+127.0.0.1:6379(TX)> set xu 0
+QUEUED
+127.0.0.1:6379(TX)> exec
+(nil)
+127.0.0.1:6379> get xu
+"666"
+
+watch命令可以监控一个或多个键，
+一旦有一个键被修改或删除，之后的第一个事务就不会执行，
+不过事务，即exec后面命令会执行；
+注意，检测一个设置过期时间的键时，该键时间到期自动删除并不会被watch认为键改变；
+
+过期时间（缓存或验证码）
+expire命令设置一个键的过期时间，到时间后redis自动删除他；
+127.0.0.1:6379> set foo bar
+OK
+127.0.0.1:6379> expire foo 20
+(integer) 1 // 返回0则表示键不存在或设置失败
+127.0.0.1:6379> ttl foo // ttl可以查看一个键还有多久被删除
+(integer) 18
+127.0.0.1:6379> ttl foo
+(integer) 10
+127.0.0.1:6379> ttl foo
+(integer) -2 // 键不存在时返回-2
+
+127.0.0.1:6379> set xqe value
+OK
+127.0.0.1:6379> ttl xqe
+(integer) -1 // 没有为键设置过期时间时，ttl返回-1
+
+取消键的过期时间设置
+127.0.0.1:6379> persist foo
+(integer) 0 // 清除成功返回1，键不存在或本来就是永久键则返回0
+直接使用set命令为键赋值时也会同时成为永久键，即清除过期时间；
+
+expire命令最小单位是1秒，想要更准确控制应该使用pexpire命令，
+后者单位是毫秒，即pexpire key 1000等价于expire key 1;
+设置过期时间为Unix时间（时间戳）时，需使用expireat和pexpireat命令；
+
+应用场景：访问频率限制
+使用列表类型的键记录最近10次访问时间，
+键中元素超过10个，判断时间最早的距离现在的时间是否小于1分钟，
+是则表示访问超过限制了，
+不是就将现在时间加入列表，同时把最早的元素删除；
+
+
+
+实现缓存
+修改配置文件maxmemory参数，限制Redis最大可用内存大小（单位是字节），
+超出时依据最近最少使用算法删除不需要的键直到内存小于指定内存；
+
+
+
+排序
+有序集合类型
+sort命令可以对列表类型、集合类型和有序集合类型进行排序
+
+列表类型
+127.0.0.1:6379> lpush mylist 3 6 8 4 2 7 0
+(integer) 7
+127.0.0.1:6379> sort mylist
+1) "0"
+2) "2"
+3) "3"
+4) "4"
+5) "6"
+6) "7"
+7) "8"
+
+有序集合类型/zadd key score member [score member ...]
+127.0.0.1:6379> zadd myzset 80 2 70 3 90 1 50 5
+(integer) 4
+127.0.0.1:6379> sort myzset
+1) "1"
+2) "2"
+3) "3"
+4) "5"
+默认sort命令尝试将所有元素转成双精度浮点数来比较，无法转换会提示错误：
+127.0.0.1:6379> lpush mylistalpha a c e d B C A
+(integer) 7
+127.0.0.1:6379> sort mylistalpha
+(error) ERR One or more scores can't be converted into double
+
+此时需要加alpha参数实现按照字典顺序排列：
+127.0.0.1:6379> sort mylistalpha alpha
+1) "A"
+2) "B"
+3) "C"
+4) "a"
+5) "c"
+6) "d"
+7) "e"
+
+sort命令的desc参数可以实现倒序，limit参数返回指定范围结果，
+sort命令的limit offset count表示跳过前offset个元素获取之后count个元素；
+
+sort命令的by参数
+根据ID对应的对象的某个属性，如创建时间，进行排序：
+参考键可以字符串类型或散列类型键的某个字段
+sort posts by post:*->time desc
+对posts列表按每个post对象的time字段进行倒序；
+*只能在->前面才有用，写成post->time:*由于参考键包含*所以不是常量键名，
+排序时会对每个元素读取键post中的time:*字段，
+由于此时参考键值都是相同的，即都不存在，所以会按照元素本身大小进行排序；
+当参考键名不包括*时，即常量键名，sort命令不会执行排序操作，
+在不需要排序但需要借助sort命令获取与元素相关联的数据时很有用；
+如果元素参考键值一样，会再比较元素本身的值来决定顺序；
+某元素参考键不存在时，默认为0；
+
+sort命令的get参数
+使sort命令返回结果不是元素自身所有值，而是get参数中指定的键值，
+和by一样支持字符串类型和散列类型，不过by参数只能有一个，而get可多个；
+排序后直接返回ID对应标题：
+sort posts by post:*->time desc get post:*->title
+sort posts by post:*->time desc get post:*->title get post:*->time
+如果还需要返回元素本身的值时：
+sort posts by post:*->time desc get post:*->title get post:*->time get #
+
+
+sort命令的store参数
+默认sort直接返回排序结果，如果向保存排序结果，可使用store参数：
+sort posts by post:*->time desc get post:*->title get post:*->time get # store sort.result
+保存后键值类型为列表类型，键存在会覆盖，获取保存结果：
+lrange sort.result 0 -1
+store参数常用来结合expire命令缓存排序结果
+expire sort.result 600 // 10分钟
+
+sort性能优化：
+时间复杂度O(n+mlog(m))，n为列表元素，m为返回个数，
+所以
+尽可能减少待排序键中元素个数，
+使用limit只获取需要的数据，
+数据量较大时，尽可能使用store参数缓存结果；
+
+
+消息通知
+邮件订阅功能
+生产者lpush-任务队列-消费者rpop
+缺点就是没有任务时消费者每秒都会调用一次rpop命令查看是否有新任务，
+可以优化成：一旦有新任务加入队列才通知消费者，
+窗口1
+xuqunhai@xuqunhaideMacBook-Pro ~ % redis-cli            
+127.0.0.1:6379> brpop queue 0 // 键名 超时时间，0表示不限制等待时间
+窗口2
+127.0.0.1:6379> lpush queue task
+(integer) 1
+窗口1立刻变成如下：
+xuqunhai@xuqunhaideMacBook-Pro ~ % redis-cli            
+127.0.0.1:6379> brpop queue 0
+1) "queue"
+2) "task"
+(11.39s)
+
+blpop和brpop区别在于前者取元素时从队列左边取；
+
+优先级队列
+确认邮件和通知邮件同时在队列中时，有限执行前者；
+brpop confirmQueue.email notifyQueue.email 0
+确认邮件被加入队列时，无论确认邮件还有多少任务，都优先完成确认邮件任务；
+
+
+发布订阅模式
+
+窗口1发布
+127.0.0.1:6379> publish channel1 hi
+(integer) 0 // 接受到此消息的订阅者数量
+
+窗口2订阅
+127.0.0.1:6379> subscribe channel1 // 进入订阅状态，此时只能使用4个特属于发布订阅的命令
+Reading messages... (press Ctrl-C to quit)
+1) "subscribe" // 表示订阅成功的消息类型
+2) "channel1" // 订阅成功的频道名称
+3) (integer) 1 // 订阅频道数量
+
+窗口1再次发布
+127.0.0.1:6379> publish channel1 hi2
+(integer) 1 // 有一个客户端订阅了
+
+此时窗口2如下显示，多了后面3行
+127.0.0.1:6379> subscribe channel1
+Reading messages... (press Ctrl-C to quit)
+1) "subscribe"
+2) "channel1"
+3) (integer) 1
+1) "message" // 有新消息
+2) "channel1" // 谁发的
+3) "hi2" // 内容
+
+取消订阅unsubscribe 频道名称 当前剩下订阅数量，
+不指定频道会取消订阅所有频道；
+
+
+按照规则订阅/退订
+psubscribe/punsubscribe channel.?*
+退订某个规则时不会将其中通配符展开，即
+punsubscribe *无法退订channel.*规则，必须使用punsubscribe channel.*
+
+
+
+管道
+客户端和Redis使用TCP连接，需要经过网络传输，存在往返时延；
+而且在执行多条命令时每条命令都需要等待上一条命令执行完，即使不需要上一条命令结果；
+通过管道可以一次性发送多条命令并执行完后一次性返回结果，
+减少通信次数实现降低往返时延累计值的目的；
+
+
+
+节省空间
+精简键名和键值
+内部编码优化
+Redis为每种类型提供两种内部编码方式，
+如散列类型通过散列表实现，实现O(1)时间复杂度查找，
+但是当元素很少时，不会比O(n)有明显性能提升，
+所以此时Redis会采用更为紧凑但性能稍差，时间复杂度为O(n)的编码；
+这些都是Redis自动调整，
+查看一个键内部编码方式可通过:
+object encoding key

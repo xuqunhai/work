@@ -1,6 +1,7 @@
 Git
 
 github高级搜索
+https://jingyan.baidu.com/article/a17d5285a912248098c8f2cc.html
 查看git学习资料
 输入框输入
 git 最好 学习 资料
@@ -77,7 +78,7 @@ cat /Users/lianyu02/.ssh/id_rsa.pub    //这个路劲在你上面不断回车里
 保存后自动格式化代码(vscode)
 解决:
 其实对于vscode来说, 实现这一点很容易. 我们只需要修改两个属性即可.
-"editor.formatOnType": true, "editor.formatOnSave": true
+"editor.formatOnType": true,"editor.formatOnSave": true
 
 
 vscode编码技巧

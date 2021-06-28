@@ -1,0 +1,9 @@
+Lua脚本：能方便地嵌入到其他语言中使用
+
+eval "return redis.call('set', 'Test', 'test')" 0 // OK
+get Test // "test"
+eval "return redis.call('set', keys[2], argv[3])" 3 test1 test2 test3 test4 test5 test6 test7
+get test2 // test6 // 上面的3表示前3个属于keys，后面的都是argv
+
+lua使用redis.call不会捕获异常，有错误则不会执行；
+redis.pcall则会捕获异常，有错误也能执行后续语句；
