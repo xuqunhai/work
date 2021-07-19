@@ -1,0 +1,2 @@
+querySelector/querySelectorAll得到的是nodeList，是死的；
+getElementByTagNames获取的是HTMLCollections，是动态的；

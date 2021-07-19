@@ -1,0 +1,144 @@
+配置文件
+strict: true
+开启严格模式
+非严格模式下，string、number和boolean类型都可以赋值为null；
+
+sourceMap：true
+开启方便调试
+
+outDir输出目录
+rootDir要编译的目录，如src
+
+const r: void = undefined
+const a: undefined = undefined
+const b: null = null
+
+const c: symbol = Symbol()
+tsconfig.json中target为es5时上面会报错，
+因为Symbol是es6产物，不在es5配置文件里；
+解决方法：
+1、把target改为es2015
+2、打开lib选项，赋值为['ES2015','DOM']
+
+错误以中文形式显示：
+yarn tsc --local zh-CN
+
+const foo: object = function() {} //这里object泛指非原始数据类型
+如果需要特别指定是对象，两种方法
+const obj: {foo: number} = {foo: 1} // 要求key必须一一对应
+接口
+
+const arr2: number[]=[1,2]
+function sum(...args: number[]){
+    return args.reduce((pre,current) => pre + current, 0)
+}
+
+const tuple: [number, string] = [10, '10']
+const [age, name]=tuple
+{key: value} -> {
+    [s: string]: number
+}
+
+枚举类型
+enum Status {
+    Draft = 0,
+    Published = 1
+}
+// 常量枚举，编译后更简单
+const enum Switch {
+    On = 'Y',
+    Off = 'N'
+}
+const p = {
+    status: Status.Draft
+}
+
+function f1(a:number, b?:number, c:number=10, ...rest:number[]):string {
+    return 'ff'
+}
+
+有回调函数的函数:
+const f2:(a:number,b:number)=>string = function(a:number,b:number):string {
+    return 'f'
+}
+// 断言：res一定是数字
+const num = res as number
+
+interface Post {
+    title: string
+    content: string
+    subTitle?: string // 可选成员，即为string或undefined
+    readonly id: string
+}
+
+function printPost(post: Post){
+    console.log(post.title)
+    console.log(post.content)
+}
+
+// 动态成员
+interface Cache {
+    [key: string]: string
+}
+
+class Person {
+    readonly name: string = 'rafer' // 只读
+    age: number
+    public a:string = 'a' // 默认就是public
+    private b:number = 1 // 只能自身访问，实例无法访问
+    protected c:boolean = true // 只能自身和子类访问, 
+    constructor(age:number){
+        this.age = age
+    }
+    sayHi(msg: string):void {
+        console.log(this.name, msg)
+    }
+}
+class Students extends Person {
+    private constructor(age: number){ // 加了private就不能被实例化和继承
+        super(age)
+        console.log(this.c) // 可以访问protected中c
+    }
+    static create(age:number){
+        return new Students(age)
+    }
+}
+const jack=Students.create(18)
+
+
+类与类之间共同特征都是用接口来定义
+interface Eat {
+    eat (food: string): void
+}
+interface Run {
+    run (distance: number): void
+}
+class Person implements Eat, Run {
+    eat(food:string):void {
+        console.log(food)
+    }
+    run(distance:number):void {
+        console.log(distance)
+    }
+}
+
+抽象类只能被继承，不能被new：
+abstract class Animal {
+    eat(food:string):void {
+        console.log(food)
+    }
+    abstract run(distance:number):void //子类必须实现
+}
+class Dog extends Animal {
+    run(distance:number):void {
+        console.log(distance)
+    }
+}
+
+泛型
+function createArray<T> (length: number, value: T):T[] {
+    return Array<T>(length).fill(value)
+}
+
+第三方库类型声明模块
+npm i -D @types/lodash // xxx.d.ts

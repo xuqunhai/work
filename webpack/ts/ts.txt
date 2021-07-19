@@ -1,0 +1,5 @@
+this.head=document.querySelector('snake')!
+最后面的感叹号表示一定存在
+
+this.head=document.querySelector('snake') as HTMLElement
+后面as表示一定是HTMLElement

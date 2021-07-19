@@ -1,0 +1,10 @@
+webpack打包可能出现箭头函数和const，导致浏览器运行解析错误，
+这时候需要告诉webapck不使用这些:
+
+// webpack.config.js
+output: {
+    environment: {
+        arrowFunction: false,
+        const: false
+    }
+}

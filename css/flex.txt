@@ -1,0 +1,14 @@
+一个大正方形，里面有四个小正方形，而且位于四个角：
+{
+    width: 10px;
+    height: 10px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    &>div{
+        width: 4px;
+        height: 4px;
+        transform: rotate(45deg);
+    }
+}

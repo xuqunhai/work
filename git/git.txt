@@ -1,5 +1,26 @@
 Git
 
+无法push代码问题解决202107
+https://www.jianshu.com/p/6621c42ef112
+ssh-keygen -t rsa -C "邮箱地址"
+如果不需要密码，接下来可以直接两次回车，然后等待完成即可
+进入Finder目录 ~/.ssh
+多了两个文件：id_rsa和id_rsa.pub
+GitHub头像，找到设置里的SSH配置
+把刚刚copy的内容粘贴到key里面，起个名字，直接Add SSH key就OK了
+回到.ssh文件夹，用记事本打开config文件
+将原来的配置信息改为新账号绑定的配置信息
+Host GitHub
+      HostName github.com
+      User git
+      IdentityFile ~/.ssh/id_rsa_moses
+再找到和.ssh文件夹同一层级下的.gitconfig文件，用记事本打开
+将原来的账号信息改为新账号
+[user]
+    name = moses1991
+    email = moses89757@gmail.com
+    
+
 github高级搜索
 https://jingyan.baidu.com/article/a17d5285a912248098c8f2cc.html
 查看git学习资料
