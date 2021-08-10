@@ -1,3 +1,7 @@
+环境
+npm i typescript ts-node @types/node -D
+ts-node用来运行ts，@types/node用来提示
+
 配置文件
 strict: true
 开启严格模式

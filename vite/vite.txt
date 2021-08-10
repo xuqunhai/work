@@ -14,3 +14,24 @@ npm 版本v7以上的
 问题的解决办法在【https://github.com/evanw/esbuild/issues/462#issuecomment-771328459】。
 手动运行 node node_modules/esbuild/install.js 来解决esbuild安装问题。
 安装完成之后，再次运行 npm run dev 即可。
+
+
+function rewriteImport(content){
+    return content.replace(/ from ['"](.*)['"]/g, function(s1, s2){
+        if(s2.startWith("./) || s2.startWith("../) || s2.startWith("/)) {
+            return s1
+        }else{
+            return ` from /@module/${s2}`
+        }
+    })
+}
+
+if(url.startWith("/@modules/")){
+    const moduleName=url.replace("/@module/","")
+    const prefix=path.join(__dirname,"../node_modules",moduleName)
+    const module=require(prefix+"/package.json").module
+    const filePath=path.join(prefix,module)
+    const ret=fs.readFileSync(filePath,"uft8")
+    ctx.type="application/javascript";
+    ctx.body=rewriteImport(ret)
+}
