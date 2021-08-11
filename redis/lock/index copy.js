@@ -109,5 +109,10 @@ async function test(key) {
     }  
 }
 
-test('name1');
-test('name1');
+// test('name1');
+// test('name1');
+
+redis.set('tasks', JSON.stringify({
+    id: 1,
+    status: 0
+}))

@@ -26,19 +26,18 @@ class RedisLock {
      * @param {*} val 
      * @param {*} expire 
      */
-    async lock(key, val, expire, v) {
+    async lock(key, val, expire) {
         const start = Date.now();
         const self = this;
 
-        return (async function intranetLock(newV = '') {
+        return (async function intranetLock() {
             try {
-                if (newV) val = newV
                 const result = await self.client.set(key, val, self.expiryMode, expire || self.lockLeaseTime, self.setMode);
         
                 // 上锁成功
                 if (result === 'OK') {
                     console.log(`${key} ${val} 上锁成功`);
-                    return newV || val || true;
+                    return true;
                 }
 
                 // 锁超时
@@ -51,9 +50,8 @@ class RedisLock {
                 console.log(`${key} ${val} 等待重试`);
                 await sleep();
                 console.log(`${key} ${val} 开始重试`);
-                newV = await getNewVal(key, v)
-                
-                return intranetLock(newV);
+
+                return intranetLock();
             } catch(err) {
                 throw new Error(err);
             }
@@ -98,36 +96,52 @@ function sleep(time) {
     });
 }
 
-async function test(key, val) {
+async function test(key, i) {
     try {
-        const newVal = await getNewVal(key, val)
-        const newV = await redisLock.lock(key, newVal, 20, val);
-        await sleep();
+        const id = Math.random();
+        await redisLock.lock(key, id, 200);
+        // await sleep();
+
+        await setRedis(i);
         
-        const unLock = await redisLock.unLock(key, newV || newVal);
-        console.log('unLock: ', key, newV || newVal, unLock);
+        const unLock = await redisLock.unLock(key, id);
+        console.log('unLock: ', key, id, unLock);
     } catch (err) {
         console.log('上锁失败', err);
     }  
 }
 
-async function getNewVal(key, val) {
-    let arr = await redisLock.client.get(key);
-    console.log('get arr', arr)
-    if (!val) {
-        console.log('result: ', arr)
-        return
-    }
-    if (!arr) arr = []
-    if (typeof arr === 'string') arr = JSON.parse(arr)
-    arr.push(val)
-    return new Promise(resolve => {
-        resolve(JSON.stringify(arr))
-    })
+// test('name1', 0);
+
+// redis.set('tasks', JSON.stringify([
+//     {
+//         id: 1,
+//         status: 0
+//     },
+//     {
+//         id: 2,
+//         status: 0
+//     },
+//     {
+//         id: 3,
+//         status: 0
+//     },
+//     {
+//         id: 4,
+//         status: 0
+//     },
+//     {
+//         id: 5,
+//         status: 0
+//     }
+// ]))
+
+for(let i=0; i< 5; i++) {
+    test('name1', i);
 }
 
-test('arr', 1);
-test('arr', 2);
-test('arr', 3);
-test('arr', 4);
-test('arr', 5);
+async function setRedis(i) {
+    const tasksFromRedis = JSON.parse(await redis.get('tasks'))
+    tasksFromRedis[i].status = 1
+    await redis.set('tasks', JSON.stringify(tasksFromRedis))
+}
