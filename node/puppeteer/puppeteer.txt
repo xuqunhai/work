@@ -1,0 +1,23 @@
+问题
+Could not find expected browser chrome locally
+解决1
+cd ./node_modules/puppeteer
+npm run install
+解决2
+npm install puppeteer --save-dev
+
+
+默认设置
+1. 使用无头模式
+Puppeteer 运行 Chromium 的headless mode。如果想要使用完全版本的 Chromium，设置 'headless' option 即可。
+const browser = await puppeteer.launch({headless: false}); // default is true
+
+2. 运行绑定的 Chromium 版本
+默认情况下，Puppeteer 下载并使用特定版本的 Chromium 以及其 API 保证开箱即用。 如果要将 Puppeteer 与不同版本的 Chrome 或 Chromium 一起使用，在创建Browser实例时传入 Chromium 可执行文件的路径即可：
+const browser = await puppeteer.launch({executablePath: '/path/to/Chrome'});
+
+
+看这篇文章了解 Chromium 与 Chrome 的不同。
+https://www.howtogeek.com/202825/what%E2%80%99s-the-difference-between-chromium-and-chrome/
+
+

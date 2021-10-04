@@ -1,3 +1,18 @@
+https://www.npmjs.com/package/mongodb
+
+灵活数据用NoSql，如mongodb；
+
+Mongodb索引、权限机制、备份还原可参考下面视频的15-19:
+https://www.bilibili.com/video/BV1xz4y1X7cE?p=20&spm_id_from=pageDriver
+
+mongodb用户权限管理配置：
+https://www.cnblogs.com/yucongblog/p/6595946.html
+mongodb权限角色介绍：
+https://www.jianshu.com/p/0a7452d8843d
+可视化工具robo3T登录需要权限的mongodb：
+https://zhuanlan.zhihu.com/p/110797341
+
+
 mongoose.connect('mongodb://127.0.0.1:27017/users',()=>{})
 运行后在4.0以后会报警告：
 current URL string parser is deprecated...
@@ -157,11 +172,15 @@ db.users.find({"hobby.movies":"hero"})注意hobby.movies必须加引号，而且
         movies: ['hero', 'xxx']
     }
 }
+
+将MongoDB结果存储在数组中的查询-
+> var mongoDbResultIntoArray=db.mongoDbResultInArrayDemo.find().toArray();
+
 向movies属性数组添加xxx：
 db.users.update({username: 'tangseng'}, {
     // $push: { "hobby.movies": "xxx" // 如果数组已经存在，还是会继续添加 },
     $addToSet: { "hobby.movies": "xxx" // 如果数组已经存在，则不会添加 }
-})
+}, false, true) // 第四个参数表示multi-update;
 
 向numbers插入20000条数据：
 const arr=[]
@@ -184,3 +203,61 @@ db.emp.find({$or: [{sal:{$lt:1000}},{sal:{$gt:3000}}]})
 
 工资低于1000的增加400:
 db.emp.updateMany({sal:{$lte:1000}},{$inc:{sal:400}})
+
+
+
+统计男生和女生的年龄总和：
+db.users.aggregate([
+    {
+        $group: {
+            _id: "$sex", // _id是固定key，表示以sex字段分组
+            rs: { // 对age字段求和并把结果放在rs字段
+                $sum: "$age"
+            }
+        }
+    }
+])
+
+统计男生和女生的人数总和：
+db.users.aggregate([
+    {
+        $group: {
+            _id: "$sex", // _id是固定key，表示以sex字段分组
+            rs: { // 把结果放在rs字段
+                $sum: 1 // $sum值为1表示count，即统计各自总数
+            }
+        }
+    }
+])
+
+求学生总数和平均年龄
+db.users.aggregate([
+    {
+        $group: {
+            _id: null, // null说明不分组
+            total_num: {
+                $sum: 1
+            },
+            avg_num: {
+                $avg: "$age"
+            }
+        }
+    }
+])
+
+查询男生、女生人数，并排序
+db.users.aggregate([
+    {
+        $group: {
+            _id: "$sex",
+            rs: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $sort: {
+            rs: -1 // -1降序，1升序
+        }
+    }
+])

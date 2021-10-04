@@ -1,0 +1,21 @@
+模拟post请求可使用插件restfulClient
+自动重启node新插件node-dev
+
+graphQL api和Restful API相比，
+优点在于数据聚合，即要什么数据就只返回什么数据，不会返回一整套；
+// 后端定义好字段类型规范
+var schema=buildSchema(
+    type Query {
+        hello: String
+    }
+)
+// 后端确定字段值
+var root={
+    hello: ()=>{
+        return 'hello world!'
+    }
+}
+// 通过graphql查询hello字段对应值并返回给前端
+graphql(schema,'{hello}',root).then((res)=>{
+    console.log(res)
+})

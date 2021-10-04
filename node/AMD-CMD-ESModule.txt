@@ -1,0 +1,4 @@
+AMD依赖前置define([a,b], function(a,b){})；
+CMD按需require,耦合性好；
+esModule是静态引入，也就是import必须放在文件开头，而且不能放在任何函数或ifElse里面，
+webpack使用esModule可以代码分析；

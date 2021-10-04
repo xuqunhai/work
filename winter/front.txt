@@ -1,0 +1,158 @@
+前端技能模型：
+领域知识 - 实践中学习
+前端知识 - 建立知识体系
+编程能力+架构能力+工程能力 - 刻意练习
+
+编程能力——解决的是难写不出来的问题 - 刷题
+架构能力——解决的是大写不出来的问题 - 带问题读源码
+一个系统你每个点都能实现，但整个系统你不一定能实现，对复杂系统进行分析、进行软件工程设计和管理代码
+工程能力——解决的是人多怎么协作的问题
+
+
+学习方法——整理法+追溯法：
+顺序关系
+编译原理
+词法分析、语法分析、ast代码优化、代码生成
+
+组合关系
+CSS规则
+选择器、属性、值
+
+维度关系
+文法
+语义
+运行时
+
+分类关系
+css简单选择器
+
+完备性
+
+搜索网址
+https://html.spec.whatwg.org/multipage/    - html标签分类参考
+https://scholar.google.com/
+https://developer.apple.com/
+https://developer.mozilla.org/zh-CN/
+https://docs.microsoft.com/zh-cn/
+
+大神
+https://zh.wikipedia.org/wiki/安德斯·海尔斯伯格
+https://zh.wikipedia.org/wiki/蒂姆·伯纳斯-李
+https://zh.wikipedia.org/wiki/布兰登·艾克
+
+
+写一本前端书籍的话目录会怎么写？
+
+0.1+0.2===0.3 // false - 浮点数-计算机组成原理
+
+前端权威文档网址
+https://tc39.es/ecma262/
+https://www.ecma-international.org/publications-and-standards/standards/ecma-262/
+https://262.ecma-international.org/12.0/#sec-ecmascript-language-lexical-grammar
+
+使用追溯法理解OOP
+https://juejin.cn/post/6844904119363174408
+面向对象——追溯法v1.0【苦行僧】
+https://juejin.cn/post/6844904128401899533
+
+
+优秀的前端工程师
+领域知识+能力+潜力+职业规划
+简历=成就
+you are the owner of your career
+成长/成就/晋升
+
+业务型成就
+业务KPI - 你公司怎么赚钱的
+三大支柱：流量/转换率/客单价
+
+学源代码最好方式：接bugfix然后调试，单步追踪；
+
+算法：排序可哈希+二叉树；
+
+数据驱动的思考方式：
+目标：分析业务目标，定数据指标，
+现状：采集数据（加载时间performance，错误数据window.error），建立数据展示系统，
+方案：设计技术方案，预估数据，
+实施：小规模试验，推广全公司形成制度，
+结果：统计最终效果汇报(不要做老黄牛，一定要有汇报，没汇报相当于没做)；
+
+老板没兴趣说明目标定得不对！
+活跃=日活/月活； （通常一个月都不用的就算已经流失的客户）
+
+
+
+unicode:
+
+https://www.fileformat.info/info/unicode/block/index.htm
+这里面重点关注：
+https://www.fileformat.info/info/unicode/block/basic_latin/list.htm
+中的2个：
+U+000A	LINE FEED (LF) (U+000A)
+U+0020	SPACE (U+0020)
+
+https://www.fileformat.info/info/unicode/block/index.htm
+下面这个是中日韩的字符：
+CJK Unified Ideographs	U+4E00	U+9FFF	(20977)
+https://www.fileformat.info/info/unicode/block/cjk_unified_ideographs/list.htm
+
+js一般只能处理BMP之内的字符，如果超过需要用这2个API：String.fromCodePoint/"".codePointAt
+https://www.fileformat.info/info/unicode/block/index.htm
+里在U+10000之后的都不是BMP范围的
+常用图标字符：
+https://home.unicode.org/
+
+
+其实js用中文命名也是可以的，但是不推荐的原因是因为中文需要编码，而不同编码方式会导致不同结果，
+var 厉害 = 1;
+推荐另一种写法：
+'厉害'.codePointAt(0).toString(16) // "5389"
+'厉害'.codePointAt(1).toString(16) // "5bb3"
+
+var \u5389\u5bb3 = 'niupi' // 这个百年来就是厉害两个字
+console.log(厉害) // niupi
+
+
+
+
+
+
+InputElement
+    WhiteSpace
+    LineTerminator
+    Comment
+    Token
+
+
+WhiteSpace
+U+0009	CHARACTER TABULATION	<TAB>  \t
+U+000B	LINE TABULATION	<VT> 纵向tab
+U+000C	FORM FEED (FF)	<FF>换页符
+U+0020	SPACE	<SP>
+U+00A0	NO-BREAK SPACE	<NBSP>不换行的sp
+U+FEFF	ZERO WIDTH NO-BREAK SPACE	<ZWNBSP>
+
+其中换行最好只用sp；
+
+比如Java Script这里当宽度不够时Java和Script会被换行
+比如Java&nbsp;Script这里当宽度不够时Java&nbsp;Script还是在同一行
+
+
+
+LineTerminator
+U+000A	LINE FEED (LF)	<LF> \n
+U+000D	CARRIAGE RETURN (CR)	<CR>  \r
+
+
+js虽然说支持unicode编码内，但是尽量还是在BMP范围内，不然可能还是会不支持；
+
+
+
+Token
+    IdentifierName 两部分：Identifier + Keywords + Future reversed Keywords
+    Punctuator
+    Literal
+
+获取类名:
+ document.body.className
+是因为早期用document.body.class会报错，不过现在不会报错，当成新属性；

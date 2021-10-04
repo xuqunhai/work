@@ -1,0 +1,2 @@
+vue是MVVM，VM是自动触发更新，
+而React是MVC，其中C是需要我们自己触发，如通过setState来更新视图；

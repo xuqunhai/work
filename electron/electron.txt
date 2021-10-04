@@ -1,0 +1,5 @@
+npm i后npm start报错：
+删除依赖包，
+执行npm cache verify 或 yarn cache clean
+重新 npm i
+再npm start即可

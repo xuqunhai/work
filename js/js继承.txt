@@ -1,0 +1,160 @@
+继承：复用代码、节省内存空间
+
+原型继承：解决方法问题
+构造函数继承：解决属性问题
+组合继承：属性和方法都能解决
+
+1 原型链继承
+父类实例作为子类原型
+Woman.prototype = new Person(); // 调用Person
+Woman.prototype.constructor = Woman;
+缺点：
+原型属性共享，一个实例修改原型属性会影响其他实例；
+创建子类实例时，无法传参给父类构造函数；
+只能继承一个父类；
+
+2 借用构造函数继承
+function Woman() {
+    Person.call(this, 'cdd') // 调用Person
+    this.age = 18
+}
+优点：传参、可继承多个构造函数
+缺点：只能继承父类构造函数属性、每次创建实例都要调用一次父类构造函数
+
+3 组合继承
+1+2
+缺点：耗内存因为调用了两次父类构造函数
+
+4 寄生组合继承（es6 extends）
+function F(){}
+F.prototype=Person.prototype
+function Woman(){
+    Person.call(this)
+}
+Woman.prototype=new F()
+Woman.prototype.constructor=Woman
+
+
+
+
+
+--------------------------------------------------------------------
+原型链继承缺点：
+function P(){
+ this.name=1
+ this.play=[]
+}
+function C(){
+ this.type=3
+}
+C.prototype=new P()
+var c1=new C()
+var c2=new C()
+c1.play.push(1)
+console.log(c1.type) // 3 - 内存空间共享
+console.log(c1.__proto__.constructor) // P
+console.log(c1.play, c2.play) // [1]  [1]
+
+
+构造函数继承缺点：
+function P(){
+ this.name=1
+}
+P.prototype.getName=function(){
+ return this.name
+}
+function C(){
+ P.call(this)
+ this.type=2
+}
+var c1=new C()
+console.log(c1) // {name: 1, type: 2}
+console.log(c1.getName) // undefined
+
+
+原型式继承：(可获得一份目标对象的浅拷贝)
+var p4={
+ name: 'p4',
+ friends: ['p1', 'p2', 'p3'],
+ getName: function(){
+  return this.name;
+ }
+}
+var pp4=Object.create(p4);
+pp4.name='pp4'
+pp4.friends.push('pp1')
+var pp5=Object.create(pp4)
+pp5.friends.push('pp2')
+console.log(pp4.name) // pp4
+console.log(pp4.name===pp4.getName()) // true
+console.log(pp5.name) // pp4
+console.log(pp4.friends) // ["p1", "p2", "p3", "pp1", "pp2"]
+console.log(pp5.friends) // ["p1", "p2", "p3", "pp1", "pp2"]
+
+寄生式继承：（和原型式继承相比，在父类基础上增加更多方法）
+var p4={
+ name: 'p4',
+ friends: ['p1', 'p2', 'p3'],
+ getName: function(){
+  return this.name;
+ }
+}
+function clone(origin){
+ var c=Object.create(origin)
+ c.getFriends=function(){
+  return this.friends
+ }
+ return c;
+}
+var p5=clone(p4)
+console.log(p5.getName()) // p4
+console.log(p5.getFriends()) // ["p1", "p2", "p3"]
+
+
+
+extends
+
+function clone(p, c){
+ c.prototype=Object.create(p.prototype)
+ c.prototype.constructor=c
+}
+function P(){
+ this.name='p'
+ this.play=[1,2]
+}
+P.prototype.getName=function(){
+ return this.name;
+}
+function C(){
+ P.call(this)
+ this.friends='c5'
+}
+clone(P, C)
+C.prototype.getFriends=function(){
+ return this.friends;
+}
+var p6=new C()
+console.log(p6.getName()) // p
+console.log(p6.getFriends()) // c5
+console.log(p6)
+{
+    friends: "c5"
+    name: "p"
+    play: (2) [1, 2]
+    [[Prototype]]: P
+        constructor: ƒ C()
+        getFriends: ƒ ()
+        [[Prototype]]: Object
+            getName: ƒ ()
+            constructor: ƒ P()
+            [[Prototype]]: Object
+                constructor: ƒ Object()
+                hasOwnProperty: ƒ hasOwnProperty()
+                isPrototypeOf: ƒ isPrototypeOf()
+                propertyIsEnumerable: ƒ propertyIsEnumerable()
+                toLocaleString: ƒ toLocaleString()
+                toString: ƒ toString()
+                valueOf: ƒ valueOf()
+
+
+}

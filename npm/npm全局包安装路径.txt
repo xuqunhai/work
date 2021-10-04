@@ -3,3 +3,21 @@ npm root -g
 
 二、修改全局包位置
 npm config set prefix '目标目录'
+
+查看npm全局-g安装过哪些包 $ npm list -g --depth 0 
+
+镜像举例：
+1.临时使用
+npm --registry https://registry.npm.taobao.org install express
+
+2.持久使用
+
+npm config set registry https://registry.npm.taobao.org
+// 配置后可通过下面方式来验证是否成功
+npm config get registry
+// 或npm info express
+
+作者：圣手小青龙
+链接：https://www.jianshu.com/p/0deb70e6f395
+来源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
