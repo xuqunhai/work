@@ -132,6 +132,9 @@ U+0020	SPACE	<SP>
 U+00A0	NO-BREAK SPACE	<NBSP>不换行的sp
 U+FEFF	ZERO WIDTH NO-BREAK SPACE	<ZWNBSP>
 
+
+\n\r 前面表示下一行，后面表示回到行首
+
 其中换行最好只用sp；
 
 比如Java Script这里当宽度不够时Java和Script会被换行
@@ -156,3 +159,62 @@ Token
 获取类名:
  document.body.className
 是因为早期用document.body.class会报错，不过现在不会报错，当成新属性；
+
+
+
+IdentifierName ::
+    IdentifierStart
+    IdentifierName IdentifierPart
+
+IdentifierStart ::
+    UnicodeIDStart
+    $
+    _
+    \ UnicodeEscapeSequence
+
+IdentifierPart ::
+    UnicodeIDContinue
+    $
+    \ UnicodeEscapeSequence
+    <ZWNJ>
+    <ZWJ>
+
+UnicodeIDStart ::
+    any Unicode code point with the Unicode property “ID_Start”
+UnicodeIDContinue ::
+    any Unicode code point with the Unicode property “ID_Continue”
+
+
+
+Punctuator ::
+    OptionalChainingPunctuator
+    OtherPunctuator
+
+OptionalChainingPunctuator ::
+    ?. [lookahead ∉ DecimalDigit]
+
+OtherPunctuator :: one of
+    { ( ) [ ] . ... ; , < > <= >= == != === !== + - * % ** ++ -- << >> >>> & | ^ ! ~ && || ?? ? : = += -= *= %= **= <<= >>= >>>= &= |= ^= &&= ||= ??= =>
+    
+    DivPunctuator ::
+    /
+    /=
+    
+    RightBracePunctuator ::
+    }
+
+
+
+OtherPunctuator为什么不包括除号？
+Lexical Grammar为什么分为四种语法分析？除号，正则，除号template，正则template
+
+示例1:
+var a;
+a
+/a/g
+上面会被解析为 a/a/g -> 1/g，即不会解析为正则，而是解析为除法；能作为除号就先做除号，不能做再作为正则；
+
+示例2:
+if(a)/a/g
+(a)/a/g
+上面一个是正则，因为无法解析为除号，第二行为正则；

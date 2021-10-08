@@ -1,0 +1,40 @@
+      ByteCount  = (StrValue.charCodeAt(i)<=256) ? ByteCount + 1 : ByteCount + 2;      
+
+      if (ByteCount>MaxValue) {      
+
+          Message.value = StrValue.substring(0,i);    
+
+         alert("评论内容最多不能超过 " +MaxValue+ " 个字节！\n注意：一个汉字为两字节。");         
+
+         ByteCount = MaxValue;         
+
+         break;      
+
+       }  
+
+
+       codePointAt方法，能够正确处理 4 个字节储存的字符，返回一个字符的码点
+
+      var a="𠮷c"
+      a.charCodeAt(0);//返回了该字的十进制码点
+      a.charCodeAt(1);//返回后两个字节的值
+      a.charCodeAt(2);//返回c的由此可见  字符c在字符串a的正确位置序号应该是 1
+
+      解决这个问题的一个办法是使用for...of循环，因为它会正确识别 32 位的 UTF-16 字符。
+
+      let a = '𠮷c';
+      for (let ch of a) {
+        console.log(ch.codePointAt(0).toString(16));
+      }
+      // 20bb7
+      // 63
+
+
+  codePointAt方法是测试一个字符由两个字节还是由四个字节组成的最简单方法。
+
+  function is32Bit(c) {
+  return c.codePointAt(0) > 0xFFFF;
+  }
+  is32Bit("𠮷") // true
+  is32Bit("a") // false
+
