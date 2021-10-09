@@ -1,0 +1,102 @@
+
+------------------------ 查看文件权限 --------------------------
+
+
+xuqunhai@xuqunhaideMacBook-Pro / % ls -lh
+total 9
+drwxrwxr-x  16 root  admin   512B 10  4 14:29 Applications
+drwxr-xr-x  64 root  wheel   2.0K  9 20 17:19 Library
+drwxr-xr-x@  9 root  wheel   288B  1  1  2020 System
+
+以第一行为例：
+文件类型和权限 drwxrwxr-x
+链接者 16
+所有者 root
+所属用户组 admin
+文件大小 512B
+最后修改时间 10  4 14:29
+文件名 Applications
+
+
+文件类型和权限深度解读
+drwxrwxr-x
+第一位表示文件类型，这里d表示这是一个目录，其他取值：
+d 目录
+l 软链接
+b 块设备
+c 字符设备
+s 网络套接字socket
+p 管道pipe
+- 普通文件
+
+后面9位表示文件权限，
+2-4拥有者权限 rwx
+5-7所属用户组权限 rwx
+8-10其他用户权限 r-x
+
+r - 读
+w - 写
+x - 可执行
+
+
+
+
+其他用法：
+查看包含隐藏的所有文件: ls -alh
+
+
+----------------------- 变更文件所有者 ---------------------------
+
+切换回到 shiyanlou 用户，使用以下命令变更文件所有者为 shiyanlou。
+
+# 需要切换到 shiyanlou 用户执行以下操作
+cd /home/lilei
+ls -alh iphone11
+sudo chown shiyanlou iphone11
+ls -alh iphone11
+
+
+
+------------------------ 修改文件权限 --------------------------
+
+权限是 rw-rw-rw-，换成对应的十进制表示就是 666，
+这就表示这个文件的拥有者，所属用户组和其他用户具有读写权限，不具有执行权限。
+
+
+修改权限：
+chmod 600 iphone11
+ls -alh iphone11
+切换其他用户
+su - lilei
+echo "hello" > iphone11 // 会提示权限不够
+
+
+
+要完成上述实验相同的效果，你可以：
+chmod go-rw iphone11
+chmod go+r-w iphone11
+
+g、o 还有 u 分别表示 group（用户组）、others（其他用户） 和 user（用户），+ 和 - 分别表示增加和去掉相应的权限。
+
+----------------------- adduser 和 useradd 的区别是什么 ---------------------------
+
+useradd 只创建用户，不会创建用户密码和工作目录，创建完了需要使用 passwd <username> 去设置新用户的密码。
+adduser 在创建用户的同时，会创建工作目录和密码（提示你设置），
+
+
+
+---------------------- 示例：创建新用户、新建文件并修改所有者，且权限700 ----------------------------
+
+sudo adduser lilei // 添加新用户
+groups lilei // 查看所属群组
+sudo usermod -G sudo lilei // 加入sudo群组
+groups lilei // 查看所属群组，确认是否成功
+su - lilei // 切换到新用户
+sudo touch a // 创建文件a
+ls -alh a // 查看文件属性，此时所有者可能是root
+sudo chown lilei a // 修改文件所有者为新用户, change owner
+ls -alh a // 查看文件属性，确认是否成功
+chmod 700 a // 设置文件属性，对自己可读写和可执行，对群组和其他人不可读写，不可执行, change mode
+
+--------------------------------------------------
+
