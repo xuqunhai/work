@@ -1,0 +1,486 @@
+通过使用 v-once 指令你也能执行一次性地插值，
+当数据 改变时，插值处的内容 不会更新。
+但是你需要注意一下，
+该元素节点下面其他数据的绑定，数据改变，内容也不会更新，
+所以，注意代码块的划分。
+
+<p v-once>msg：{{msg}}</p>
+
+
+双大括号语法不能作用在 HTML 特性（标签属性）上，需要对标签属性操作，应该使用 v-bind 指令
+HTML 标签属性为布尔特性时，它们的存在表示为 true，v-bind 工作起来略有不同，
+注意： 如果 isChecked 的值是 null、undefined 或 false，则 checked 特性甚至不会被包含在渲染出来的 <input> 元素中，
+
+计算属性
+在开发中经常会涉及到一种需求，一个数据需要通过其他数据计算而来
+重点： 在 Vue 中计算属性是 惰性的，只有当依赖数据发生改变时，才会触发计算，否则，它的值是上一次触发计算的缓存值，
+通过计算属性来改变依赖数据的值：
+methods: {
+    //changeName 定义一个方法改变 计算属性 fullName 的值
+    changeName: function () {
+        //修改计算属性 fullName 等于李花花
+        this.fullName = '李花花';
+        //上面一句等于触发了 fullName 属性的 setter
+    },
+},
+computed: {
+    fullName: {
+        //getter
+        get: function () {
+            return this.firstName + this.lastName;
+        },
+        //setter  直接改变计算属性 fullName的值就可以触发setter this.fullName='XX'
+        set: function (newName) {
+            var name = newName;
+            this.firstName = name.slice(0, 1); //取新值的第一个字符
+            this.lastName = name.slice(1); //从新值的第二个字符开始取值
+        },
+    },
+},
+
+在双花括号插值和 v-bind 表达式中把需要过滤的数据用 | 与过滤器分割 （data|fliter）
+过滤器应用场景
+应用比较多的商品价格过滤、表单数据过滤等。
+我们从后台获取的数据一般是这样
+{ courseName:'xxx', price:199, coupon:8 }
+我们请求到的数据并没有￥，在开发中直接去操作数据源是不推荐的，
+此时我们的过滤器就派上用场，定义一个拼接￥的过滤器，只是在视图层面实现了效果。
+// filters 过滤器选项
+filters: {
+    //joint 定义￥拼接过滤器
+    joint: function (price) {
+    return '￥' + price;
+    },
+},
+
+使用某些 CSS 属性需要带各浏览器的前缀，
+然而如果你在 Vue 中使用了 v-bind:style你完全不用去考虑，
+因为 Vue 在编译过程中，会自动给需要前缀的属性加前缀。
+class 与 style 绑定
+<p v-bind:style="{fontSize:size,backgroundColor:bgColor}">你好，实验楼</p>
+data: {
+    size: '26px',
+    bgColor: 'pink',
+},
+
+<p v-bind:style="styleObject">你好，实验楼</p>
+data: {
+    styleObject: {
+    fontSize: '26px',
+    backgroundColor: 'pink',
+    },
+},
+
+v-show 只是简单地切换元素的 CSS 属性 display。而 v-if 是从虚拟 DOM 的层面操作。
+因此，如果需要非常频繁地切换，则使用 v-show 较好；如果在运行时条件很少改变，则使用 v-if 较好。
+
+还是由于 JavaScript 的限制，Vue 不能检测对象属性的添加或删除，
+直接进行 app.userInfo.height='180cm' 这样操作是不会构成响应式，不会触发视图更新。
+使用对象方法时，要想触发视图更新，常常需要使用 Vue.set()去操作。
+Vue.set(app.userInfo, 'height', '170cm');
+
+
+key 属性
+为了给 Vue 一个提示，以便它能跟踪每个节点的身份，从而重用和重新排序现有元素，你需要为每项提供一个唯一 key 属性。
+
+事件修饰符。之前提过，修饰符是由点开头的指令后缀来表示的。
+.stop(阻止单击事件继续传播)
+.prevent（阻止事件默认行为）
+.capture（添加事件监听器时使用事件捕获模式）
+.self（只当在 event.target 是当前元素自身时触发处理函数 ）
+.once（点击事件将只会触发一次）
+.passive（滚动事件的默认行为 (即滚动行为) 将会立即触发 ）
+
+监听键盘事件时添加按键修饰符：
+.enter
+.tab
+.delete (捕获“删除”和“退格”键)
+.esc
+.space
+.up
+.down
+.left
+.right
+
+keyCode 特征，了解更多键码：
+按键	键码
+Enter	13
+Shift	16
+Alt	18
+Spacebar	32
+Page Up	33
+Page Down	34
+
+<button @click.left="alert('你按了鼠标左击键')">按钮</button>
+<button @click.middle="alert('你按了鼠标滚轮')">按钮</button>
+<button @click.right="alert('你按了鼠标右击键')">按钮</button>
+
+用如下修饰符来实现仅在按下相应按键时才触发鼠标或键盘事件的监听器。
+.ctrl
+.alt
+.shift
+.meta
+说明：在 Mac 系统键盘上，meta 对应 command 键 (⌘)。在 Windows 系统键盘 meta 对应 Windows 徽标键 (⊞)。在 Sun 操作系统键盘上，meta 对应实心宝石键 (◆)。
+<!-- 同时鼠标左击和按ctrl 弹出提示 -->
+<div @click.ctrl="alert('你同时按了鼠标点击和ctrl')">Do something</div>
+
+.exact 精确按键修饰符，允许你控制由精确的系统修饰符组合触发的事件。
+<!-- 即使 Alt 或 Shift 被一同按下时也会触发 -->
+<button
+    @click.ctrl="alert('你不单单只按了鼠标左键和 Ctrl键，同时按其他键我也可以触发')"
+>
+A
+</button>
+
+<!-- 有且只有 ctrl键+鼠标左键 被按下的时候才触发 -->
+<button @click.ctrl.exact="alert('你只按ctrl键+鼠标左键，才能触发我')">
+A
+</button>
+
+<!-- 没有任何系统修饰符被按下的时候才触发 -->
+<button @click.exact="alert('没有按任何系统修饰符')">A</button>
+
+
+v-model
+v-model  会忽略所有表单元素的  value、checked、selected  特性的初始值而总是将 Vue 实例的数据作为数据来源。
+直接给元素 value 赋值不会生效的，
+<!-- 直接给value不会生效 -->
+<input v-model="msg" value="hello" />
+
+v-model 在内部使用不同的属性为不同的输入元素并抛出不同的事件
+text 和 textarea 元素使用 value 属性和 input 事件(内部监听 input 事件)；
+checkbox 和 radio 使用 checked 属性和 change 事件(内部监听 change 事件)；
+select 字段将 value 作为 prop 并将 change 作为事件(内部监听 change 事件)。
+说明： change 和 input 区别就是，input 实时更新数据，change 不是实时更新。
+
+使用 .lazy 修饰符，可以将抛出事件由 input 改为 change ,使表单元素惰性更新，不实时更新。
+<!--使用 .lazy 修饰符将文本框 抛出的事件改为 change 事件，不再实时更新，只有文本框失去焦点才更新数据 惰性更新 -->
+<input v-model.lazy="msg" />
+想自动将用户的输入值转为数值类型，可以给  v-model  添加  number  修饰符
+如果这个值无法被  parseFloat()  解析，则会返回原始的值。 用户即使输入的是非数值类型，也会进行转换，无法转换时，会返回原始的。
+表单元素值首尾空格，自动过滤。
+<input v-model.trim="msg" type="text" />
+
+
+日常开发中，复选框的值很多情况是特定的值，
+那么我们可以这样做，在标签中声明 true-value="yes" 和 false-value="no"这两个属性，
+当选中时就是 true-value 属性指定的值，当未选中时就是 false-value 属性值。
+<input
+    type="checkbox"
+    v-model="toggle"
+    true-value="yes"
+    false-value="no"
+/>
+
+
+组件
+全局注册
+//Vue.component(组件名字,template:{元素标签})
+      Vue.component('syl', {
+        template: '<h1>实验楼全局组件</h1>',
+      });
+局部组件
+在父级 components 对象中声明，局部组件只有它的父级才能调用
+//头部组件
+      var childComponent = {
+        template: '<h2>我是实验楼局部组件header，只有我们父级才能调用</h2>',
+      };
+      //header vm
+      var header = new Vue({
+        el: '#header',
+        //子组件必须声明后使用，不然不能起效
+        components: {
+          'syl-header': childComponent,
+        },
+      });
+
+组件复用
+注意： 复用组件内的 data 必须是一个函数，组件数据独立管理。
+
+组件间通信
+父子组件之 props
+props 是一个单向的数据流，只允许父组件向子组件传值，
+注意：HTML 中的特性名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。
+这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 需要使用其等价的 kebab-case (短横线分隔命名) 命名，
+<title-component post-title="syl1"></title-component>
+//组件上 传递的 props 属性名为 kebab-case（短横线分隔命名)的要转换为驼峰命名
+      Vue.component('title-component', {
+        props: ['postTitle'], //post-title 转换为驼峰命名
+        template: '<p>{{postTitle}}</p>',
+      });
+
+子父组件通信之 emit
+this.$emit('自定义事件名'，参数)
+
+
+
+生命周期函数
+beforeCreate() {
+    alert(
+    '在实例初始化之后，数据观测 (data observer) 和 event/watcher 事件配置之前被调用'
+    );
+},
+created() {
+    1.created 钩子函数内我们可以进行异步数据请求
+    alert(
+    '在实例创建完成后被立即调用,挂载阶段还没开始，$el 属性目前不可见'
+    );
+},
+beforeMount() {
+    alert('在挂载开始之前被调用：相关的 render 函数首次被调用');
+},
+mounted() {
+    2.mounted 我们可以直接操作元素 DOM 了 ,但是并不推荐这样做，不利于性能提升。
+    alert('el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子');
+},
+beforeUpdate() {
+    alert('数据更新时调用');
+},
+updated() {
+    alert('组件 DOM 已经更新');
+},
+
+
+
+过渡与动画
+Vue 在插入、更新或者移除 DOM 时，提供多种不同方式的应用过渡动画效果。
+
+过渡的 class
+/* 定义进入和离开过渡生效时的状态 */
+    .v-enter,
+    .v-leave-to {
+    /* 定义元素默认状态 例如：opacity:0*/
+    }
+    .v-enter-to,
+    .v-leave {
+    /* 定义元素激活时状态 例如：opacity:1*/
+    }
+    .v-enter-active,
+    .v-leave-active {
+    /* 定义过渡或动画，在过渡中的状态 */
+    /* 
+            最常用的就是在这里面指定过渡动画 时间/延迟/曲线函数  
+            transition:opacity:1s 1s ease-in-out
+            */
+    }
+    <!-- transition ’见名知意‘ 这是一个 Vue 内置封装的 动画组件 他可以指定被他包囊 元素的交互效果 -->
+    <!-- name 就是动画过渡名字 fade 这个是内置动画过渡名-->
+    <transition name="fade">
+    <!-- v-if 如果show 为true 就渲染 -->
+    <p v-if="show">hello syl</p>
+    </transition>
+
+    快进缓出 过渡效果：
+    .my-transition-enter,
+      .my-transition-leave-to {
+        /* 定义元素默认状态 例如：opacity:0 */
+        opacity: 0;
+      }
+      .my-transition-enter-to,
+      .my-transition-leave {
+        /* 定义元素激活时状态 例如：opacity:1*/
+        opacity: 1;
+      }
+      .my-transition-enter-active {
+        /* 默认到激活状态过渡，0.5s 快速进入 */
+
+        transition: opacity 0.5s;
+      }
+      .my-transition-leave-active {
+        /* 激活到默认状态过渡  2s  缓出过渡打造 */
+        transition: opacity 2s;
+      }
+      <!--自定义一个 my-transition 过渡-->
+      <transition name="my-transition">
+        <!-- v-if 如果show 为true 就渲染 -->
+        <p v-if="show">hello syl</p>
+      </transition>
+
+    放大缩小动画：
+    .bounce-enter-active {
+        animation: bounce-in 0.5s;
+      }
+      .bounce-leave-active {
+        animation: bounce-in 0.5s reverse;
+      }
+      @keyframes bounce-in {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.5);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    
+自定义过渡类名
+和其他第三方 CSS 动画库，如 Animate.css 结合使用十分有用。
+<!-- 自定义过渡的类名  animate.css动画库的类名 -->
+      <transition
+        name="custom-classes-transition"
+        enter-active-class="animated tada"
+        leave-active-class="animated bounceOutRight"
+      >
+        <p v-if="show">hello</p>
+      </transition>
+
+
+Vue 为了知道过渡的完成，必须设置相应的事件监听器。它可以是 transitionend 或 animationend ，
+给同一个元素同时设置两种过渡动效，比如 animation很快的被触发并完成了，而 transition 效果还没结束。
+在这种情况下，你就需要使用 type 特性并设置 animation 或 transition 来明确声明你需要 Vue 监听的类型。
+
+一些嵌套的内部元素相比于过渡效果的根元素有延迟的或更长的过渡效果。
+<transition> 组件上的 duration 属性定制一个显性的过渡持续时间 (以毫秒计)，形成先后顺序的动画队列。
+.bounce-enter-active {
+        animation: bounce-in 0.5s;
+      }
+      .bounce-leave-active {
+        animation: bounce-in 0.5s reverse;
+      }
+      @keyframes bounce-in {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.5);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      <transition name="bounce" :duration="2000">
+        <p v-if="show">hello syl hello syl hello syl</p>
+      </transition>
+      <transition name="bounce" :duration="1500">
+        <p v-if="show">hello syl hello syl hello syl</p>
+      </transition>
+
+
+JavaScript 动画钩子
+<transition
+  v-on:before-enter="beforeEnter"
+  v-on:enter="enter"
+  v-on:after-enter="afterEnter"
+  v-on:enter-cancelled="enterCancelled"
+  v-on:before-leave="beforeLeave"
+  v-on:leave="leave"
+  v-on:after-leave="afterLeave"
+  v-on:leave-cancelled="leaveCancelled"
+>
+</transition>
+前面四个进入动画钩子，后面四个离开动画钩子
+
+使用 velocity.js 动画库和动画钩子函数
+methods: {
+    beforeEnter: function (el) {
+        el.style.opacity = 0;
+        el.style.transformOrigin = 'left';
+    },
+    enter: function (el, done) {
+        Velocity(
+            el,
+            {
+            opacity: 1,
+            fontSize: '1.4em',
+            },
+            {
+            duration: 300,
+            }
+        );
+        Velocity(
+            el,
+            {
+            fontSize: '1em',
+            },
+            {
+            complete: done,
+            }
+        );
+    },
+    leave: function (el, done) {
+        Velocity(
+            el,
+            {
+            translateX: '15px',
+            rotateZ: '50deg',
+            },
+            {
+            duration: 600,
+            }
+        );
+        Velocity(
+            el,
+            {
+            rotateZ: '100deg',
+            },
+            {
+            loop: 2,
+            }
+        );
+        Velocity(
+            el,
+            {
+            rotateZ: '45deg',
+            translateY: '30px',
+            translateX: '30px',
+            opacity: 0,
+            },
+            {
+            complete: done,
+            }
+        );
+    },
+},
+
+
+想要页面初次渲染就有一个过渡效果，可以通过 appear 特性设置节点在初始渲染的过渡。
+<!-- 自定义初始化渲染过渡和动画 -->
+/* 自定义初始化css */
+      .bounce-enter-active,
+      .bounce-appear-active-class {
+        animation: bounce-in 0.5s;
+      }
+      @keyframes bounce-in {
+        0% {
+          transform: scale(0);
+        }
+        50% {
+          transform: scale(1.5);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      <transition
+        appear
+        appear-class="bounce-appear-class"
+        appear-to-class="bounce-appear-to-class"
+        appear-active-class="bounce-appear-active-class"
+      >
+
+
+多个元素过渡，可以使用 v-if/v-else，确定那个元素渲染，但是注意为相同标签的元素绑定 key 值，提高性能。
+.fade-enter-active,
+      .fade-leave-active {
+        transition: all 1s;
+      }
+      .fade-enter,
+      .fade-leave-active {
+        opacity: 0;
+      }
+      .fade-enter {
+        transform: translateX(31px);
+      }
+      .fade-leave-active {
+        transform: translateX(-31px);
+      }
+      <transition name="fade">
+        <button v-if="docState === 'saved'" key="saved" @click="handleClick">
+          Edit
+        </button>
+        <button v-if="docState === 'edited'" key="edited" @click="handleClick">
+          Save
+        </button>
+      </transition>

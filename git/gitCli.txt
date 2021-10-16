@@ -1,0 +1,62 @@
+let workspacePath = path.join(config.root, `../workspace/ci/${this.body.projectId}`),
+repo = `http://${this.body.gitUserName}:${this.body.gitPassword}@${this.body.gitPath.split('http://')[1]}`
+
+simpleGit(workspacePath).init()
+                    .addRemote('origin', repo, (err) => { }).raw(['config',
+                          'core.sparsecheckout',
+                          'true'], (err, result) => { 
+                    }).raw(['config',
+                          '--global',
+                          'http.postbuffer',
+                          '2048576000'], (err, result) => { 
+                    }).raw(['config',
+                          'core.compression',
+                          '-1'], (err, result) => { 
+                    }).fetch({'--all': true}, async (err) => {  // 更新所有分支代码 
+                        //放弃所有冲突 -- 待开发
+                    }).checkout([`remotes/origin/${this.body.gitBranch}`], async (err) => { 
+                    }).show(['-s', '--pretty=format:%s'],(err, status) => { 
+                    })
+
+
+
+
+
+Git fetch和pull的详解及区别
+    git fetch origin master:tmp
+    git diff tmp 
+    git merge tmp
+    从远程获取最新的版本到本地的tmp分支上之后再进行比较合并
+    2. git pull：相当于是从远程获取最新版本并merge到本地
+
+git clone early EOF error 的解决方式
+    这个错误的原因应该是文件太大,解决方式为git添加 compression 配置项
+    解决办法：git config --global core.compression -1
+    compression 是压缩的意思，从 clone 的终端输出就知道，服务器会压缩目标文件，然后传输到客户端，客户端再解压。取值为 [-1, 9]，-1 以 zlib 为默认压缩库，0 表示不进行压缩，1..9 是压缩速度与最终获得文件大小的不同程度的权衡，数字越大，压缩越慢，当然得到的文件会越小。
+
+错误
+RPC failed; HTTP 411 curl 22 The requested URL returned error: 411 Length Required
+fatal: The remote end hung up unexpectedly
+    原因
+    提交的文件太大(默认是1M)，导致push失败
+    解决方案
+    把提交文件大小的上限设置大点就可以了
+    将http.postBuffer设置的尽量大，例如git config --global http.postBuffer 524288000 （500M）
+    git config --global http.postBuffer 1048576000 (1G)。再大的应该是依次类推吧
+    因为下载的时候不止是工程数据，还有其它配置数据，总量会大于工程数据量，所以设置的缓存大小一定要比工程大小多一些。
+
+
+git 1.7版本后支持的sparse checkout特性，可以指定需要checkout的目录或者文件。 
+    # 设置允许git克隆子目录
+    git config core.sparsecheckout true
+    # 创建本地空repo
+    git init myRepo && cd myRepo
+    # 设置要克隆的仓库的子目录路径, “*” 是通配符，“!” 是反选
+    echo deployment >> .git/info/sparse-checkout
+    # 设置远程仓库地址
+    git remote add origin ssh://github.com/abc.git
+    # 用 pull 来拉取代码
+    git pull origin master
+    # 如果需要添加目录，就增加sparse-checkout的配置，再checkout master
+    echo another_folder >> .git/info/sparse-checkout
+    git checkout master

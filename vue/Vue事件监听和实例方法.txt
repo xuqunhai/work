@@ -1,0 +1,4 @@
+<button @click="say('hello', $event)">
+
+vm.$el -> Vue 实例使用的根 DOM 元素。
+vm.$root => 当前组件树的根 Vue 实例。如果当前实例没有父实例，此实例将会是其自己。

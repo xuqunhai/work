@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>syl-vue</title>
+    <script src="https://labfile.oss.aliyuncs.com/courses/1262/vue.min.js"></script>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      nav {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        list-style: none;
+        width: 175px;
+        height: 367px;
+        border: 1px solid #000;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      nav .nav-header {
+        height: 40px;
+        background: #9966cc;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.5s;
+      }
+
+      .line1,
+      .line2,
+      .line3 {
+        width: 20px;
+        height: 1px;
+        background: black;
+        margin: 5px 10px;
+        align-self: flex-end;
+        transition: all 0.5s;
+      }
+      .nav-header.active .line1 {
+        transition: all 0.4s ease-in-out;
+        transform: rotate(-45deg) translate(-10px, 5px);
+      }
+      .nav-header.active .line2 {
+        opacity: 0;
+      }
+      .nav-header.active .line3 {
+        transition: all 0.4s;
+        transform: rotate(45deg) translate(-9px, -5px);
+      }
+
+      nav ul {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      nav ul li {
+        width: 100%;
+        padding: 10px 0px;
+        text-align: center;
+      }
+
+      .bounce-enter-active {
+        animation: bounce-in 0.5s;
+      }
+
+      .bounce-leave-active {
+        animation: bounce-in 0.5s reverse;
+      }
+
+      @keyframes bounce-in {
+        0% {
+          transform: translateX(300px);
+        }
+
+        100% {
+          transform: translateX(0px);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <nav>
+        <div class="nav-header" @click="show=!show" :class="{active:show}">
+          <div class="line1"></div>
+          <div class="line2"></div>
+          <div class="line3"></div>
+        </div>
+        <transition name="bounce">
+          <ul v-if="show">
+            <li v-for="nav in navbar" :key="nav">
+              {{nav}}
+            </li>
+          </ul>
+        </transition>
+      </nav>
+    </div>
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data() {
+          return {
+            navbar: ['HOME', 'CONTACT', 'ABOUT', 'INFO'],
+            show: false,
+          };
+        },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+内置过滤器
+首字母转大写capitalize - > value.charAt(0).toUpperCase()+value.slice(1)
+大写uppercase -> value.toString().toUpperCase()
+小写lowercase
+json.stringify - > {{ message | json(4) }}
+limitBy
+filterBy - 索引可用$index
+orderBy - 索引可用$index
+currency货币形式输出
+
+双向过滤器
+Vue.filter(id, {
+    read: function(val){},
+    write: function(new, old){}
+})
+
+过滤器重名会覆盖，也会覆盖内置过滤器；
+过滤器函数最好返回有意义的值；
+
+管道源码解析
+获取过滤器和参数后，整理输出为对象
+{
+    expression: 'a+1',
+    filters: [
+        {
+            name: 'uppercase', args: null
+        }
+    ]
+}
+然后将表达式值作为参数，依次调用filters数组中过滤器函数，最后输出结果；
+
+采用Vue.filter需要在实例化Vue前定义，否则不起作用；

@@ -1,0 +1,11 @@
+checkbox为单选时
+<input type="checkbox" v-model="toggle" :true-value="a" :false-value="b">
+勾选时vm.toggle === vm.a
+当checkbox为多选时请使用v-model数组方式绑定
+
+修饰指令原理
+lazy源码：
+所有表单控件都绑定change事件，只是在不设置lazy时默认还多绑定了input事件
+
+number源码：
+isNaN(Number(value)) ? value : Number(value)

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <div class="v1">
+            <button @click="toggleShow">show</button>
+            <p v-if="aaa">{{ totalPrice }}</p>
+        </div>
+        <div class="v2">
+            <button @click="toggleShow2">show</button>
+            <p>{{ totalPrice2 }}</p>
+            <p v-if="aaa2">{{ totalPrice2 }}</p>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script>
+new Vue({
+    el: '#app',
+    data() {
+        return {
+            aaa: true,
+            aaa2: true,
+            price: 100,
+            price2: 100
+        }
+    },
+    computed: {
+        // 当包含计算属性的节点被移除且模版中其他地方没有再引用该属性时，getter不会执行
+        totalPrice: function() {
+            console.log('computed totalPrice')
+            return this.price
+        },
+        totalPrice2: function() {
+            console.log('computed totalPrice2')
+            return this.price2
+        }
+    },
+    methods: {
+        toggleShow: function(){
+            this.price++
+            this.aaa = !this.aaa
+        },
+        toggleShow2: function(){
+            this.price2++
+            this.aaa2 = !this.aaa2
+        }
+    },
+})
+</script>
+
+</body>
+</html>

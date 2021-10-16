@@ -1,0 +1,22 @@
+自动添加前缀：
+采用prefix函数完成
+// 这里如果检测到filter也会为其添加前缀，
+// 因为Chrome只支持带webkit前缀版本的，而element-style却含有filter属性
+if(camel !== 'filter' && (camel in testEl.style)) {
+    return {
+        kebab: prop,
+        camel,
+    }
+}
+// 加前缀后在属性列表里的就返回
+while(i--){
+    prefixed=camelPrefixes[i]+upper
+    if(prefixed in testEl.style) {
+        return {
+            kebab: prefixes[i]+prop,
+            camel: prefixed
+        }
+    }
+}
+
+注意Vue只加了moz、ms、webkit三种前缀；

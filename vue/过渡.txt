@@ -1,0 +1,57 @@
+由于Vue需要监听过渡何时结束，所以当一个元素需要同时带两种类型动画时，
+如触发一个动画，同时该元素在鼠标悬浮时有过渡效果，
+这时，就必须显式声明希望处理的动画类型（animation或transition）
+Vue.transition('bounce', {
+    type: 'animation'
+})
+
+CSS动画中v-enter类名在节点插入DOM后不会立即删除，而是在animationend事件触发时删除；
+
+Vue处理过渡原理：
+如果show变为false：
+调用beforeLeave钩子，
+添加v-leave类名，
+调用leave钩子，
+等待过渡结束，transitionend事件，
+从DOM中删除元素并删除v-leave类名，
+调用afterLeave钩子；
+
+如果show变为true：
+调用beforeEnter钩子，
+添加v-enter类名后将元素插入DOM
+调用enter钩子，
+强制一次CSS布局，让v-enter生效，然后删除v-enter类名以触发过渡，回到元素原始状态，
+等待过渡结束，
+调用afterEnter钩子；
+
+
+如果过渡还在进行中时删除元素，将调用enterCancelled钩子，清理变动或enter创建的计时器；
+enter钩子和leave钩子有第二个可选回调参数，用于控制过渡如何结束：
+enter: function(el){
+    // 没有第二个参数，由css transitionend事件决定过渡何时结束
+} 
+enter: function(el, done){
+    // 有第二参数，过渡只有在调用done时结束
+}
+
+
+
+
+JavaScript 钩子
+<transition
+  v-on:before-enter="beforeEnter"
+  v-on:enter="enter"
+  v-on:after-enter="afterEnter"
+  v-on:enter-cancelled="enterCancelled"
+
+  v-on:before-leave="beforeLeave"
+  v-on:leave="leave"
+  v-on:after-leave="afterLeave"
+  v-on:leave-cancelled="leaveCancelled"
+>
+当只用 JavaScript 过渡的时候，在 enter 和 leave 中必须使用 done 进行回调。否则，它们将被同步调用，过渡会立即完成。
+
+推荐对于仅使用 JavaScript 过渡的元素添加 v-bind:css="false"，Vue 会跳过 CSS 的检测。这也可以避免过渡过程中 CSS 的影响。
+
+官网有列表的新增、删除、排序动画：
+https://cn.vuejs.org/v2/guide/transitions.html

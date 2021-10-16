@@ -1,0 +1,22 @@
+computed: {
+    all: {
+        get: function(){},
+        set: function(newV){}
+    },
+    example: {
+        cache: false, // 关闭缓存后，每次访问example都会重新执行getter方法
+        get: function() {
+            return Date.now()
+        }
+    }
+}
+
+计算属性getter不执行的场景
+当包含计算属性的节点被移除且模版中其他地方没有再引用该属性时，getter不会执行
+<p v-if="showTotal">Total Price = {{ totalPrice }}</p>
+computed: {
+    totalPrice: function(){
+        // basePrice变化，但是showTotal为false时这里不会执行
+        return this.basePrice;
+    }
+}
