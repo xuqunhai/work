@@ -1,0 +1,31 @@
+组件注册（需在初始化根实例new Vue之前）
+
+全局注册：
+Vue.component('aa', AAComponent)
+
+AAComponent:组件构造函数，
+可以Function；
+AAComponent=Vue.extend({})
+也可以Object(Vue在背后自动调用Vue.extend): 
+AAComponent={
+    template: ''
+}
+
+局部注册：
+让组件只能用在父组件模版，用实例选项components注册
+
+
+
+
+
+-----------------------------------------------------------------
+
+数据传递
+props：获取父组件数据
+因html特性不区分大小写，所以props为驼峰形式的要转换为短横线形式；
+如果props绑定的是v-bind动态绑定，则父组件数据变化时，该变化也会传导给子组件；
+vue2.x Props 现在只能单向传递。为了对父组件产生反向影响，子组件需要显式地传递一个事件而不是依赖于隐式地双向绑定。
+Props 现在只能单向传递。.once 和 .sync 修饰符移除
+变更 prop 值可以用以下选项替代：
+1、通过 data property，用 prop 去设置一个 data property 的默认值。
+2、通过计算属性。

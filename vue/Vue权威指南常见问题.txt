@@ -1,0 +1,22 @@
+传递实际数字
+<comp :some-prop="1"></comp>
+
+模版解析必须要是有效的HMTML片段，即
+a不能包含其他交互元素，如按钮；
+ul和ol智能直接包含li；
+select只能包含option和optgroup； 所以自定义组件<my-select><option>...即使最终展开为<select>，也不是有效模版；
+table只能直接保护thead、tbody、tfoot、tr、caption、col、colgroup；
+tr只能直接包含th和td；
+
+自定义标签component、template不能用在ul、select、table等对内部元素有限制的标签内，
+不然会把自定义标签提到元素外面，导致渲染不正确；
+可使用is特性：
+<table><tr is="my-comp">
+template不能在table内，而table可以有多个tbody，所以：
+<table><tbody v-for="item in items"><tr>...
+
+
+异步获取数据层次比较深时，可使用$set手动定义一层数据：
+vm.$set("d", a.b.c.d);
+
+计算属性没放到$data里，而是直接用Object.defineProperty定义到实例上；

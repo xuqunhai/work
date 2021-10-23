@@ -1,0 +1,41 @@
+&& 就是用来实现选择性执行的，
+它表示如果前面的命令执行结果（不是表示终端输出的内容，而是表示命令执行状态的结果）返回 0 则执行后面的，否则不执行，
+
+
+使用 which 来查找是否安装某个命令，如果找到就执行该命令，否则什么也不做，
+which cowsay>/dev/null && cowsay -f head-in ohch~
+
+
+|| 在这里就是与 && 相反的控制效果，当上一条命令执行结果为 ≠0(\$?≠0) 时则执行它后面的命令：
+which cowsay>/dev/null && echo "exist" || echo "not exist"
+在类 UNIX 系统中，/dev/null，或称空设备，是一个特殊的设备文件，它通常被用于丢弃不需要的输出流，或作为用于输入流的空文件，
+
+
+cut 命令，打印每一行的某一字段
+wc 命令用于统计并输出一个文件中行、单词和字节的数目，
+> 或 >> 操作了，并知道他们分别是将标准输出导向一个文件或追加到一个文件中
+使用 xargs 分割参数列表
+
+搜索/home/shiyanlou目录下所有包含"shiyanlou"的文本文件，并显示出现在文本中的行号：
+grep -rnI "shiyanlou" ~
+-r 参数表示递归搜索子目录中的文件，-n 表示打印匹配项行号，-I 表示忽略二进制文件。
+
+# 查看环境变量中以 "yanlou" 结尾的字符串
+export | grep ".*yanlou$"
+
+
+sort 排序命令
+默认为字典排序：
+cat /etc/passwd | sort
+反转排序：
+cat /etc/passwd | sort -r
+
+uniq 命令可以用于过滤或者输出重复行。
+
+
+
+
+data1 文件里记录是一些命令的操作记录，现在需要你从里面找出出现频率次数前 3 的命令并保存在 /home/shiyanlou/result。
+cat data1 |cut -c 8-|sort|uniq -dc|sort -rn -k1 |head -3 > /home/shiyanlou/result
+
+-c set characters -dc count,repeat

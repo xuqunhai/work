@@ -36,3 +36,6 @@ if (inMatch) {
    }
    return
 }
+
+// 之前，v-for="number in 10" 的 number 从 0 开始到 9 结束，现在从 1 开始，到 10 结束。
+

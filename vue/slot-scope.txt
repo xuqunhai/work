@@ -1,0 +1,196 @@
+<ul>
+  <li v-for="book in books" :key="book.id">
+    {{ book.name }}
+  </li>
+</ul>
+
+如果想自定义它的模板（即内容分发），就要用到 slot，但 slot 只能是固定的模板，没法自定义循环体中的一个具体的项，
+
+常规的 slot 无法实现对组件循环体的每一项进行不同的内容分发，这就要用到 slot-scope，它本质上跟 slot 一样，只不过可以传递参数。
+
+比如上面的示例，使用 slot-scope 封装：
+
+<ul>
+  <li v-for="book in books" :key="book.id">
+    <slot :book="book">
+      <!-- 默认内容 -->
+      {{ book.name }}
+    </slot>
+  </li>
+</ul>
+
+它的值绑定的是当前循环项的数据 book，这样在父级使用时，就可以在 slot 中访问它了：
+
+<book-list :books="books">
+  <template slot-scope="{ book }">
+    <span v-if="book.sale">限时优惠</span>
+    {{ book.name }}
+  </template>
+</book-list>
+
+
+除了可以传递参数，其它用法跟 slot 是一样的，比如也可以“具名”：
+
+<slot :book="book" name="book">
+  {{ book.name }}
+</slot>
+
+<template slot-scope="{ book }" slot="book">
+  <span v-if="book.sale">限时优惠</span>
+  {{ book.name }}
+</template>
+
+
+
+具体示例：
+https://github.com/sillit/silitBlog/blob/03c60bb342a30e8a154ef2f27f5352cd59b8ee91/docs/books/bookA/%E5%AE%9E%E6%88%98%206%EF%BC%9A%E5%8F%AF%E7%94%A8%20slot-scope%20%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%97%E7%9A%84%E8%A1%A8%E6%A0%BC%E7%BB%84%E4%BB%B6%E2%80%94%E2%80%94Table.md
+
+<!-- src/components/table-slot/table.vue -->
+<template>
+  <table>
+    <thead>
+      <tr>
+        <th v-for="col in columns">{{ col.title }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(row, rowIndex) in data">
+        <td v-for="col in columns">
+          <template v-if="'render' in col">
+            <Render :row="row" :column="col" :index="rowIndex" :render="col.render"></Render>
+          </template>
+          <template v-else-if="'slot' in col">
+            <slot :row="row" :column="col" :index="rowIndex" :name="col.slot"></slot>
+          </template>
+          <template v-else>{{ row[col.key] }}</template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</template>
+
+
+<!-- src/views/table-slot.vue -->
+<template>
+  <div>
+    <table-slot :columns="columns" :data="data">
+      <template slot-scope="{ row, index }" slot="name">
+        <input type="text" v-model="editName" v-if="editIndex === index" />
+        <span v-else>{{ row.name }}</span>
+      </template>
+
+      <template slot-scope="{ row, index }" slot="age">
+        <input type="text" v-model="editAge" v-if="editIndex === index" />
+        <span v-else>{{ row.age }}</span>
+      </template>
+
+      <template slot-scope="{ row, index }" slot="birthday">
+        <input type="text" v-model="editBirthday" v-if="editIndex === index" />
+        <span v-else>{{ getBirthday(row.birthday) }}</span>
+      </template>
+
+      <template slot-scope="{ row, index }" slot="address">
+        <input type="text" v-model="editAddress" v-if="editIndex === index" />
+        <span v-else>{{ row.address }}</span>
+      </template>
+
+      <template slot-scope="{ row, index }" slot="action">
+        <div v-if="editIndex === index">
+          <button @click="handleSave(index)">保存</button>
+          <button @click="editIndex = -1">取消</button>
+        </div>
+        <div v-else>
+          <button @click="handleEdit(row, index)">操作</button>
+        </div>
+      </template>
+    </table-slot>
+  </div>
+</template>
+<script>
+  import TableSlot from '../components/table-slot/table.vue';
+
+  export default {
+    components: { TableSlot },
+    data () {
+      return {
+        columns: [
+          {
+            title: '姓名',
+            slot: 'name'
+          },
+          {
+            title: '年龄',
+            slot: 'age'
+          },
+          {
+            title: '出生日期',
+            slot: 'birthday'
+          },
+          {
+            title: '地址',
+            slot: 'address'
+          },
+          {
+            title: '操作',
+            slot: 'action'
+          }
+        ],
+        data: [
+          {
+            name: '王小明',
+            age: 18,
+            birthday: '919526400000',
+            address: '北京市朝阳区芍药居'
+          },
+          {
+            name: '张小刚',
+            age: 25,
+            birthday: '696096000000',
+            address: '北京市海淀区西二旗'
+          },
+          {
+            name: '李小红',
+            age: 30,
+            birthday: '563472000000',
+            address: '上海市浦东新区世纪大道'
+          },
+          {
+            name: '周小伟',
+            age: 26,
+            birthday: '687024000000',
+            address: '深圳市南山区深南大道'
+          }
+        ],
+        editIndex: -1,  // 当前聚焦的输入框的行数
+        editName: '',  // 第一列输入框，当然聚焦的输入框的输入内容，与 data 分离避免重构的闪烁
+        editAge: '',  // 第二列输入框
+        editBirthday: '',  // 第三列输入框
+        editAddress: '',  // 第四列输入框
+      }
+    },
+    methods: {
+      handleEdit (row, index) {
+        this.editName = row.name;
+        this.editAge = row.age;
+        this.editAddress = row.address;
+        this.editBirthday = row.birthday;
+        this.editIndex = index;
+      },
+      handleSave (index) {
+        this.data[index].name = this.editName;
+        this.data[index].age = this.editAge;
+        this.data[index].birthday = this.editBirthday;
+        this.data[index].address = this.editAddress;
+        this.editIndex = -1;
+      },
+      getBirthday (birthday) {
+        const date = new Date(parseInt(birthday));
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+
+        return `${year}-${month}-${day}`;
+      }
+    }
+  }
+</script>

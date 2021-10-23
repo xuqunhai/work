@@ -4,7 +4,7 @@ computed: {
         set: function(newV){}
     },
     example: {
-        cache: false, // 关闭缓存后，每次访问example都会重新执行getter方法
+        cache: false, // 关闭缓存后，每次访问example都会重新执行getter方法, 2.x计算属性的缓存验证将会被移除。把不缓存的计算属性转换为方法可以得到和之前相同的结果。
         get: function() {
             return Date.now()
         }

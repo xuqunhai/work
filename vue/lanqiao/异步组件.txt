@@ -1,0 +1,4 @@
+Vue.component('async-webpack-example', function(resolve){
+    // 编译后的代码分割成不同块，将通过ajax请求自动下载
+    require(['./my-async-component'], resolve)
+})

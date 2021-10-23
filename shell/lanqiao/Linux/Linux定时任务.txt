@@ -1,0 +1,71 @@
+目标
+为 shiyanlou 用户添加计划任务
+每天凌晨 3 点的时候定时备份 alternatives.log 到 /home/shiyanlou/tmp/ 目录
+命名格式为 年-月-日，比如今天是 2017 年 4 月 1 日，那么文件名为 2017-04-01
+
+sudo cron -f & # 启动 crontab
+crontab -e # 添加
+0 3 * * * sudo rm /home/shiyanlou/tmp/*
+0 3 * * * sudo cp /var/log/alternatives.log /home/shiyanlou/tmp/$(date +%Y-%m-%d)
+
+crontab 的格式：
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+
+
+
+启动 rsyslog，以便我们可以通过日志中的信息来了解我们的任务是否真正的被执行了（在本实验环境中需要手动启动，而在自己本地中 Ubuntu 会默认自行启动不需要手动启动）。
+sudo apt-get install -y rsyslog
+sudo service rsyslog start
+
+启动crontab:
+sudo cron －f &
+
+使用 crontab -e 添加计划任务，都会在 /var/spool/cron/crontabs 中添加一个该用户自己的任务文档，这样目的是为了隔离。
+添加一个计划任务：
+crontab -e
+第一次启动会出现这样一个画面，这是让我们选择编辑的工具，输入2选择第二个基本的 vim 就可以了。
+
+任务是每分钟我们会在/home/shiyanlou 目录下创建一个以当前的年月日时分秒为名字的空白文件
+
+进入vim模式后，在最后插入：
+*/1 * * * * touch /home/shiyanlou/$(date +\%Y\%m\%d\%H\%M\%S)
+
+“ % ” 在 crontab 文件中，有结束命令行、换行、重定向的作用，前面加 ” \ ” 符号转义，
+否则，“ % ” 符号将执行其结束命令行或者换行的作用，并且其后的内容会被做为标准输入发送给前面的命令。
+
+
+查看我们添加了哪些任务：
+crontab -l
+
+通过以下 2 种方式来确定我们的 cron 是否成功的在后台启动，默默的帮我们做事，若是没有就得执行上文准备中的第二步了。
+ps aux | grep cron
+# or
+pgrep cron
+
+查看到执行任务命令之后在日志中的信息反馈：
+sudo tail -f /var/log/syslog
+
+删除任务：
+crontab -r
+
+
+系统级别的定时任务，需要 root 权限执行的任务
+使用 sudo 编辑 /etc/crontab 文件就可以。
+
+cron 服务监测时间最小单位是分钟，所以 cron 会每分钟去读取一次 /etc/crontab 与 /var/spool/cron/crontabs 里面的內容。
+
+在 /etc 目录下，cron 相关的目录有下面几个：
+每个目录的作用：
+/etc/cron.daily，目录下的脚本会每天执行一次，在每天的 6 点 25 分时运行；
+/etc/cron.hourly，目录下的脚本会每个小时执行一次，在每小时的 17 分钟时运行；
+/etc/cron.monthly，目录下的脚本会每月执行一次，在每月 1 号的 6 点 52 分时运行；
+/etc/cron.weekly，目录下的脚本会每周执行一次，在每周第七天的 6 点 47 分时运行；
+系统默认执行时间可以根据需求进行修改。

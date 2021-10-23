@@ -1,0 +1,117 @@
+dd 的命令行语句与其他的 Linux 程序不同，因为它的命令行选项格式为 选项=值，而不是更标准的 --选项 值 或 -选项=值。
+dd 默认从标准输入中读取，并写入到标准输出中，
+但可以用选项 if（input file，输入文件）和 of（output file，输出文件）改变。
+
+# 输出到文件
+dd of=test bs=10 count=1
+hello raferxu
+# 或者 dd if=/dev/stdin of=test bs=10 count=1
+上述命令从标准输入设备读入用户输入（缺省值，所以可省略）然后输出到 test 文件，
+bs（block size）用于指定块大小（缺省单位为 Byte，也可为其指定如 K，M，G 等单位），count 用于指定块数量。
+
+du -b test # 10,使用 du 和 cat 10 个字节
+cat test # hello rafe, 其他的多余输入将被截取并保留在标准输入。
+
+
+dd 在拷贝的同时还可以实现数据转换，那下面就举一个简单的例子：将输出的英文字符转换为大写再写入文件：
+dd if=/dev/stdin of=test bs=10 count=1 conv=ucase
+raferxu
+cat test #RAFERXU
+
+
+
+
+使用 dd 命令来完成创建虚拟磁盘的第一步。
+
+从 /dev/zero 设备创建一个容量为 256M 的空文件：
+dd if=/dev/zero of=virtual.img bs=1M count=256
+du -h virtual.img
+
+将我们的虚拟磁盘镜像格式化为 ext4 文件系统：
+
+sudo mkfs.ext4 virtual.img
+
+就掌握这基本用法吧，等你有特殊需求时，再查看 man 文档解决。
+
+
+想知道 Linux 支持哪些文件系统你可以输入 
+ls -l /lib/modules/$(uname -r)/kernel/fs 查看
+
+
+使用 mount 来查看下主机已经挂载的文件系统：
+sudo mount
+输出的结果中每一行表示一个设备或虚拟设备，每一行最前面是设备名，然后是 on 后面是挂载点，type 后面表示文件系统类型，再后面是挂载选项（比如可以在挂载时设定以只读方式挂载等等）。
+
+挂载我们创建的虚拟磁盘镜像到 /mnt 目录：
+mount -o loop -t ext4 virtual.img /mnt
+# 也可以省略挂载类型，很多时候 mount 会自动识别
+
+# 以只读方式挂载
+mount -o loop --ro virtual.img /mnt
+# 或者 mount -o loop,ro virtual.img /mnt
+
+
+使用 umount 命令卸载已挂载磁盘
+# 命令格式 sudo umount 已挂载设备名或者挂载点，如：
+sudo umount /mnt
+
+
+
+如何为磁盘分区。
+# 查看硬盘分区表信息
+sudo fdisk -l
+
+重点看一下中间的分区信息，
+/dev/sda1，/dev/sda2 为主分区分别安装了 Windows 和 Linux 操作系统，
+/dev/sda3 为交换分区（可以理解为虚拟内存），
+/dev/sda4 为扩展分区其中包含 /dev/sda5，/dev/sda6，/dev/sda7，/dev/sda8 四个逻辑分区，
+因为主机上有几个分区之间有空隙，没有对齐边界扇区，所以分区之间不是完全连续的。
+
+# 进入磁盘分区模式
+sudo fdisk virtual.img
+
+分区方案:
+这里我将在使用 128M（可用 127M 左右）的虚拟磁盘镜像创建一个 30M 的主分区剩余部分为扩展分区包含 2 个大约 45M 的逻辑分区。
+使用 losetup 命令建立镜像与回环设备的关联
+sudo losetup /dev/loop0 virtual.img
+# 如果提示设备忙你也可以使用其它的回环设备，"ls /dev/loop*"参看所有回环设备
+
+# 解除设备关联
+sudo losetup -d /dev/loop0
+
+再使用 mkfs 格式化各分区（前面我们是格式化整个虚拟磁盘镜像文件或磁盘），
+不过格式化之前，我们还要为各分区建立虚拟设备的映射，用到 kpartx 工具，需要先安装：
+sudo apt-get install kpartx
+sudo kpartx -av /dev/loop0
+
+# 取消映射
+sudo kpartx -dv /dev/loop0
+
+接着再是格式化，我们将其全部格式化为 ext4：
+
+sudo mkfs.ext4 -q /dev/mapper/loop0p1
+sudo mkfs.ext4 -q /dev/mapper/loop0p5
+sudo mkfs.ext4 -q /dev/mapper/loop0p6
+
+格式化完成后在 /media 目录下新建四个空目录用于挂载虚拟磁盘：
+
+mkdir -p /media/virtualdisk_{1..3}
+
+
+# 挂载磁盘分区
+sudo mount /dev/mapper/loop0p1 /media/virtualdisk_1
+sudo mount /dev/mapper/loop0p5 /media/virtualdisk_2
+sudo mount /dev/mapper/loop0p6 /media/virtualdisk_3
+
+# 卸载磁盘分区
+sudo umount /dev/mapper/loop0p1
+sudo umount /dev/mapper/loop0p5
+sudo umount /dev/mapper/loop0p6
+
+然后：
+df -h查看结果
+
+
+
+
+

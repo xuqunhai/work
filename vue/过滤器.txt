@@ -1,11 +1,17 @@
 内置过滤器
+
+现在2.x过滤器只能用在插入文本中 ({{ }} tags)。
+我们发现在指令 (如：v-model，v-on 等) 中使用过滤器使事情变得更复杂。
+像 v-for 这样的列表过滤器最好把处理逻辑作为一个计算属性放在 js 里面，这样就可以在整个模板中复用。
+总之，能在原生 js 中实现的东西，我们尽量避免引入一个新的符号去重复处理同样的问题。
+
 首字母转大写capitalize - > value.charAt(0).toUpperCase()+value.slice(1)
 大写uppercase -> value.toString().toUpperCase()
 小写lowercase
 json.stringify - > {{ message | json(4) }}
 limitBy
-filterBy - 索引可用$index
-orderBy - 索引可用$index
+filterBy
+orderBy
 currency货币形式输出
 
 双向过滤器

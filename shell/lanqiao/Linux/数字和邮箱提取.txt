@@ -1,0 +1,5 @@
+在文件 /home/shiyanlou/data2 中匹配数字开头的行，将所有以数字开头的行都写入 /home/shiyanlou/num 文件。
+在文件 /home/shiyanlou/data2 中匹配出正确格式的邮箱，将所有的邮箱写入 /home/shiyanlou/mail 文件，注意该文件中每行为一个邮箱。
+
+grep '^[0-9]' /home/shiyanlou/data2 > /home/shiyanlou/num
+grep -E '^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$' /home/shiyanlou/data2 > /home/shiyanlou/mail

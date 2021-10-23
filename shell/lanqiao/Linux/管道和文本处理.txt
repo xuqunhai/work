@@ -1,0 +1,13 @@
+# 行数
+wc -l /etc/passwd
+
+统计 /etc 下面所有目录数：
+ls -dl /etc/*/ | wc -l
+
+
+tr 命令可以用来删除一段文本信息中的某些文字。或者将其进行转换。
+
+# 删除 "hello shiyanlou" 中所有的'o'，'l'，'h'
+$ echo 'hello shiyanlou' | tr -d 'olh'
+# 将"hello" 中的ll，去重为一个l
+$ echo 'hello' | tr -s 'l'

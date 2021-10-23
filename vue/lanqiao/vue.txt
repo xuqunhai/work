@@ -1,3 +1,6 @@
+v-bind 的 .once 和 .sync 修饰符移除
+Props 现在只能单向传递。为了对父组件产生反向影响，子组件需要显式地传递一个事件而不是依赖于隐式地双向绑定。
+
 通过使用 v-once 指令你也能执行一次性地插值，
 当数据 改变时，插值处的内容 不会更新。
 但是你需要注意一下，
@@ -174,6 +177,13 @@ select 字段将 value 作为 prop 并将 change 作为事件(内部监听 chang
 
 
 组件
+Vue在模版中会将驼峰转为短横纲形式，
+即在组件定义中使用驼峰后，可直接在模版使用短横杠形式：
+components: {
+  myCom: {}
+}
+<my-Com />
+
 全局注册
 //Vue.component(组件名字,template:{元素标签})
       Vue.component('syl', {
@@ -208,6 +218,8 @@ props 是一个单向的数据流，只允许父组件向子组件传值，
         props: ['postTitle'], //post-title 转换为驼峰命名
         template: '<p>{{postTitle}}</p>',
       });
+
+对于一个根实例来说 (比如：用 new Vue({ ... }) 创建的实例)，只能用 propsData 而不是 props。
 
 子父组件通信之 emit
 this.$emit('自定义事件名'，参数)
