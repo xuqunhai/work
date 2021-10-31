@@ -1,0 +1,11 @@
+Shelljs
+javascript代码中编写shell命令实现功能。
+https://blog.csdn.net/weixin_33980459/article/details/91422235
+
+
+
+使用脚手架的时候最明显的就是与命令行的交互，
+如果想自己做一个脚手架或者在某些时候要与用户进行交互，
+这个时候就不得不提到inquirer.js了。
+
+
