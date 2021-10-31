@@ -1,0 +1,5 @@
+xuqunhai@xuqunhaideMacBook-Pro work % git push
+fatal: unable to access 'https://github.com/xuqunhai/work.git/': LibreSSL SSL_connect: SSL_ERROR_SYSCALL in connection to github.com:443 
+xuqunhai@xuqunhaideMacBook-Pro work % git config --global --unset http.proxy
+xuqunhai@xuqunhaideMacBook-Pro work % git config --global --unset https.proxy
+
