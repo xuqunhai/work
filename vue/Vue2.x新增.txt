@@ -1,0 +1,28 @@
+Vue.config.errorHandler
+组件渲染时遇到未处理的异常会调用，默认输出错误堆栈信息
+
+Vue.compile
+把模版字符串编译成render function
+
+vm选项
+vm.render
+一个函数，可直接渲染
+写模版和写render函数是等价的，因为只有模版没有render函数时，在运行时会把模版内容经过编译，转换成渲染方法存在这个字段
+
+新增functional
+可创建一个functional的component，即通过render函数创建虚拟DOM
+
+生命周期
+新增beforeMount钩子，在模版编译成render后，创建Watcher之前触发
+新增mounted钩子，在DOM树生成后触发
+
+指令
+新增v-once指令，表明该元素是一个静态根节点，内容生成后就不会改变，这样在虚拟DOM的diff和patch中会忽略这些节点来提升性能
+v-for不仅可以遍历数组，还可以遍历对象, (value, key, index) in obj
+
+服务端渲染
+renderToString(component, done)
+把组件渲染成DOM字符串，可在done回调函数中拿到渲染好的DOM字符串
+
+renderToString(component)
+返回一个渲染流，在app非常复杂时，能确保服务端响应度，更快展示渲染内容

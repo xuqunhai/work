@@ -1,0 +1,25 @@
+Virtual DOM核心思想：
+通过js对象表示的树结构构建DOM树，
+数据变化时修改js对象，对比修改后的js对象，记录下需要对页面做的DOM操作，
+将其应用到真正DOM树，实现视图更新；
+
+
+虚拟DOM在vue2实现
+每一个原生DOM元素或Vue组件对应一个Vnode对象，
+区别是原生的Vnode对象的属性componentOptions值为空，
+而组件的componentOptions值包括Ctor、propData、listeners、parent、children等；
+
+VNode是如何在Vue中生成？
+vm.$mount - has render option? - 
+ no - has template option - yes - get template string - parse template to ast - optimize ast - ast to render code - code to render function - call render function
+ yes - call render function - create element - tag is string? - 
+        no - create component Vnode
+        yes -  is reserved tag ? - 
+                yes - create DOM VNode
+                no - has component option? - yes - create component Vnode
+
+其中optimize ast包括：
+1、找出静态class和attributes，初始化渲染后不再被对比；
+2、找出最大静态子树，每次重渲染直接重用Vnode跳过对比；
+
+
