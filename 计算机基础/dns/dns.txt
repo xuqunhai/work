@@ -1,0 +1,107 @@
+域名解析的两种方法：
+迭代解析：根服务器返回查询结果，之后本地依靠着返回值依次查询顶级域名服务器，再查询权限域名服务器
+递归查询：本地域名服务器依次访问根服务器-顶级域名服务器-权限域名服务器
+
+域名是什么
+举个例子，https://www.baidu.com，这个其实并不是域名，其中 https 是指协议，去掉 https 后，www.baidu.com.（注意最后面有一个点号） 才是真正的域名。
+每个域名的最后面都有一个点号 "." 表示根域名，为了方便在实际使用的时候被省略了。
+根域名的下一级就是顶级域名了，.com 也就是顶级域名，常见的顶级域名后缀有 .com、.cn、.net、.org 等，这些都是固定的，用户不能自己修改，只能选择。
+顶级域名的下一级又是权威域名，如 http://baidu.com 中的 .baidu ，这个权威域名就是我们自己可注册的域名。
+顶级域名下就是主机名了，www 是指主机名，这个是我们可以自己定义的，通常在 http 服务器如 nginx 中可以修改。
+
+DNS概念
+dns 即是 domain name system 域名系统的缩写，将域名和 ip 的映射关系保存在一个分布式数据库中。
+
+域名解析过程分析
+下面就还以 www.baidu,com 这个网址来分析一下 dns 的解析过程。
+当浏览器拿到输入的 http://www.baidu.com 后，首先会去浏览器的 dns 缓存中去查询是否有对应记录，如果查询到记录就可以直接返回 ip 地址，完成解析。
+如果浏览器没有缓存，那就再去查询操作系统的缓存，同样的，如果查询到记录就可以直接返回 ip 地址，完成解析。
+如果操作系统也没有缓存，那就再去查看本地 host 文件，Windows 下 host 文件一般位于 "C:\Windows\System32\drivers\etc"。
+近几年网上流传的通过修改本地 host 文件来避免双 11 女友剁手的段子，其实就是将淘宝的支付接口解析到错误的 ip 地址，从而导致支付不成功。
+如果本地 host 文件也没有相应记录，那就需要求助于本地 dns 服务器了，所以应该要知道本地 dns 的 ip 地址。
+本地 dns 服务器 ip 地址一般是由本地网络服务商如移动、电信提供，一般是通过 DHCP 自动分配，当然你也可以自己手动配置。目前用的比较多的是谷歌提供的公用 dns 8.8.8.8 和国内的公用 dns 114.114.114.114 。
+你之前可能有遇到过电脑可以正常上 QQ 但是就是不能打开网页的怪现象，这种情况大多数可能就是 dns 域名解析出问题了，你可以尝试手动把 dns 设置为公用 dns，如下图：
+找到本地 dns 后，它也会先去查询一遍它自己的缓存，如果有记录就返回，如果没有记录，它将开始要去我们前面提到的根域名服务器查询了。注意由于根域名服务器 ip 地址一般都是固定的，所以本地 dns 服务器一般都内置了根域名服务器 ip 地址。
+目前全球一共有 13 组根域名服务器（这里并不是指 13 台服务器，是指 13 个 ip 地址，按字母 a-m 编号），为了能更高效完成全球所有域名的解析请求，根域名服务器本身并不会直接去解析域名，而是会把不同的解析请求分配给下面的其他服务器去完成，下面是 dns 域名系统的树状结构图。
+注意，dns 域名服务器一般分三种，分别是根域名服务器 (.)、顶级域名服务器 (.com)、权威域名服务器 (http://baidu.com) 。
+当根域名接收到本地 dns 的解析请求后，发现是后缀是 .com，于是就把负责 .com 的顶级域名服务器 ip 地址返给本地 dns。
+本地 dns 拿着返回的 ip 地址再去找到对应的顶级域名服务器，顶级域名又把负责该域名的权威服务器 ip 返回去。
+本地 dns 又拿着 ip 去找对应的权威服务器，权威服务器最终把对应的主机 ip 返回给本地 dns，至此就完成了域名解析的全过程。
+
+
+
+详细的过程，使用命令 dig +trace http://www.weatherfood.com
+
+[root@iZm5eiqn00z9x3zuxajldvZ ~]# dig +trace www.weatherfood.com
+; <<>> DiG 9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.4 <<>> +trace www.weatherfood.com
+;; global options: +cmd
+.            455141  IN  NS  h.root-servers.net.
+.            455141  IN  NS  c.root-servers.net.
+.            455141  IN  NS  b.root-servers.net.
+.            455141  IN  NS  f.root-servers.net.
+.            455141  IN  NS  j.root-servers.net.
+.            455141  IN  NS  g.root-servers.net.
+.            455141  IN  NS  i.root-servers.net.
+.            455141  IN  NS  m.root-servers.net.
+.            455141  IN  NS  e.root-servers.net.
+.            455141  IN  NS  d.root-servers.net.
+.            455141  IN  NS  a.root-servers.net.
+.            455141  IN  NS  k.root-servers.net.
+.            455141  IN  NS  l.root-servers.net.
+.            455141  IN  RRSIG   NS 8 0 518400 20190314050000 20190301040000 16749 . sGpl0QBD/E3PaZ/tyjNmt4L1g415w5r6E0gbXTazmU1PNkQbYYrwyAx8 +vSoSLXaXcNsLgUfpJQThidOk5JSL8IUC+lHljxIvr6xIqx1kPvsl+Jq 8JdEWv4zZJtejehhxCyU74pK4gONO7fTgX3j2sXJUzQBtlYpZTfnYYeL JdF+WwGR1RxuBWJm68tQkrhIJ3mLdGmIlZkUk1WpxpU2jORGdcDgaCVl QgNxWI7+RBNmDNpqZD5848kHpJ6bWUwxyNM/rbVeXBgaqZvZz/6LbfiC QWxyfqDh4CK8HvxnTrp8Gl7i/IgHcLoIZf/YI9PopYmf49b4lqfjNBai 06Dy1w==
+;; Received 525 bytes from 10.202.72.116#53(10.202.72.116) in 0 ms
+com.            172800  IN  NS  m.gtld-servers.net.
+com.            172800  IN  NS  c.gtld-servers.net.
+com.            172800  IN  NS  j.gtld-servers.net.
+com.            172800  IN  NS  h.gtld-servers.net.
+com.            172800  IN  NS  d.gtld-servers.net.
+com.            172800  IN  NS  a.gtld-servers.net.
+com.            172800  IN  NS  e.gtld-servers.net.
+com.            172800  IN  NS  f.gtld-servers.net.
+com.            172800  IN  NS  l.gtld-servers.net.
+com.            172800  IN  NS  i.gtld-servers.net.
+com.            172800  IN  NS  k.gtld-servers.net.
+com.            172800  IN  NS  b.gtld-servers.net.
+com.            172800  IN  NS  g.gtld-servers.net.
+;; Received 497 bytes from 192.203.230.10#53(192.203.230.10) in 176 ms
+weatherfood.com.    172800  IN  NS  dns9.hichina.com.
+weatherfood.com.    172800  IN  NS  dns10.hichina.com.
+;; Received 396 bytes from 192.35.51.30#53(192.35.51.30) in 268 ms
+www.weatherfood.com.    600 IN  A   115.29.141.125
+;; Received 53 bytes from 140.205.41.25#53(140.205.41.25) in 14 ms
+
+可以看到，第一次从本地 dns 服务器 10.202.72.116 查询根服务器 . 地址，结果得到从字母 a-m 13 个 ns (name server)，即返回 13 个根服务器地址。
+其中 192.203.230.10 这台根服务器又返回 13个 .com 顶级域名服务器，可以查一下 192.203.230.10 这台服务器是位于美国的。
+接下来又从 192.35.51.30 这台顶级域名服务器返回两个 http://weatherfood.com 权威域名服务器。
+最后再向上面两个权威服务器查询到主机名 www，并返回域名的最终 ip 115.29.141.125。
+
+
+
+
+
+
+
+
+
+
+
+按层次分，IP协议位于网络层。
+IP协议的作用是把各种数据包传送给对方。而要保证确实传送到对方那里，则需要满足各类条件，其中两个重要的条件是IP地址和MAC地址。
+IP地址就像现实世界中的地址，而MAC地址，则更像一个人的身份证号。MAC地址是固定的，IP地址是可变的。
+你或许会有疑问，光有MAC没有IP，或者光有IP没有MAC，行不行？
+答案是不行。
+光有MAC地址，就好像某人在上海，你在广州喊“身份证是XXX的，你站出来”，对方听不到。
+光有IP地址，就像某个人在一栋大厦里，你到了该大厦，但你不知道对方具体是谁，你一样找不到对方。
+相信你对IP地址跟MAC地址已经有了较深的理解，我们接着往下看~
+
+确保可靠性的TCP协议
+网络世界，不确定性才是确定的，无论哪台计算机、哪台网络设备，都无法全面掌握互联网的细节。
+这就很矛盾了，因为我们知道TCP位于传输层，提供可靠的字节流服务。
+所谓的字节流服务，是为了方便传输，将大块数据分割成以报文段为单位的数据包进行管理。
+而可靠的传输服务是指，能够把数据准确可靠地传给对方。
+简言之，TCP协议既要负责分割数据，又要确保数据最终是否送达对方。
+为了准确无误地将数据送达目标处，TCP协议采用三次握手策略。
+
+发送端首先发送一个带SYN标志的数据包给对方。
+接收端收到后，回传一个带有SYN/ACK标志的数据包以示传达确认信息。
+最后，发送端再回传一个带ACK标志的数据包，代表握手结束。

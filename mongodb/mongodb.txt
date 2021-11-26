@@ -1,0 +1,30 @@
+.insert([]/{}, {ordered: false})
+默认顺序写入，一旦遇到错误，操作会退出，剩余的稳定无论是否正确，都不会写入；
+而如果采用乱序写入，则正确的文档仍然会被写入，即使有些文档造成错误；
+
+insert支持explain命令，而insertOne和insertMany不支持；
+
+创建文档的另一个命令save，当save处理一个新文档时，会调用insert命令；
+
+
+文档主键_id
+创建一个
+ObjectId()
+创建一个指定字符串的对象主键
+ObjectId("xxxxxx")
+提取ObjectId创建时间
+ObjectId("xxx").getTimestamp()
+
+
+可使用文档作为复合主键
+{
+    _id: {a:1, b:2}
+}
+如果再次插入会报错
+{
+    _id: {a:1, b:2}
+}
+但是插入下面这个不会，即打乱顺序
+{
+    _id: {b:2， a:1}
+}
