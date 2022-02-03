@@ -1,0 +1,24 @@
+{
+  "name": "code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "node --inspect=5858 ./node_modules/.bin/webpack",
+    "start": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "file-loader": "^6.2.0",
+    "loader-utils": "^2.0.0",
+    "node-webp": "^1.0.2",
+    "webpack": "^5.68.0"
+  },
+  "devDependencies": {
+    "cwebp": "^2.0.5",
+    "webpack-cli": "^4.9.2"
+  }
+}
