@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>三栏布局</title>
+    <style media="screen">
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      .layout {
+        margin-top: 10px;
+      }
+      .layout article div {
+        min-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="layout float">
+      <style media="screen">
+        .layout.float .left {
+          float: left;
+          width: 300px;
+          background-color: red;
+        }
+        .layout.float .right {
+          float: right;
+          width: 300px;
+          background-color: blue;
+        }
+        .layout.float .center {
+          background-color: yellow;
+        }
+      </style>
+      <article class="left-right-center">
+        <div class="left"></div>
+        <div class="right"></div>
+        <div class="center">
+          <h1>浮动解决方案</h1>
+          1.这时三栏布局中间部分 1.这时三栏布局中间部分
+          <p>增加高度不行</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="layout absolute">
+      <style media="screen">
+        .layout.absolute .left-right-center > div {
+          position: absolute;
+        }
+        .layout.absolute .left {
+          left: 0;
+          width: 300px;
+          background-color: red;
+        }
+        .layout.absolute .right {
+          right: 0;
+          width: 300px;
+          background-color: blue;
+        }
+        .layout.absolute .center {
+          left: 300px;
+          right: 300px;
+          background-color: yellow;
+        }
+      </style>
+      <article class="left-right-center">
+        <div class="left"></div>
+        <div class="center">
+          <h1>绝对定位解决方案</h1>
+          1.这时三栏布局中间部分 1.这时三栏布局中间部分
+          <p>增加高度不行</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+    <section class="layout flexbox">
+      <style>
+        .layout.flexbox {
+          margin-top: 120px;
+        }
+        .layout.flexbox .left-center-right {
+          display: flex;
+        }
+        .layout.flexbox .left {
+          width: 300px;
+          background-color: red;
+        }
+        .layout.flexbox .right {
+          width: 300px;
+          background-color: blue;
+        }
+        .layout.flexbox .center {
+          flex: 1;
+          background-color: yellow;
+        }
+      </style>
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h1>flex解决方案</h1>
+          1.这时三栏布局中间部分 1.这时三栏布局中间部分
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度没问题</p>
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+    <section class="layout table">
+      <style>
+        .layout.table .left-center-right {
+          display: table;
+          width: 100%;
+          height: 120px;
+        }
+        .layout.table .left-center-right > div {
+          display: table-cell;
+        }
+        .layout.table .left {
+          width: 300px;
+          background-color: red;
+        }
+        .layout.table .right {
+          width: 300px;
+          background-color: blue;
+        }
+        .layout.table .center {
+          background-color: yellow;
+        }
+      </style>
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h1>table解决方案</h1>
+          1.这时三栏布局中间部分 1.这时三栏布局中间部分
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度没问题</p>
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+    <section class="layout grid">
+      <style>
+        .layout.grid .left-center-right {
+          display: grid;
+          width: 100%;
+          grid-template-rows: 120px;
+          grid-template-columns: 300px auto 300px;
+        }
+        .layout.grid .left {
+          background-color: red;
+        }
+        .layout.grid .right {
+          background-color: blue;
+        }
+        .layout.grid .center {
+          background-color: yellow;
+        }
+      </style>
+      <article class="left-center-right">
+        <div class="left"></div>
+        <div class="center">
+          <h1>grid解决方案</h1>
+          1.这时三栏布局中间部分 1.这时三栏布局中间部分
+          <p>增加高度不行</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+          <p>增加高度</p>
+        </div>
+        <div class="right"></div>
+      </article>
+    </section>
+  </body>
+</html>
