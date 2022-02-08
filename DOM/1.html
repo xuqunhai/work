@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="city">
+        城市
+        <div id="sh" class="east">上海</div>
+        <div id="gz" class="south">广州</div>
+        <div id="xa" class="west">西安</div>
+        <div id="bj" class="north">北京</div>
+      </div>
+    </div>
+    <script>
+      var target = document.getElementById('city').getElementsByTagName('div');
+      console.log('getElementsByTagName返回的是一个数组 ', target); // HTMLCollection(4)
+      var target = document.getElementById('city').childNodes;
+      console.log('childNodes返回的是子节点的集合,会把换行和空格也当成是节点信息 ', target); // NodeList(9)
+      // 去掉换行的空格
+      for (var i = 0; i < target.length; i++) {
+        if (target[i].nodeName == '#text' && !/\s/.test(target.nodeValue)) {
+          document.getElementById('city').removeChild(target[i]);
+        }
+      }
+      console.log('去掉换行的空格removeChild ', target);
+      var count = document.getElementById('city').childElementCount;
+      console.log('childElementCount ', count);
+      var target = document.getElementById('city').children;
+      console.log('children返回出一个数组 ', target);
+      var getFirstChild = document.getElementById('city').firstChild;
+      console.log(
+        'firstChild 获取第一个子节点 ',
+        getFirstChild,
+        'firstChild 和 childNodes 是一样的，在浏览器解析的时候会把换行和空格一起解析，获取的是第一个子节点，只是这个子节点是一个换行或者是一个空格而已'
+      );
+      var target = document.getElementById('city').firstElementChild;
+      console.log('firstElementChild 获取第一个子节点 ', target);
+    </script>
+  </body>
+</html>

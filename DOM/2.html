@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let div = document.createElement('div');
+      div.id = 'content';
+      div.className = 'note';
+      let text = document.createTextNode('我是通过createTextNode创建的文本');
+      div.appendChild(text);
+
+      // 创建一个H2元素
+      let h2 = document.createElement('h2');
+      h2.textContent = '将H2元素插入到div内';
+      div.appendChild(h2);
+
+      document.body.appendChild(div);
+    </script>
+  </body>
+</html>
