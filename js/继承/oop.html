@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      function Parent3() {
+        this.name = 'parent3';
+        this.play = [1, 2, 3];
+      }
+      function Child3() {
+        Parent3.call(this); // 执行这一步相当于每个实例都有自己的play，
+        this.type = 'child3';
+      }
+
+      /*
+      Child3.prototype = new Parent3(); // 这一步说明原型链有2个play，一个在new Child3，另一个在Child3.prototype
+      var s3 = new Child3();
+      var s4 = new Child3();
+      s3.play.push(4);
+      console.log(s3.play); // [1,2,3,4]
+      console.log(s4.play); // [1,2,3]
+      console.log(s3);
+      */
+
+      // 上面缺点是 Parent3 运行 2 次
+      /*
+      // 优化
+      Child3.prototype = Parent3.prototype;
+      
+      var s3 = new Child3();
+      console.log(s3 instanceof Child3); // true
+      console.log(s3 instanceof Parent3); // true
+      console.log(s3.constructor); // Parent3
+
+      Child3.prototype = Object.create(Parent3.prototype);
+      Child3.prototype.constructor = Child3;
+      */
+      // 上面这里new出的实例无法判断是子类还是父类产生的？
+
+      var s4 = new Child3();
+      console.log(s4 instanceof Child3); // true
+      console.log(s4 instanceof Parent3); // false
+      console.log(s4.constructor); // Child3
+    </script>
+  </body>
+</html>
