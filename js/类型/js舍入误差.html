@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /*
+      js IEEE754双精度浮点数
+      0.1+0.2计算时会先转成二进制
+      0.1. toString(2) // '0.0001100110011001100110011001100110011001100110011001101'
+      js规定最多52位，所以会在超出时进行截断，这就导致了精度缺失
+      在进行运算过程也有可能出现精度缺失
+      两者就是原因
+
+      解决方案：
+      Math.abs()+Number.EPSILON
+
+      parseFloat((0.1+0.2).toFixed(2))
+
+      Math.pow(10,2)
+
+      */
+    </script>
+  </body>
+</html>

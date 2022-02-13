@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <pre>
+    深入理解DOM数加载过程
+
+    1.在浏览器中输入url，交给DNS域名解析，找到IP，向服务器发起请求；(里面还有缓存，http协议，TCP...)
+
+    2. 服务器返回数据，浏览器接收文件(html,css,js,img...)，二进制文件
+
+            html:二进制转换为html
+
+             构建DOM树：HTML解析器
+
+                            Token->Node->DOM
+
+                            Token词法解析，根是"document"对象
+
+                             Node:HTMLDivElement
+
+                             DOM:DOM和标签基本是一一对应的关系div
+
+                解析过程中：
+
+                            1.遇到link的外部css，遇到css的代码会进行css加载，并行解析
+
+                            2.遇到script标签的时候，会先去执行js的内容，直至脚本完成执行，然后继续构建DOM；
+
+                             底部引入Javascript代码的原因。或者说可以在头部引用，但是前提是加上async、defer,或window.onload:
+
+                                解析器遇到设置了async属性的script时，开始下载脚本并继续解析文档。脚本会在它下载完成后尽快执行，但是解析器不会停下来等它下载
+
+                                如果script标签设置了该属性，则浏览器会异步下载该文件并且不会影响后续DOM的渲染；
+
+                                如果有多个设置了defer的script标签存在，则会按照顺序执行所有的script；
+
+                                 defer脚本会在文档渲染完毕后，DOMContentLoaded事件调用前执行；脚本会被延迟到整个页面都解析完毕后再运行
+
+                    构建css树：css解析器
+
+                                        每个css文件解析为样式表对象scctyleSheet,每个对象都包含cssRule,cssRule包含选择器和声明对象，以及其他与css语法对应的对象。
+
+                                        Token解析:css的词法及语法文法
+
+                                         Node->CSSOM
+
+                    构建render树：渲染树=DOM树+css树
+
+                    布局layout与绘制paint:计算对象之间的大小，距离确定每个节点在屏幕上的确切坐标；映射浏览器屏幕绘制；使用UI后端层绘制每个节点
+
+        reflow(回流)：当元素属性发生改变且影响布局时(宽度、高度、内外边距等)，产生回流，相当于刷新页面
+
+        repaint(重绘)：当元素属性发生改变且不影响布局时(背景颜色，透明度，字体样式等)，产生重绘，相当于不刷新页面，动态更新内容
+  </pre
+    >
+  </body>
+</html>

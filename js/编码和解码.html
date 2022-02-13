@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <pre>
+  escape/unescape()
+  针对的是字符串，采用ASCII，这是比较老的规范
+  下面采用的是unicode最新规范
+  encodeURI/decodeURI
+  适合对整个url操作，特别是ios对特殊字符有过滤问题
+  encodeURIComponent/decodeURIComponent
+  对url参数转码
+
+  var url='https://www.baidu.com?name=拉夫&&redirect=https://www.imooc.com/video/23107'
+
+  encodeURI(url)
+  'https://www.baidu.com?name=%E6%8B%89%E5%A4%AB&&redirect=https://www.imooc.com/video/23107'
+
+  encodeURIComponent(url)
+  'https%3A%2F%2Fwww.baidu.com%3Fname%3D%E6%8B%89%E5%A4%AB%26%26redirect%3Dhttps%3A%2F%2Fwww.imooc.com%2Fvideo%2F23107'
+
+  decodeURI(encodeURI(url))===decodeURIComponent(encodeURIComponent(url)) // true
+  </pre
+    >
+  </body>
+</html>

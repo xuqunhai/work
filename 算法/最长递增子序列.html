@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>最长递增子序列</title>
+  </head>
+  <body>
+    <script>
+      function maxIncLen(arr) {
+        const arrLen = arr.length;
+        let max = 1;
+        let lenArr = new Array(arrLen).fill(1);
+        for (let i = 0; i < arrLen; i++) {
+          for (let j = 0; j < i; j++) {
+            if (arr[j] < arr[i]) {
+              lenArr[i] = Math.max(lenArr[j] + 1, lenArr[i]);
+            }
+          }
+          max = Math.max(max, lenArr[i]);
+        }
+        console.log(max);
+        return max;
+      }
+      maxIncLen([10, 9, 2, 5, 3, 7, 101, 18]); // 4
+      maxIncLen([0, 1, 0, 3, 2, 3]); // 4
+      maxIncLen([7, 7, 7, 7, 7]); // 1
+    </script>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /*
+      装箱：基本类型数据 - 对应引用数据类型
+        var str=new String('rr')
+        str[0]; // 'r' - {} key:value 0:r,1:r
+        底层实现
+          var str=new String('rr')
+          var result=str.xxx()
+          str=null
+          return result
+
+          包装对象 string number boolean
+          var str = 'rr'
+          str[0] = 'r'
+
+      拆箱：引用类型数据 - 对应基本类型
+        底层实现
+        js toPrimitive(input, type)
+        1 input 判断是不是原始类型，是: 直接返回
+        2 不是: input.valueOf() 是不是原始类型，是: 直接返回
+        3 不是: input.toString(): string 是不是原始类型，是: 直接返回
+        4 报错
+
+        var obj={},arr=[]
+        obj.valueOf() // {}
+        arr.valueOf() // []
+        obj.toString() // '[object Object]'
+        arr.toString() // ''
+
+        所以
+        arr+obj='[object Object]'
+        obj+arr='[object Object]'
+        部分浏览器会出现
+        obj+arr=0
+        因为{}+[]会把前面看成块级作用域，所以最后计算的是 +[]，所以结果为0
+      */
+
+      /*
+        null 与 false、“”，0时比较“==“时是按类型，不是值，所以结果都是false
+        undefined 与 false、“”，0时比较“==“时是按类型，不是值，所以结果都是false
+        undefined 和 null进行==比较时，隐式转换为boolean型都是false，所以又相等了
+
+        0 NaN undefined null '' -> Boolean(x) -> false
+        undefined == null // true - Boolean(x) -> false
+        Number(null) // 0
+        Number(undefined) // NaN
+      */
+    </script>
+  </body>
+</html>

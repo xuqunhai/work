@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>统计追加字母可以获得单词数</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @param {string[]} startWords
+       * @param {string[]} targetWords
+       * @return {number}
+       */
+      /*
+    101 & 100 = 100 // 对位都为1才为1
+    101 ｜100 = 101 // 对位有为1就是1
+    101 ^ 100 = 1 // 对位不同才为1
+
+    101 >> 1 = 10 右移一位，超出阶段
+    101 << 1 = 1010 左移一位，不足补0
+    */
+      function wordCount(startWords, targetWords) {
+        let ans = 0;
+        const set = new Set();
+        const pos = (x) => x.charCodeAt() - 'a'.charCodeAt();
+        for (const word of startWords) {
+          let x = 0;
+          for (const char of word) {
+            const offset = pos(char);
+            x = x | (1 << offset); // offset为n，则 (1 << offset) 为 100000... 即1后面接n个0 ---- 101 ｜100 = 101 // 对位有为1就是1
+          }
+          set.add(x);
+        }
+        for (const target of targetWords) {
+          let x = 0;
+          for (const char of target) {
+            const offset = pos(char);
+            x = x | (1 << offset);
+          }
+
+          for (const char of target) {
+            const offset = pos(char);
+            /*
+            101 ^ 100 = 1 // 对位不同才为1
+            100100101 ^
+            000000100 =
+            100100001
+            */
+            const t = x ^ (1 << offset); // 如目标为abc，假设二进制后为10111，要看开始里有没ab，即把c对应位数置为0，如果c为10，则 10111 ^ 10 = 10101,这个就是ab，所以可以
+            if (set.has(t)) {
+              ans++;
+              break;
+            }
+          }
+        }
+        return ans;
+      }
+      var startWords = ['ant', 'act', 'tack'],
+        targetWords = ['tack', 'act', 'acti'];
+      console.log(wordCount(startWords, targetWords)); // 2
+      startWords = ['ab', 'a'];
+      targetWords = ['abc', 'abcd'];
+      console.log(wordCount(startWords, targetWords)); // 1
+    </script>
+  </body>
+</html>

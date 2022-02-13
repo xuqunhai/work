@@ -13,16 +13,44 @@
     DOM0: ele.onclick
     DOM2: eledocument.addEventListener('click', (event) => {});
     DOM3: eledocument.addEventListener('keyup/鼠标/键盘事件', (event) => {});
+    //事件监听的优点:可以绑定多个事件;常规的事件绑定只执行最后绑定的事件
+    //js不支持事件重载,绑定事件相当于一个变量存储的是函数的地址,如果再绑定一个事件,相当于变量指向另一个函数的地址;
+    //事件监听相当于订阅发布者,改变了数据,触发了事件,订阅这个事件的函数被执行
+    dom2级事件：事件监听
+    //element.addEventListener(event,function,useCapture)removeEventListener
+    //event:(必需）事件名，支持所有DOM事件。
+    //function:(必需）指定要事件触发时执行的函数。
+    //useCapture:(可选）指定事件是否在捕获或冒泡阶段执行。true,捕获。false,冒泡。默认false
+    //IE8:element.attachEvent(event,function)
+    //event:(必需）事件类型。需加“on“，例如：onclick。
+    //function:(必需）指定要事件触发时执行的函数。
+    事件触发
+        事件对象：事件触发时候自动创建的，封装了事件发生的元素和属性信息    
+        window.event // ie
+        e.target // 触发元素对象  ie:e.srcElement
+    事件捕获
+        addEventListener 第三个参数为true，事件处于捕获阶段，默认false
+        ie没有捕获阶段
+    事件冒泡
+        e.stopPropagation()阻止冒泡
+        IE:e.cancelBubble=true 阻止冒泡
+        利用冒泡（事件委托）
     
     DOM事件模型：捕获/冒泡
     DOM事件流：捕获-目标阶段-冒泡
+
     描述DOM事件捕获的具体流程
     window - document - html - body - ... - 目标元素
+    
     Event对象应用
     event.preventDefault/stopPropagation/currentTarget/target/stopImmediatePropagation()
+    阻止默认行为场景和方式
+      a链接不跳转或者form提交按钮不提交
+      e.preventDefault()/return false; - return false也可以阻止，但是后面代码不再执行，而且只限于传统时间注册方式
     target - 点击对象
     currentTarget - 事件绑定元素
     stopImmediatePropagation - 事件优先级，A->B，A执行后不执行B可用
+
     自定义事件
     var eve=new Event('haha')
     ele.addEventListener('haha', function(){});

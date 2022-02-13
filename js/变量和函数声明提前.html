@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <pre>
+    js 解释执行
+
+    js解释引擎:词法分析->语法分析->语法树
+
+    词法分析是将字符流(char stream ) 转换为记号流(token stream)
+
+    语法分析成AST(语法树)
+
+    js解析：预编译期(预处理、预解析、预编译) 与 执行期
+
+    预编译预解析，当Javascript引擎解析脚本时，它会在预编译期对所有声明的变量和函数进行处理；并且是先预声明变量，再预定义函数
+
+    var a=10;
+    function test(a,b){
+      console.log('1',a) // function
+      console.log('1b',b) // 1000
+      function a(){}
+      var b=2
+      console.log('3',a) // function
+      a=1
+      console.log('2',a) // 1
+    }
+    test(100,1000)
+
+    上面说明var声明提前最先执行，然后是形参赋值，最后才是函数声明
+  </pre
+    >
+  </body>
+</html>

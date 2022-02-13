@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /*
+        typeof检测null为什么是object
+        因为typeof返回的结果是看元素转成机器码后最后三位来判定的，其中如果最后三位都是0，就返回object
+        而null转成机器码后全部都是0
+
+        typeof为什么对函数返回function而不是object
+        因为typeof会检查元素是否有[[Call]]属性，有的话就返回function，没有才返回object； ECMA上面有定义
+        用双括号的属性是你没法用JS代码访问的私有属性，你得用C++代码调用JS引擎才能看到这些属性。
+
+        函数 具有[[call]]私有字段
+        构造器对象 具有[[construct]]私有字段
+      */
+      /*
+      instanceof 原型链
+      es6提供内置函数可直接访问操纵原型
+      设置一个对象原型Object.setPrototypeOf
+      查询一个对象原型Object.getPrototypeOf
+      根据指定原型创建对象Object.create
+
+      Object.prototype.toString.call获取的是对象的私有Class属性
+      因为无法修改，所以比instanceof更准确识别对应基本类型
+      但因为call本身会产生装箱操作，所以需配合typeof区分基本类型还是对象类型
+      var a=1,b=new Number(1)
+      console.log(Object.prototype.toString.call(a), Object.prototype.toString.call(b)) // [object Number] [object Number]
+      console.log(typeof a,  typeof b) // number object
+       */
+    </script>
+  </body>
+</html>

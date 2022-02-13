@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>背包问题</title>
+  </head>
+  <body>
+    <script>
+      function beibao(M, W, arrP, arrW) {
+        var result = [];
+        for (var i = 0; i <= M; i++) {
+          result[i] = [];
+          for (var j = 0; j <= W; j++) {
+            if (i == 0) {
+              result[i][j] = 0;
+            } else if (arrW[i - 1] > j) {
+              // 要放入的物品重量 已经 大于 j总容量，也就是放不进去了，直接取没放之前最优解
+              // itemWeight>currentWeight
+              result[i][j] = result[i - 1][j]; // table[row][col]=table[row-1][col]
+            } else {
+              // 对比 没放之前最优解 和 放了之后的最优解，取最大
+              // 放了之后 计算 新商品价值 arrP[i - 1]  加 总容量-新商品容量=剩余容量最优解
+              // table[row][col] = Math.max(table[row-1][col],table[row-1][currentWight-itemWeight]+itemValue)
+              result[i][j] = Math.max(arrP[i - 1] + result[i - 1][j - arrW[i - 1]], result[i - 1][j]);
+            }
+          }
+        }
+        console.log(result);
+        return result[i - 1][j - 1];
+      }
+
+      var M = 5; // 物体个数
+      var W = 16; // 背包总容量
+      var arrP = [4, 5, 10, 11, 13]; // 物体价值
+      var arrW = [3, 4, 7, 8, 9]; // 物体个数
+      console.log(beibao(M, W, arrP, arrW)); // 23
+    </script>
+  </body>
+</html>

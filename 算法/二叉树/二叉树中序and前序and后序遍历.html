@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>创建二叉树-中序遍历/复制二叉树-前序遍历/文件系统目录操作-后序遍历</title>
+  </head>
+  <body>
+    <script>
+      /*
+      function BinaryTree() {
+        var Node = function (key) {
+          this.key = key;
+          this.left = null;
+          this.right = null;
+        };
+        root = null;
+        // var root = null;
+        var insertNode = function (node, newNode) {
+          if (newNode.key < node.key) {
+            if (node.left === null) {
+              node.left = newNode;
+            } else {
+              insertNode(node.left, newNode);
+            }
+          } else {
+            if (node.right === null) {
+              node.right = newNode;
+            } else {
+              insertNode(node.right, newNode);
+            }
+          }
+        };
+        this.insert = function (key) {
+          var newNode = new Node(key);
+          if (root === null) {
+            root = newNode;
+          } else {
+            insertNode(root, newNode);
+          }
+        };
+
+        var inOrderTraverseNode = function (node, callback) {
+          if (node !== null) {
+            inOrderTraverseNode(node.left, callback);
+            callback(node.key);
+            inOrderTraverseNode(node.right, callback);
+          }
+        };
+
+        this.inOrderTraverse = function (callback) {
+          inOrderTraverseNode(root, callback);
+        };
+      }
+
+      var nodes = [8, 3, 10, 1, 6, 14, 4, 7, 13];
+      var binaryTree = new BinaryTree();
+      nodes.forEach((key) => binaryTree.insert(key));
+      console.log(root);
+      var callback = function (key) {
+        console.log(key);
+      };
+      binaryTree.inOrderTraverse(callback);
+      */
+    </script>
+    <script>
+      // 创建二叉树-中序遍历 / 复制二叉树-前序遍历 / 文件系统目录操作-后序遍历
+      var arr = [8, 3, 10, 1, 6, 14, 4, 7, 13];
+
+      class Node {
+        constructor(key) {
+          this.key = key;
+          this.left = null;
+          this.right = null;
+        }
+      }
+
+      class BinaryTree {
+        constructor() {
+          this.root = null;
+        }
+        insert(node) {
+          if (this.root === null) {
+            this.root = node;
+          } else {
+            this.insertChild(this.root, node);
+          }
+        }
+        insertChild(node, newNode) {
+          if (newNode.key < node.key) {
+            if (node.left === null) {
+              node.left = newNode;
+            } else {
+              this.insertChild(node.left, newNode);
+            }
+          } else {
+            if (node.right === null) {
+              node.right = newNode;
+            } else {
+              this.insertChild(node.right, newNode);
+            }
+          }
+        }
+        traverNode(node, cb = (key) => console.log(key)) {
+          if (node && node.key) {
+            this.traverNode(node.left);
+            cb(node.key);
+            this.traverNode(node.right);
+          }
+        }
+        preTraverNode(node, cb = (key) => console.log(key)) {
+          if (node && node.key) {
+            cb(node.key);
+            this.preTraverNode(node.left);
+            this.preTraverNode(node.right);
+          }
+        }
+        postTraverNode(node, cb = (key) => console.log(key)) {
+          if (node && node.key) {
+            this.postTraverNode(node.left);
+            this.postTraverNode(node.right);
+            cb(node.key);
+          }
+        }
+        getMinNode(node, isReturnNode) {
+          if (node !== null) {
+            while (node.left) {
+              node = node.left;
+            }
+            return isReturnNode ? node : node.key;
+          }
+          return null;
+        }
+        getMaxNode(node, isReturnNode) {
+          if (node !== null) {
+            while (node.right) {
+              node = node.right;
+            }
+            return isReturnNode ? node : node.key;
+          }
+          return null;
+        }
+        existNode(key, nodes) {
+          if (key && nodes !== null) {
+            if (key === nodes.key) {
+              return true;
+            }
+            if (key < nodes.key) {
+              return this.existNode(key, nodes.left);
+            }
+            return this.existNode(key, nodes.right);
+          }
+          return false;
+        }
+        findNode(key, nodes) {
+          if (key && nodes !== null) {
+            if (key === nodes.key) {
+              return nodes;
+            }
+            if (key < nodes.key) {
+              return this.findNode(key, nodes.left);
+            }
+            return this.findNode(key, nodes.right);
+          }
+          return null;
+        }
+        removeNode(key, node) {
+          if (node === null) {
+            return null;
+          }
+          if (key < node.key) {
+            node.left = this.removeNode(key, node.left);
+            return node;
+          }
+          if (key > node.key) {
+            node.right = this.removeNode(key, node.right);
+            return node;
+          }
+          if (node.left === null && node.right === null) {
+            node = null;
+            return node;
+          }
+          if (node.left === null) {
+            node = node.right;
+            return node;
+          }
+          if (node.right === null) {
+            node = node.left;
+            return node;
+          }
+          // console.log('rightMinNode', JSON.stringify(node.right));
+          var rightMinNode = this.getMinNode(node.right, true);
+          node.key = rightMinNode.key;
+          node.right = this.removeNode(rightMinNode.key, node.right);
+          return node;
+        }
+      }
+
+      var nodes = arr.map((item) => new Node(item));
+      var binaryTree = new BinaryTree();
+      nodes.forEach((node) => binaryTree.insert(node));
+      console.log(binaryTree.root);
+      console.log('--- traverNode ---');
+      binaryTree.traverNode(binaryTree.root);
+      console.log('--- preTraverNode ---');
+      binaryTree.preTraverNode(binaryTree.root);
+      console.log('--- postTraverNode ---');
+      binaryTree.postTraverNode(binaryTree.root);
+      console.log('--- getMinNode ---');
+      console.log(binaryTree.getMinNode(binaryTree.root));
+      console.log('--- getMaxNode ---');
+      console.log(binaryTree.getMaxNode(binaryTree.root));
+      console.log('--- existNode ---');
+      console.log(binaryTree.existNode(7, binaryTree.root));
+      console.log(binaryTree.existNode(5, binaryTree.root));
+      console.log('--- removeNode ---');
+      // console.log(binaryTree.removeNode(4, binaryTree.root));
+      console.log(binaryTree.removeNode(3, binaryTree.root));
+    </script>
+  </body>
+</html>

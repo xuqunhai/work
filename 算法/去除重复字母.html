@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>去除重复字母</title>
+  </head>
+  <body>
+    <script>
+      var removeDuplicateLetters = function (s) {
+        const len = s.length;
+        const arr = [];
+        const countMap = new Map();
+        const existMap = new Map();
+        for (let i = 0; i < len; i++) {
+          const v = s[i];
+          if (countMap.has(v)) {
+            countMap.set(v, countMap.get(v) + 1);
+          } else {
+            countMap.set(v, 1);
+          }
+        }
+        // console.log('countMap', countMap);
+        for (let i = 0; i < len; i++) {
+          const v = s[i];
+
+          countMap.set(v, countMap.get(v) - 1); // 这样就能判断后面还有没有
+
+          // 已在arr里面，跳过
+          if (existMap.has(v)) {
+            continue;
+          }
+
+          // 上一个比现在的大
+          while (arr.length && arr[arr.length - 1] > v) {
+            // 上一个元素后面没有
+            if (countMap.get(arr[arr.length - 1]) === 0) break;
+            // 上一个元素n后面还有一样的n，删掉上一个n，清除existMap，这样后面n才能push到arr
+            existMap.delete(arr.pop());
+          }
+
+          arr.push(v);
+          existMap.set(v, 1);
+        }
+        console.log(s, 'return ', arr.join(''));
+        return arr.join('');
+      };
+
+      removeDuplicateLetters('bcabc');
+      removeDuplicateLetters('cbacdcbc');
+      removeDuplicateLetters('ecbacba');
+    </script>
+  </body>
+</html>

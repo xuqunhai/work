@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>最大公因数</title>
+  </head>
+  <body>
+    <script>
+      function maxcommonDivisor(n1, n2) {
+        n1 = n1 && parseInt(n1);
+        n2 = n2 && parseInt(n2);
+        if (n1 < n2) {
+          [n1, n2] = [n2, n1];
+        }
+        /*
+        判断n1,n2,做求余运算，值是否为0，如果为0，那么n2就是就是两个整数的最大公约数。
+        如果不为0，则继续调用函数自身，使除数和余数继续求余运算
+    */
+        if (n1 % n2 == 0) {
+          return n2;
+        } else {
+          // 100%80=20 80%20=0 result-20
+          return arguments.callee(n2, n1 % n2);
+        }
+      }
+
+      function maxcommonDivisor(n1, n2) {
+        n1 = n1 && parseInt(n1);
+        n2 = n2 && parseInt(n2);
+        if (n1 - n2 > 0) {
+          // 比较 n1,n2的大小，使用解构赋值交换n1,n2的值
+          [n1, n2] = [n2, n1];
+        }
+        let sum;
+        for (let i = 0; i <= n1; i++) {
+          if (n1 % i == 0 && n2 % i == 0) {
+            sum = i;
+          }
+        }
+        return sum;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>动态规划=状态+选择</title>
+  </head>
+  <body>
+    <h1>
+      如下图所示：一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start”
+      ）。机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径❓
+    </h1>
+    <script>
+      function uniquePath(m, n) {
+        const gridArr = new Array(m).fill(0).map((rowArr) => new Array(m).fill(0));
+        gridArr[0][0] = 1;
+        let top, left;
+        for (let i = 0; i < m; i++) {
+          for (let j = 0; j < n; j++) {
+            top = i > 0 ? gridArr[i - 1][j] : 1;
+            left = j > 0 ? gridArr[i][j - 1] : 1;
+            gridArr[i][j] = i * j ? top + left : 1;
+          }
+        }
+        return gridArr[m - 2][n - 1] + gridArr[m - 1][n - 2];
+      }
+
+      console.log(uniquePath(3, 7)); // 28
+      console.log(uniquePath(3, 2)); // 3
+    </script>
+  </body>
+</html>
