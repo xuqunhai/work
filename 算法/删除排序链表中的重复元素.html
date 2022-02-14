@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      var deteleDuplicates = function (head) {
+        let p = head;
+        // cur 与 cur.next 比， 重复则删除cur.next, 不重复则进行下次遍历
+        while (p) {
+          if (p && p.next) {
+            if (p.val === p.next.val) {
+              p.next = p.next.next;
+              // p = p.next; // [1,1,1]不能执行这一行，不然最后结果是[1,1]，相当于执行一次发现1和2相同，就把1指向3，如果直接比对下一组，即3和4，那么1和3就被跳过比对了
+            } else {
+              // 比对下一个元素和下下个元素
+              p = p.next; // [1,1,1]
+            }
+          }
+        }
+        return head;
+      };
+    </script>
+  </body>
+</html>

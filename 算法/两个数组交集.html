@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      var intersection = function (n1, n2) {
+        return [...new Set(n1)].filter((n) => n2.includes(n));
+      };
+      var intersection2 = function (n1, n2) {
+        const map = new Map();
+        n1.forEach((n) => map.set(n.true));
+        const res = [];
+        m2.forEach((n) => {
+          if (map.get(n)) {
+            res.push(n);
+            map.delete(n);
+          }
+        });
+      };
+      return res;
+    </script>
+  </body>
+</html>

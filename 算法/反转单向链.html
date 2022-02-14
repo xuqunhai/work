@@ -33,14 +33,17 @@
     */
 
       var reverseList = function (head) {
-        let pre = null;
-        for (let cur = head; cur; ) {
-          let nextTemp = cur.next; // 保存当前头节点的下一个节点
-          cur.next = pre;
-          pre = cur;
-          cur = nextTemp;
+        var cur = head;
+        var prev = null;
+
+        while (cur) {
+          var temp = cur.next;
+          cur.next = prev;
+          // 后移指针
+          prev = cur;
+          cur = temp;
         }
-        return pre;
+        return prev;
       };
     </script>
   </body>
