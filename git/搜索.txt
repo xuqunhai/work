@@ -1,0 +1,6 @@
+git输入框里输入
+xxx xx默认在名称和描述去搜索匹配
+xxx xx in:readme
+xxx xx in:readme stars:>1000
+
+'after_script'+'stage:xxx' filename:.gitignore

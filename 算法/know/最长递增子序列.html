@@ -10,14 +10,19 @@
     <script>
       function maxIncLen(arr) {
         const arrLen = arr.length;
-        let max = 1;
-        let lenArr = new Array(arrLen).fill(1);
+        let max = 1; // 取出每一位最长值的最者
+        let lenArr = new Array(arrLen).fill(1); // 默认每一位最长初始值为1
+        // 遍历每一位
         for (let i = 0; i < arrLen; i++) {
+          // 加头指针
           for (let j = 0; j < i; j++) {
+            // 头指针指向值小于当前位所在值
             if (arr[j] < arr[i]) {
+              // 取头指针和当前位置两者最长
               lenArr[i] = Math.max(lenArr[j] + 1, lenArr[i]);
             }
           }
+          // 判断当前位置是否最长，是的话存在max
           max = Math.max(max, lenArr[i]);
         }
         console.log(max);

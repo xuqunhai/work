@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>无重复字符的最长子串</title>
+  </head>
+  <body>
+    <script>
+      /*
+      有一个for循环，所以时间复杂度是O(n)
+      有一个Map，所以空间复杂度是O(m)-m是不重复个数
+      */
+      function lengthOfLongestSubstring(s) {
+        let l = 0; // 头指针
+        let res = 0; // 滑动窗口长度
+        const map = new Map();
+        for (let r = 0; r < s.length; r++) {
+          // 当前的值前面出现过，而且前面重复值索引不小于滑动窗口左指针l
+          if (map.has(s[r]) && map.get(s[r]) >= l) {
+            // abbcdea - 加这个条件map.get(s[r]) >= l就是为了解决这种问题
+            //   l  r
+            // 下一步r往右走，发现前面有a，就是第一位，如果此时把头指针移到下一位，也就是移到第二位，即l往回走
+            // 这样结果就是6，明显是错的，头指针不能往回走
+            l = map.get(s[r]) + 1; // 头指针l移到重复字符的下一位
+          }
+          // 获取新滑动窗口的大小，看是否是最大的，是的话设为max
+          res = Math.max(res, r - l + 1);
+          // 字符串作为Map的key，方便用has/get/set操作
+          map.set(s[r], r);
+        }
+        return res;
+      }
+      lengthOfLongestSubstring('abbcdea');
+    </script>
+  </body>
+</html>

@@ -4,18 +4,20 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>两个数组交集</title>
   </head>
   <body>
     <script>
+      // 对n1去重后filter筛选出在n2的元素n2.includes
       var intersection = function (n1, n2) {
         return [...new Set(n1)].filter((n) => n2.includes(n));
       };
+      // 遍历n1一个一个存map，遍历n2，如果已经在map存在就push到数组，并从map删除
       var intersection2 = function (n1, n2) {
         const map = new Map();
-        n1.forEach((n) => map.set(n.true));
+        n1.forEach((n) => map.set(n, true));
         const res = [];
-        m2.forEach((n) => {
+        n2.forEach((n) => {
           if (map.get(n)) {
             res.push(n);
             map.delete(n);
