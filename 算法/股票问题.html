@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <pre>
+      解题思路
+      动态规划
+      用 dp数组 存储每天的股票最大利润，例如 dp[i] 代表第i天股票的最大利润
+      而每天的股票利润等于什么？
+      前一天股票的利润，跟今天的股票价格和历史股票最低价的差值 进行相比，
+      取大的那个
+
+      举个例子
+      假如前一天股票最大利润已经记录为5了，然后股票历史最低价是1，
+      今天开盘了，股票价格上升到了惊人的9！那此时你手中的股票利润是不是就是 9 - 1 = 8？ 跟历史最低价相比
+      因为你今天开盘后股票利润是8，大于前一天记录的5了，此时今天的股票最大利润就是8。
+
+      假如说今天的股票价格跌了，变成了4，那股票利润就是 4 - 1 = 3，跟前一天记录的 8 相比，很明显你因为跌了所以不是历史最高价了，那今天记录的股票最大利润仍是之前的8
+
+      总结如下
+      根据上面例子，列出 dp式
+      dp(n) = Math.max(dp(n - 1), prices[n] - min)
+      第n天最大利润等于 第n-1天最大利润 跟 第n天股票价格和股票历史最低价的差值 相比，取大的那个
+    </pre>
+    <script>
+      var maxProfit = function (prices) {
+        // dp(n) = Math.max(dp(n - 1), prices[n] - min) 第n天最大利润等于 第n-1天最大利润 跟 第n天股票价格和股票历史最低价的差值 相比
+
+        let min = prices[0],
+          len = prices.length,
+          dp = [0],
+          n;
+        if (!prices.length) return 0;
+
+        for (n = 1; n < len; n++) {
+          if (prices[n] < min) {
+            min = prices[n]; // 如果是股票历史最低价，那么便赋值
+          }
+          dp[n] = Math.max(dp[n - 1], prices[n] - min);
+        }
+        return dp[n - 1];
+      };
+    </script>
+  </body>
+</html>

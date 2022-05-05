@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数组中比左边大比右边小</title>
+  </head>
+  <body>
+    <script>
+      var res = function (arr) {
+        if (arr.length < 3) {
+          // 比左边大比右边小,说明至少有3个元素，所以小于3返回空
+          return [];
+        }
+        const res = [];
+        // 先生成一个新数组，每个位置的值记录它右边(子数组中)最小的值（不包含它本身）
+        const m = new Array(arr.length);
+        let min = arr[arr.length - 1]; // 右边最小值，所以最后一个元素先当成最小值
+        // 从倒数第二个元素开始往前循环，第2个元素终止，因为要判断比左边大
+        for (let i = arr.length - 2; i > 0; i--) {
+          m[i] = min;
+          if (arr[i] < min) {
+            min = arr[i];
+          }
+          m[i - 1] = min;
+        }
+        console.log(m);
+        let max = arr[0];
+        for (let i = 1; i < arr.length - 1; i++) {
+          // 如果当前值是比它前面最大的值还要大
+          if (arr[i] > max) {
+            max = arr[i];
+            // 并且比它右边最小的值还要小，则满足条件
+            if (arr[i] < m[i]) {
+              res.push(max);
+            }
+          }
+        }
+        return res;
+      };
+
+      res = function (arr) {
+        const len = arr.length;
+        if (len < 3) return [];
+        const r = [];
+        let min = arr[len - 1];
+        const minArr = [];
+        for (let i = len - 2; i > 0; i--) {
+          minArr[i] = min;
+          if (arr[i] < min) {
+            min = arr[i];
+          }
+          minArr[i - 1] = min;
+        }
+        console.log(minArr);
+        let max = arr[0];
+        for (let i = 1; i < len; i++) {
+          if (arr[i] > max) {
+            if (arr[i] < minArr[i]) {
+              r.push(arr[i]);
+            }
+            max = arr[i];
+          }
+        }
+        console.log(r);
+      };
+      res([1, 3, 2, 5, 4, 6, 8, 9, 7]);
+    </script>
+  </body>
+</html>

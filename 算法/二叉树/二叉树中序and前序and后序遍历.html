@@ -65,7 +65,81 @@
       */
     </script>
     <script>
-      // 创建二叉树-中序遍历 / 复制二叉树-前序遍历 / 文件系统目录操作-后序遍历
+      /*
+         a
+       b   c
+      d e f  g
+
+      */
+      // 创建二叉树-中序遍历 dbeafcg
+      /*
+      inorder=root=>{
+        if(!root)return
+        inorder(root.left)
+        console.log(root.val)
+        inorder(root.right)
+      }
+      非递归版本
+      inorder=root=>{
+        if(!root)return
+        const stack=[]
+        let p=root
+        while(stack.length||p){
+          while(p){
+            stack.push(p)
+            p=p.left
+          }
+          const n=stack.pop()
+          console.log(n.val)
+          p=n.right
+        }
+      }
+       */
+      // 复制二叉树-前序遍历 abcdefg
+      /*
+      preorder = root => {
+        if(!root) return
+        console.log(root.val)
+        preorder(root.left)
+        preorder(root.right)
+      }
+      非递归版本
+      preorder=root=>{
+        if(!root) return
+        const stack=[root]
+        while(stack.length){
+          const n=stack.pop()
+          console.log(n.val)
+          if(n.right) stack.push(n.right)
+          if(n.left) stack.push(n.left)
+        }
+      }
+       */
+      // 文件系统目录操作-后序遍历debfgca
+      /*
+      postorder=root=>{
+        if(!root)return;
+        postorder(root.left)
+        postorder(root.right)
+        console.log(root.val)
+      }
+      非递归版本
+      postorder=(root)=>{
+        if(!root)return
+        const outputStack=[]
+        const stack=[root]
+        while(stack.length){
+          const n=stack.pop()
+          outputStack.push(n)
+          if(n.left)stack.push(n.left)
+          if(n.right)stack.push(n.right)
+        }
+        while(outputStack.length){
+          const n=outputStack.pop()
+          console.log(n.val)
+        }
+      }
+       */
       var arr = [8, 3, 10, 1, 6, 14, 4, 7, 13];
 
       class Node {

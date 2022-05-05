@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      var a = [1, 2, 3, 3, 3, 3, 4, 5],
+        b = [3, 3, 3, 4];
+      var c;
+      let j = 0;
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] === b[j]) {
+          if (j === b.length - 1) {
+            c = j;
+            break;
+          }
+          j++;
+        } else if (j > 0) {
+          i = i - j; // 4-2
+          j = 0;
+        } // 2=0,3/1,
+      }
+      console.log(c);
+
+      // reg2=/^\w+(\.\w+)*@\w+\.(\w+\.)*\w+$/; reg2.test('raferxu.qq@163.com.cn')
+    </script>
+  </body>
+</html>
