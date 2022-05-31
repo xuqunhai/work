@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>对敏感的 DOM 操作逻辑进行谨慎地编写，并在出现问题的时候借助工具快速排查</title>
+  </head>
+  <body>
+    <div id="my-div">
+      <div id="inner-div">Inner DIV</div>
+    </div>
+
+    <button onclick="deleteMyDiv()">Delete My Div</button>
+
+    <pre>
+      如果删除一个节点，这个节点没有被直接引用，但里面的子节点被引用，会怎么样？
+      两个都已经变成 Detached Dom
+    </pre>
+    <script>
+      // 加入 innerDiv.
+      const innerDiv = document.querySelector('#inner-div');
+
+      function getInnerDiv() {
+        return innerDiv;
+      }
+
+      // 下边还是之前的代码.
+
+      function getMyDiv() {
+        return document.querySelector('#my-div');
+      }
+
+      function deleteMyDiv() {
+        const myDiv = getMyDiv();
+        myDiv.parentElement.removeChild(myDiv);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>对敏感的 DOM 操作逻辑进行谨慎地编写，并在出现问题的时候借助工具快速排查</title>
+  </head>
+  <body>
+    <a href="https://juejin.cn/post/6844903570546901006">HTML 节点的内存泄露问题</a>
+    <pre>
+      只要不要把节点存的变量myDiv暴露在全局即可
+      修改之后的代码没有任何地方保持了对 myDiv 的引用，所以在删除操作执行完毕后会立刻释放 div#my-div 节点.
+    </pre>
+    <div id="my-div2">
+      <span>My Div</span>
+      <ul>
+        <li>Hero</li>
+        <li>Cows</li>
+        <li>Bugs</li>
+      </ul>
+    </div>
+
+    <button onclick="deleteMyDiv2()">Delete My Div2</button>
+    <script>
+      function getMyDiv2() {
+        return document.querySelector('#my-div2');
+      }
+      function deleteMyDiv2() {
+        const myDiv2 = document.querySelector('#my-div2'); // 不会内存泄露
+        // const myDiv2 = getMyDiv2(); // 不会内存泄露
+        myDiv2.parentElement.removeChild(myDiv2);
+      }
+    </script>
+  </body>
+</html>

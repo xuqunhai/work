@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>对敏感的 DOM 操作逻辑进行谨慎地编写，并在出现问题的时候借助工具快速排查</title>
+  </head>
+  <body>
+    <a href="https://juejin.cn/post/6844903570546901006">HTML 节点的内存泄露问题</a>
+    <pre>
+      请问，点击 "Delete My Div" 按钮时，节点 #my-div 消失了么？
+      用 Memory 抓一下 Heap 看一下
+      Detached DOM 代表一个 HTML 节点在 HTML 中被移除，但在内存中还保持引用的状态，意思就是，没删干净侧漏啦！
+
+      抓两次快照，第一次是在点击删除按钮前的快照，
+      我们在搜索框中输入 detached，看起来并没有 Detached 节点.
+      我们点击页面中的 "Delete My Div" 后来抓第二次：
+      嚯，这就有了！选中它看看这个 div#my-div，I'm angry!
+
+      问题出现在了，deleteMyDiv 对 myDiv 进行了引用，而且 deleteMyDiv 没有进行回收，所以导致 myDiv 的一直存在.
+      就算是将 myDiv 从 HTML 中删除，内存中也会一直保存其数据不会释放.
+
+    </pre>
+
+    <div id="my-div">
+      <span>My Div</span>
+      <ul>
+        <li>Hero</li>
+        <li>Cows</li>
+        <li>Bugs</li>
+      </ul>
+    </div>
+
+    <button onclick="deleteMyDiv()">Delete My Div</button>
+
+    <script>
+      const myDiv = document.querySelector('#my-div');
+
+      // deleteMyDiv 对 myDiv 进行了引用，而且 deleteMyDiv 没有进行回收，所以导致 myDiv 的一直存在.
+      function deleteMyDiv() {
+        myDiv.parentElement.removeChild(myDiv);
+      }
+    </script>
+  </body>
+</html>

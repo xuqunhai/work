@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <pre>
+      打开无痕浏览器，打开调试，切换到Performance面板，打勾Memory，刷新页面，点击Memory右边垃圾图标来清空内存，以便录制时是干净的；
+      点击Memory最左边的录制按钮，点击button多次后，再点击垃圾图标来清空内存（其实就算你点击了也不会被清空，因为window全局对象不会被回收），停止录制，查看内存图，
+      可以发现js Heap走势图像一个楼梯，一节一节往上走，而且最后面没有降下来，说明无法被回收；
+      点击走势图上升处可查看当时相关操作；
+
+      如果想知道前后相关变量对比，则需要用到Memory面板；
+      首先切换到Memory面板，选中HEAP SNAPSHOTS，刷新页面，点击垃圾图标来清空内存；
+      点击垃圾图标最左侧的快照按钮，获取页面操作前快照，
+      进行页面操作（点击button），再次点击快照按钮获取操作后快照；
+      将右侧‘All objects’切换到第3个，即对比2次快照，查看变化列表；
+      选中增长最大的，展开详情，点击具体项即可查看更多信息；
+
+      录制实时操作的实时内存：
+      选择第二个‘Allocation instrumentation on timeline’，并打勾后面的‘Record stack traces of...’；
+      刷新页面，点击垃圾图标来清空内存；
+      点击录制按钮，开始操作页面，如果遇到内存剧增会出现蓝色长条；
+      操作完毕后结束录制，点击蓝色长条可查看详情，查看代码对应位置；
+    </pre>
+    <button onclick="grow()">Global Var</button>
+    <script>
+      function LargeObj() {
+        this.largeArr = new Array(1000_0000);
+      }
+      var x = [];
+      function grow() {
+        var o = new LargeObj();
+        x.push(o);
+      }
+    </script>
+  </body>
+</html>

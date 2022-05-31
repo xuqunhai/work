@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>闭包可能导致内部变量留存导致内存泄露，尽量不使用匿名函数，</title>
+  </head>
+  <body>
+    <pre>
+      录制实时操作的实时内存：
+      选择第二个‘Allocation instrumentation on timeline’，并打勾后面的‘Record stack traces of...’；
+      刷新页面，点击垃圾图标来清空内存；
+      点击录制按钮，开始操作页面，如果遇到内存剧增会出现蓝色长条；
+      操作完毕后结束录制，点击蓝色长条可查看详情，查看代码对应位置；
+    </pre>
+    <button onclick="closure()">closure</button>
+    <script>
+      var func = [];
+      function outer() {
+        var someText = new Array(1000_0000);
+        return function inner() {
+          return someText;
+        };
+      }
+      function closure() {
+        func.push(outer()());
+        console.log(func);
+      }
+    </script>
+  </body>
+</html>
