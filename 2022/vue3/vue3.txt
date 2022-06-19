@@ -1,0 +1,18 @@
+vue3循环中ref获取到的不是数组，而是对象；
+$children返回undefined，需要用this.$refs.xxx获取；
+
+slot无论vue2还是vue3都需要使用template标签；
+vue2.6把slot属性和slot-scope合并成了v-slot一个；
+<template v-slot:namexxx="scope">{{scope.data}}</template>
+elementPlus表格就使用<template #default="scope"></template>来在vue3使用；
+
+li上面加了v-for，每个li加ref，
+vue2可通过this.$refs.xxx获取li数组元素，
+vue3里ref需绑定一个函数，传入当前元素，需自己维护元素列表；
+
+通过下标对数组的某个元素进行修改，vue2是无法监听到变化的，因为考虑到性能问题；而vue3使用Proxy默认就可以；
+
+vite也可以用vue2，需使用插件vite-plugin-vue2;
+
+import {createApp} from 'vue';
+createApp(App).mount('#app');
