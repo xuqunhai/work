@@ -1,0 +1,254 @@
+transformAST() 会先调用 walkScope() 来处理根作用域（root scope），然后调用 walk() 函数逐层地处理 AST 节点
+
+声明语句 let count = $ref(1) 对应的 AST 结构：
+{
+  "type": "Program",
+  "start": 0,
+  "end": 19,
+  "body": [
+    {
+      "type": "VariableDeclaration", // let 的 AST 节点类型 type 会是 VariableDeclaration
+      "start": 0,
+      "end": 19,
+      "declarations": [ // 其余的代码部分对应的 AST 节点则会被放在 declarations 中
+        {
+          "type": "VariableDeclarator",
+          "start": 4,
+          "end": 19,
+          "id": { // 变量 count 的 AST 节点会被作为 declarations.id
+            "type": "Identifier",
+            "start": 4,
+            "end": 9,
+            "name": "count"
+          },
+          "init": { // $ref(1) 的 AST 节点会被作为 declarations.init
+            "type": "CallExpression",
+            "start": 12,
+            "end": 19,
+            "callee": {
+              "type": "Identifier",
+              "start": 12,
+              "end": 16,
+              "name": "$ref"
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 17,
+                "end": 18,
+                "value": 1,
+                "raw": "1"
+              }
+            ],
+            "optional": false
+          }
+        }
+      ],
+      "kind": "let"
+    }
+  ],
+  "sourceType": "module"
+}
+
+function walkScope(node: Program | BlockStatement) {
+  for (const stmt of node.body) { // stmt 则是 let 对应的 AST 节点
+    if (stmt.type === 'VariableDeclaration') {
+      for (const decl of stmt.declarations) {
+        let toVarCall
+        if (
+          decl.init &&
+          decl.init.type === 'CallExpression' &&
+          decl.init.callee.type === 'Identifier' &&
+          (toVarCall = isToVarCall(decl.init.callee.name))
+        ) { // decl.init.callee.name 指的是 $ref
+          processRefDeclaration(
+            toVarCall, // -> '$ref'
+            decl.init as CallExpression, -> $ref(1) ast
+            decl.id, -> count ast
+            stmt -> all ast
+          )
+        }
+      }
+    }
+  }
+}
+
+// packages/ref-transform/src/refTransform.ts
+const TO_VAR_SYMBOL = '$'
+const shorthands = ['ref', 'computed', 'shallowRef']
+function isToVarCall(callee: string): string | false {
+  if (callee === TO_VAR_SYMBOL) {
+    return TO_VAR_SYMBOL
+  }
+  if (callee[0] === TO_VAR_SYMBOL && shorthands.includes(callee.slice(1))) {
+    return callee
+  }
+  return false
+}
+// 使用的是 $ref 的方式，所以这里会命中 callee[0] === TO_VAR_SYMBOL && shorthands.includes(callee.slice(1)) 的逻辑，
+// 即 toVarCall 会被赋值为 $ref。
+
+// packages/ref-transform/src/refTransform.ts
+function processRefDeclaration(
+    method: string, // -> '$ref'
+    call: CallExpression, -> $ref(1) ast
+    id: VariableDeclarator['id'], -> count ast
+    statement: VariableDeclaration -> all ast
+) {
+  // ...
+  if (id.type === 'Identifier') {
+    registerRefBinding(id) // 解释一
+    s.overwrite(
+      call.start! + offset, // call -> $ref(1) ast
+      call.start! + method.length + offset,
+      helper(method.slice(1)) // method -> '$ref'
+    )  // 解释二
+  } 
+  // ...
+}
+
+入参id ast如下：
+  "id": { // 变量 count 的 AST 节点会被作为 declarations.id
+    "type": "Identifier",
+    "start": 4,
+    "end": 9,
+    "name": "count"
+  },
+
+// 解释一
+调用 registerRefBinding() 函数，它实际上是调用的是 registerBinding()
+const registerRefBinding = (id: Identifier) => registerBinding(id, true)
+function registerBinding(id: Identifier, isRef = false) {
+  // 给 excludedIds 中添加该 AST 节点，
+  // 而 excludeIds 它是一个 WeekMap，它会用于后续跳过不需要进行 ref 语法糖处理的类型为 Identifier 的 AST 节点
+  excludedIds.add(id)
+  if (currentScope) {
+    // 在当前作用域 currentScope 上绑定该变量 id.name 并设置为 true ，
+    // 它表示这是一个用 ref 语法糖创建的变量，这会用于后续判断是否给某个变量添加 .value
+    currentScope[id.name] = isRef
+  } else {
+    error(
+      'registerBinding called without active scope, something is wrong.',
+      id
+    )
+  }
+}
+
+// 解释二
+s.overwrite(
+  call.start! + offset, // call -> $ref(1) ast, 在计算重写的起始位置的时候用到了 offset，它代表着此时操作的字符串在源字符串中的偏移位置
+  call.start! + method.length + offset,
+  helper(method.slice(1)) // method -> '$ref', method.slice(1) -> 'ref'
+)
+s.overwrite() 函数来将 $ref 重写为 _ref
+接收 3 个参数，分别是重写的起始位置、结束位置以及要重写为的字符串
+call 则对应着 $ref(1) 的 AST 节点，
+{
+  type: "Identifier",
+  start: 12,
+  end: 19,
+  callee: {...}
+  arguments: {...},
+  optional: false
+}
+helper() 函数则会返回字符串 _ref
+function helper(msg: string) {
+  importedHelpers.add(msg) // 会在 compileScript() 时用于生成对应的 import 语句
+  return `_${msg}`
+}
+
+到这里就完成了对 $ref 到 _ref 的重写，也就是此时我们代码的会是这样：
+let count = _ref(1)
+function add() {
+	count++
+}
+
+接着，则是通过 walk() 函数来将 count++ 转换成 count.value++。
+walk() 函数:用于遍历符合 ESTree 规范的 AST 包（Package）。
+import { walk } from 'estree-walker'
+walk(ast, {
+  enter(node, parent, prop, index) { // 每次访问 AST 节点的时候会被调用，
+    // ...
+  },
+  leave(node, parent, prop, index) { // 离开 AST 节点的时候被调用。
+    // ...
+  }
+});
+
+walk() 函数主要做了这 2 件事：
+1.维护 scopeStack、parentStack 和 currentScope
+2.处理 Identifier 类型的 AST 节点
+
+1.维护 scopeStack、parentStack 和 currentScope
+  // scopeStack 存放此时 AST 节点所处的作用域链，初始情况下栈顶为根作用域 rootScope
+  const scopeStack: Scope[] = [rootScope]
+  // parentStack 存放遍历 AST 节点过程中的祖先 AST 节点（栈顶的 AST 节点是当前 AST 节点的父亲 AST 节点）
+  const parentStack: Node[] = []
+  // currentScope 指向当前的作用域，初始情况下等于根作用域 rootScope
+  let currentScope: Scope = rootScope
+
+  parent && parentStack.push(parent) // enter阶段父节点入栈祖先parentStack
+  if (isFunctionType(node)) { // 为函数
+    scopeStack.push((currentScope = {})) // 入栈 scopeStack
+    // ...
+    return
+  }
+  if (node.type === 'BlockStatement' && !isFunctionType(parent!)) { // 为块且父节点不是函数
+    scopeStack.push((currentScope = {})) // 入栈 scopeStack
+    // ...
+    return
+  }
+
+  parent && parentStack.pop() // leave阶段父节点出栈祖先parentStack
+  if (
+    (node.type === 'BlockStatement' && !isFunctionType(parent!)) ||
+    isFunctionType(node)
+  ) { // 为函数、块
+    scopeStack.pop() // 出栈 scopeStack
+    // 更新 currentScope 为出栈后的 scopeStack 的栈顶元素
+    currentScope = scopeStack[scopeStack.length - 1] || null
+  }
+
+2.处理 Identifier 类型的 AST 节点
+ref 语法糖创建 count 变量的 AST 节点类型是 Identifier
+enter() 阶段命中这样的逻辑：
+if (
+  node.type === 'Identifier' &&
+  isReferencedIdentifier(node, parent!, parentStack) &&
+  !excludedIds.has(node) //  是一个 WeekMap，它会用于后续跳过不需要进行 ref 语法糖处理的类型为 Identifier 的 AST 节点
+) {
+  let i = scopeStack.length
+  // 通过访问 scopeStack 来沿着作用域链来判断
+  while (i--) {
+    // 是否某个作用域中有 id.name（变量名 count）属性以及属性值为 true
+    if (checkRefId(scopeStack[i], node, parent!, parentStack)) {
+      return
+    }
+  }
+}
+/*
+重点*********************
+!excludedIds.has(node)作用：
+如下面
+let count=$ref(1)
+count++
+当进行转换时，第一行count是不需要转换的，而第二行count是需要转换成count.value，所以把不许转换的count存入excludedIds，后续即可跳过；
+*/
+// isReferencedIdentifier() 是通过 parenStack 来判断当前类型为 Identifier 的 AST 节点 node 是否是一个引用了这之前的某个 AST 节点。
+function checkRefId(
+    scope: Scope,
+    id: Identifier,
+    parent: Node,
+    parentStack: Node[]
+): boolean {
+  if (id.name in scope) {
+    if (scope[id.name]) {
+      // 这代表它是一个使用 ref 语法糖创建的变量
+      // ...
+      // 给该变量添加 .value
+      s.appendLeft(id.end! + offset, '.value')
+    }
+    return true
+  }
+  return false
+}

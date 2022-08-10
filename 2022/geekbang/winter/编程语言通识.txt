@@ -1,0 +1,100 @@
+<DecimalNumber> = /0|[1-9][0-9]*/
+
+<PrimaryExpression> = <DecimalNumber> | "(" <LogicalExpression> ")"
+
+<MultiplicativeExpression> = <PrimaryExpression> | <MultiplicativeExpression> "*" <PrimaryExpression> | <MultiplicativeExpression> "/" <PrimaryExpression>
+
+<AdditiveExpression> = <MultiplicativeExpression> | <AdditiveExpression> "+" <MultiplicativeExpression> |  <AdditiveExpression> "-" <MultiplicativeExpression>
+
+<LogicalExpression> = <AdditiveExpression> | <LogicalExpression> "||" <AdditiveExpression> | <LogicalExpression> "&&" <AdditiveExpression>
+
+<ExpExpression> = <MultiplicativeExpression> | <MultiplicativeExpression> "**" <ExpExpression>
+只有**求幂运算会把自身位置放置在运算符后面，其他都是放置在运算符前面
+具体可查阅ECMA-262标准的Expressions章节
+https://262.ecma-international.org/12.0/#sec-exp-operator
+
+13.6 Exponentiation Operator
+ExponentiationExpression[Yield, Await] :
+  UnaryExpression[?Yield, ?Await]
+  UpdateExpression[?Yield, ?Await] ** ExponentiationExpression[?Yield, ?Await]
+  这里 UnaryExpression 和 UpdateExpression 是啥？
+  13.4 Update Expressions
+  UpdateExpression[Yield, Await] :
+    LeftHandSideExpression[?Yield, ?Await]
+    LeftHandSideExpression[?Yield, ?Await] [no LineTerminator here] ++
+    LeftHandSideExpression[?Yield, ?Await] [no LineTerminator here] --
+    ++ UnaryExpression[?Yield, ?Await]
+    -- UnaryExpression[?Yield, ?Await]
+    这里 LeftHandSideExpression 和 UnaryExpression 是啥？
+    13.3 Left-Hand-Side Expressions
+    LeftHandSideExpression[Yield, Await] :
+      NewExpression[?Yield, ?Await]
+      CallExpression[?Yield, ?Await]
+      OptionalExpression[?Yield, ?Await]
+      这里的 NewExpression 是什么？
+      NewExpression[Yield, Await] :
+        MemberExpression[?Yield, ?Await]
+        new NewExpression[?Yield, ?Await]
+      这里的 MemberExpression 是什么？
+      MemberExpression[Yield, Await] :
+        PrimaryExpression[?Yield, ?Await]
+        MemberExpression[?Yield, ?Await] [ Expression[+In, ?Yield, ?Await] ]
+        MemberExpression[?Yield, ?Await] . IdentifierName
+        MemberExpression[?Yield, ?Await] TemplateLiteral[?Yield, ?Await, +Tagged]
+        SuperProperty[?Yield, ?Await]
+        MetaProperty
+        new MemberExpression[?Yield, ?Await] Arguments[?Yield, ?Await]
+        这里的 PrimaryExpression 是什么？
+        PrimaryExpression[Yield, Await] :
+          this
+          IdentifierReference[?Yield, ?Await]
+          Literal
+          ArrayLiteral[?Yield, ?Await]
+          ObjectLiteral[?Yield, ?Await]
+          FunctionExpression
+          ClassExpression[?Yield, ?Await]
+          GeneratorExpression
+          AsyncFunctionExpression
+          AsyncGeneratorExpression
+          RegularExpressionLiteral
+          TemplateLiteral[?Yield, ?Await, ~Tagged]
+          CoverParenthesizedExpressionAndArrowParameterList[?Yield, ?Await]
+          这里 IdentifierReference 是什么？
+          IdentifierReference[Yield, Await] :
+            Identifier
+            [~Yield]yield
+            [~Await]await
+            这里的 Identifier 是什么？
+            Identifier :
+              IdentifierName but not ReservedWord
+              这里的 IdentifierName 是什么？
+              IdentifierName ::
+                IdentifierStart
+                IdentifierName IdentifierPart
+                这里的 IdentifierStart 和 IdentifierPart 是什么？
+                IdentifierStart ::
+                  UnicodeIDStart
+                  $
+                  _
+                  \ UnicodeEscapeSequence
+                IdentifierPart ::
+                  UnicodeIDContinue
+                  $
+                  \ UnicodeEscapeSequence
+                  <ZWNJ>
+                  <ZWJ>
+                UnicodeIDStart ::
+                  any Unicode code point with the Unicode property “ID_Start”
+                UnicodeIDContinue ::
+                  any Unicode code point with the Unicode property “ID_Continue”
+  13.5 Unary Operators
+  UnaryExpression[Yield, Await] :
+    UpdateExpression[?Yield, ?Await]
+    delete UnaryExpression[?Yield, ?Await]
+    void UnaryExpression[?Yield, ?Await]
+    typeof UnaryExpression[?Yield, ?Await]
+    + UnaryExpression[?Yield, ?Await]
+    - UnaryExpression[?Yield, ?Await]
+    ~ UnaryExpression[?Yield, ?Await]
+    ! UnaryExpression[?Yield, ?Await]
+    [+Await]AwaitExpression[?Yield]
