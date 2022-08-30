@@ -1,0 +1,104 @@
+xuqunhai@xuqunhaideMacBook-Pro reactive % node activeEffect.js
+执行 reactive 函数，将包含price 和 quantity 属性的对象变成响应式数据
+执行 effect 函数
+执行 effect 函数，将参数 eff 赋值给 activeEffect
+eff 就是一个函数： () => {
+  console.log('获取 price 和 quantity 属性后赋值给 total');
+    total = product.price * product.quantity
+} ；
+执行 activeEffect
+获取 price 和 quantity 属性后赋值给 total
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {true}
+有 activeEffect，从 WeakMap 类型的 targetMap对象获取key为 {"price":10,"quantity":2} 的Map值:false;
+获取不到, 设置为新 Map 实例
+从Map值里获取key为 price 的 Set 实例: false;
+获取不到, 设置为新 Set 实例
+添加 activeEffect 依赖到 Set 实例， 此时 price 依赖个数：1; 
+执行 reactive 函数 get 方法，key为 quantity;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {true}
+有 activeEffect，从 WeakMap 类型的 targetMap对象获取key为 {"price":10,"quantity":2} 的Map值:true;
+Map 实例已存在，即之前收集过了
+从Map值里获取key为 quantity 的 Set 实例: false;
+获取不到, 设置为新 Set 实例
+添加 activeEffect 依赖到 Set 实例， 此时 quantity 依赖个数：1; 
+activeEffect执行完毕，重置 activeEffect
+打印 total： 20
+赋值 quantity
+执行 reactive 函数 set 方法，key为 quantity;
+执行 reactive 函数 set 方法里面 trigger
+从类型为 WeakMap 的 targetMap 获取key为 {"price":10,"quantity":5} 的值，类型为Map: true
+Map值存在, 获取key为 quantity 的Set实例值: true
+Set值存在, 遍历并一一调用， depLen: 1
+获取 price 和 quantity 属性后赋值给 total
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+执行 reactive 函数 get 方法，key为 quantity;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+打印 total： 50
+赋值 price
+执行 reactive 函数 set 方法，key为 price;
+执行 reactive 函数 set 方法里面 trigger
+从类型为 WeakMap 的 targetMap 获取key为 {"price":20,"quantity":5} 的值，类型为Map: true
+Map值存在, 获取key为 price 的Set实例值: true
+Set值存在, 遍历并一一调用， depLen: 1
+获取 price 和 quantity 属性后赋值给 total
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+执行 reactive 函数 get 方法，key为 quantity;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+打印 total： 100
+执行另一个effetc！！！
+执行 effect 函数，将参数 eff 赋值给 activeEffect
+eff 就是一个函数： () => {
+  console.log('触发price属性，收集依赖？');
+    salePrice = product.price * 0.9
+} ；
+执行 activeEffect
+触发price属性，收集依赖？
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {true}
+有 activeEffect，从 WeakMap 类型的 targetMap对象获取key为 {"price":20,"quantity":5} 的Map值:true;
+Map 实例已存在，即之前收集过了
+从Map值里获取key为 price 的 Set 实例: true;
+Set 实例已存在，即之前 price 收集过了
+添加 activeEffect 依赖到 Set 实例， 此时 price 依赖个数：2; 
+activeEffect执行完毕，重置 activeEffect
+100 18
+执行 reactive 函数 set 方法，key为 quantity;
+执行 reactive 函数 set 方法里面 trigger
+从类型为 WeakMap 的 targetMap 获取key为 {"price":20,"quantity":5} 的值，类型为Map: true
+Map值存在, 获取key为 quantity 的Set实例值: true
+Set值存在, 遍历并一一调用， depLen: 1
+获取 price 和 quantity 属性后赋值给 total
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+执行 reactive 函数 get 方法，key为 quantity;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+100 18
+执行 reactive 函数 set 方法，key为 price;
+执行 reactive 函数 set 方法里面 trigger
+从类型为 WeakMap 的 targetMap 获取key为 {"price":20,"quantity":5} 的值，类型为Map: true
+Map值存在, 获取key为 price 的Set实例值: true
+Set值存在, 遍历并一一调用， depLen: 2
+获取 price 和 quantity 属性后赋值给 total
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+执行 reactive 函数 get 方法，key为 quantity;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+触发price属性，收集依赖？
+执行 reactive 函数 get 方法，key为 price;
+执行 reactive 函数 get 方法里面 track
+执行 track 函数， 判断当前是否有 activeEffect: {false}
+100 18
