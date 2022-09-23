@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>打开chrome的Memory神器，带你体验如何感觉内存。</title>
+</head>
+<body>
+  <script>
+    let array=[]//创建数组
+    createArray()//push内容，增加内存
+
+    function createArray(){
+        for(let j=0;j<100000;j++){
+            array.push(j*3*5)
+        }
+    }
+    function clearArray(){
+      // 清除分配给变量的内容，可以释放内存，这也是为什么有许多代码结束之后会xxx=null，也就是为了释放内存的原因。
+      array=[]
+    }
+
+    let grow=document.getElementById("grow")
+    grow.addEventListener("click",clearArray)//点击清除数组内容，也就是清除了内存
+  </script>
+</body>
+</html>

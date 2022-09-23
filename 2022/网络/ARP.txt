@@ -1,0 +1,14 @@
+ARP（通过IP查MAC）数据链路层协议
+什么时候用到？局域网通信
+作用？二层寻址
+作用范围？同一个广播域
+opcode: request（表示请求）
+Target MAC address: 00:00:00:00:00:00（广播MAC地址，向所有人询问）
+Target IP adderss: 192.168.1.11
+ARP响应报文以单播形式发送，
+opcode: reply
+Sender MAC adderss: ca:00:13:40:00:00 
+Sender IP adderss: 192.168.1.11
+(同时更新对方IP和MAC到ARP表，下次就不用发查询报文（arp -a查看arp表）)
+
+arp表 记录 IP 和mac地址 对应关系

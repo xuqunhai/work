@@ -1,0 +1,169 @@
+www.bilibili.com
+
+. (.root) - 根域名服务器
+.com / .net / .cn / .org / .edu - 顶级域名服务器
+bilibili.com - 权威域名服务器
+www / emial / member
+www.bilibili.com.
+
+根服务器现在由13个域名（1467台主机）构成，
+即很多主机ip地址是一样的，如何与最近的节点取得联系？任播。
+
+浏览器调用解析器进行域名解析
+解析器帮助浏览器调用系统网络功能，
+解析器其实就是程序，类似gethostbyname('www.bilibili.com')，相当于DNS客户端。
+向DNS服务器发送请求查询IP地址，我们怎么知道DNS服务器地址？网络设置里面可以查询到DNS服务器地址
+可以上QQ但是不能浏览网页原因？就是网络设置里面DNS服务器地址设置错误，因为QQ是直接使用IP地址访问服务器，而浏览器是需要DNS域名解析
+
+这个DNS服务器一般是最接近我们的本地DNS服务器，由ISP（互联网服务提供商，中国电信、网通等）负责管理，
+ISP会先查看本地缓存，有的话就返回并标记非权威non-authoritative（非控管域名）
+DNS一般都是UDP传输的
+
+命令行模仿本地NDS后面解析过程：
+xuqunhai@xuqunhaideMacBook-Pro ~ % nslookup
+> set type=ns
+> .
+Server:		10.0.0.1
+Address:	10.0.0.1#53
+** server can't find .: REFUSED
+解决方法
+mac网络设置偏好-高级-dns-DNS服务器改成8.8.8.8-断开网络重新连接，重启命令行
+重新执行
+xuqunhai@xuqunhaideMacBook-Pro ~ % nslookup
+> set type=ns   （名称服务器nameserver）
+> .  （查询根服务器域名）
+Server:		8.8.8.8
+Address:	8.8.8.8#53  （53端口是典型DNS端口）
+Non-authoritative answer:  （缓存结果-根服务器现在由13个域名）
+.	nameserver = m.root-servers.net.
+.	nameserver = b.root-servers.net.
+.	nameserver = c.root-servers.net.
+.	nameserver = d.root-servers.net.
+.	nameserver = e.root-servers.net.
+.	nameserver = f.root-servers.net.
+.	nameserver = g.root-servers.net.
+.	nameserver = h.root-servers.net.
+.	nameserver = a.root-servers.net.
+.	nameserver = i.root-servers.net.
+.	nameserver = j.root-servers.net.
+.	nameserver = k.root-servers.net.
+.	nameserver = l.root-servers.net.
+Authoritative answers can be found from:
+
+现在知道了域名地址，现在需要知道对应IP地址
+> set type=a （a意思就是用IPv4地址）
+> b.root-servers.net. （本次选用b开头这个地址）
+Server:		8.8.8.8
+Address:	8.8.8.8#53
+Non-authoritative answer:
+Name:	b.root-servers.net
+Address: 199.9.14.201
+
+根服务器知道域名服务器地址，直接跟b根域名服务器对话
+> server 199.9.14.201
+Default server: 199.9.14.201
+Address: 199.9.14.201#53
+> set type=ns
+> com. （咨询com域名服务器地址）
+Server:		199.9.14.201
+Address:	199.9.14.201#53
+Non-authoritative answer:
+*** Can't find com.: No answer
+Authoritative answers can be found from: （本次返回的是权威响应）
+com	nameserver = a.gtld-servers.net. （服务器域名）
+com	nameserver = b.gtld-servers.net.
+com	nameserver = c.gtld-servers.net.
+com	nameserver = d.gtld-servers.net.
+com	nameserver = e.gtld-servers.net.
+com	nameserver = f.gtld-servers.net.
+com	nameserver = g.gtld-servers.net.
+com	nameserver = h.gtld-servers.net.
+com	nameserver = i.gtld-servers.net.
+com	nameserver = j.gtld-servers.net.
+com	nameserver = k.gtld-servers.net.
+com	nameserver = l.gtld-servers.net.
+com	nameserver = m.gtld-servers.net.
+a.gtld-servers.net	internet address = 192.5.6.30 （下面是域名对应的IPv4和IPv6地址，gtld表示通用顶级域名generic top level domain）
+a.gtld-servers.net	has AAAA address 2001:503:a83e::2:30
+b.gtld-servers.net	internet address = 192.33.14.30
+b.gtld-servers.net	has AAAA address 2001:503:231d::2:30
+c.gtld-servers.net	internet address = 192.26.92.30
+c.gtld-servers.net	has AAAA address 2001:503:83eb::30
+d.gtld-servers.net	internet address = 192.31.80.30
+d.gtld-servers.net	has AAAA address 2001:500:856e::30
+e.gtld-servers.net	internet address = 192.12.94.30
+e.gtld-servers.net	has AAAA address 2001:502:1ca1::30
+f.gtld-servers.net	internet address = 192.35.51.30
+f.gtld-servers.net	has AAAA address 2001:503:d414::30
+
+选一个通用顶级域名地址，和它进行通话
+> server 192.33.14.30
+Default server: 192.33.14.30
+Address: 192.33.14.30#53
+> set type=ns
+> bilibili.com.
+Server:		192.33.14.30
+Address:	192.33.14.30#53
+Non-authoritative answer:
+*** Can't find bilibili.com.: No answer
+Authoritative answers can be found from:
+bilibili.com	nameserver = ns3.dnsv5.com. (返回2个域名服务器)
+bilibili.com	nameserver = ns4.dnsv5.com.
+ns3.dnsv5.com	internet address = 1.12.0.17 （2个域名服务器对应多个IP地址）
+ns3.dnsv5.com	internet address = 1.12.0.18
+ns3.dnsv5.com	internet address = 1.12.0.20
+ns3.dnsv5.com	internet address = 18.194.2.137
+ns3.dnsv5.com	internet address = 223.166.151.16
+ns3.dnsv5.com	has AAAA address 2402:4e00:1430:1102:0:9136:2b2b:ba61
+ns3.dnsv5.com	internet address = 36.155.149.211
+ns3.dnsv5.com	internet address = 49.234.175.103
+ns3.dnsv5.com	internet address = 52.220.136.67
+ns3.dnsv5.com	internet address = 61.151.180.51
+ns4.dnsv5.com	internet address = 1.12.0.16
+ns4.dnsv5.com	internet address = 1.12.0.19
+ns4.dnsv5.com	internet address = 106.55.82.76
+ns4.dnsv5.com	internet address = 117.89.178.200
+ns4.dnsv5.com	internet address = 183.192.164.119
+ns4.dnsv5.com	internet address = 223.166.151.126
+ns4.dnsv5.com	has AAAA address 2402:4e00:1020:1264:0:9136:29b6:fc32
+ns4.dnsv5.com	internet address = 52.198.159.146
+ns4.dnsv5.com	internet address = 59.36.120.147
+
+选一个bilibili.com域名服务器地址，进行对话,咨询 www.bilibili.com. 域名服务器IPv4地址
+> server 1.12.0.17
+Default server: 1.12.0.17
+Address: 1.12.0.17#53
+> set type=a
+> www.bilibili.com.
+Server:		1.12.0.17
+Address:	1.12.0.17#53
+www.bilibili.com	canonical name = a.w.bilicdn1.com. 
+（CNAME，表示 www.bilibili.com 会跳转到 a.w.bilicdn1.com. 这里a开头地址是一个CND内容分发网络）
+
+直接查询该cdn地址对应IP地址
+> a.w.bilicdn1.com
+Server:		1.12.0.17
+Address:	1.12.0.17#53
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.230
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.231
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.232
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.225
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.226
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.227
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.228
+Name:	a.w.bilicdn1.com
+Address: 120.240.78.229
+
+这样本地DNS服务器获取到B站对应IP后就会返回解析器，同时进行本地缓存，
+解析器拿到后就返回给浏览器，浏览器就可以拿这个IP进行网络连接了
+
+
+解析器DNS客户端和本地DNS服务器之间是递归查询（发送数据以后返回结果就可以了）
+本地DNS和三层服务器之间是迭代查询

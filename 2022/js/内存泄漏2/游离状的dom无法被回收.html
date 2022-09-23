@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    let root=document.getElementById("root")
+    for(let i=0;i<2000;i++){
+        let div=document.createElement("div")
+        root.appendChild(div)
+    }
+    // root已经被删除了，那么root中的子元素是否可以被回收？
+    /*
+      答案是no，
+      因为root的引用还存在着，虽然在dom中被删除了，但是引用还在，
+      这个时候root的子元素就会以游离状态的dom存在，而且无法被回收。
+      解决方案就是root=null，清空引用，消除有力状态的dom。
+    */
+    document.body.removeChild(root)
+  </script>
+</body>
+</html>

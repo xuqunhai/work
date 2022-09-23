@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    let array=[] // 全局变量
+    createArray()
+    function createArray(){ // 函数运行完之后，全局变量却一直存在
+        for(let j=0;j<100000;j++){
+            array.push(j*3*5) // 变量的提升（hoist）而且不及时清除引用的情况下会导致内存无法释放
+        }
+    }
+
+    createArray2()
+    function createArray2(){ // 函数运行完之后，内部的内存会自动释放，无需重置
+        let array2=[] // array2 为函数内定义的变量，
+        for(let j=0;j<100000;j++){
+            array2.push(j*3*5)
+        }
+    }
+  </script>
+</body>
+</html>

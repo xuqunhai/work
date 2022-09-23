@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  垃圾回收机制。主要分为两种：reference-counting和mark sweap。
+  reference-counting 引用计数
+  当前对象是否被引用，如果被引用标记。最后没有被标记的则清除。
+  存在问题是参数互相引用，这样两个都会被标记，然后都无法被删除，也就是锁死了。
+
+  为了解决这个问题，所以出现了标记清除法 mark sweap
+  从这个程序的global开始，被global引用到的参数则标记。最后清除所有没有被标记的对象，
+  这样可以解决两对象互相引用，无法释放的问题。
+  因为是从global开始标记的，所以函数作用域内的变量，函数完成之后就会释放内存。
+  global中定义的内容要谨慎，因为global相当于是主函数，浏览器不会随便清除这一部分的内容。
+  所以要注意，变量提升问题。
+</body>
+</html>
