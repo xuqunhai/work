@@ -1,4 +1,4 @@
-import { PC_DEVICE_WIDTH } from '../constants/index.js'
+import { PC_DEVICE_WIDTH } from '@/constants/index.js'
 import { computed } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 
