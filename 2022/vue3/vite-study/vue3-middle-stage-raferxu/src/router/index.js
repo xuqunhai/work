@@ -1,27 +1,12 @@
-import { 
-    createRouter,
-    createWebHashHistory
-} from 'vue-router'
-
-import Index from '~/pages/index.vue'
-import Login from '~/pages/login.vue'
-import NotFound from '~/pages/404.vue'
-
-const routes = [{
-    path:"/",
-    component:Index
-},{
-    path:"/login",
-    component:Login
-},{ 
-    path: '/:pathMatch(.*)*', 
-    name: 'NotFound', 
-    component: NotFound 
-}]
+// 1 初始化VueRouter实例
+import { createRouter, createWebHistory } from 'vue-router'
+import { isMobileTerminal } from '@/utils/flexible.js'
+import mobileTerminalRoutes from './modules/mobile-routes'
+import pcTerminalRoutes from './modules/pc-routes'
 
 const router = createRouter({
-    history:createWebHashHistory(),
-    routes
+  history: createWebHistory(),
+  routes: isMobileTerminal.value ? mobileTerminalRoutes : pcTerminalRoutes
 })
 
 export default router
