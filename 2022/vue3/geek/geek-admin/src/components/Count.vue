@@ -1,5 +1,6 @@
 <template>
   <div @click="add">{{ count }} - {{ double }}</div>
+  <button @click="asyncAdd">asyncAdd</button>
 </template>
 
 <script setup>
@@ -14,5 +15,9 @@ let double = computed(() => store.getters.double)
 
 function add() {
   store.commit('add')
+}
+
+function asyncAdd() {
+  store.dispatch('asyncAdd')
 }
 </script>
