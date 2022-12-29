@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 let props = defineProps({
   value: Number,
   theme: { type: String, default: 'orange' }

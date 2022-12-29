@@ -22,6 +22,16 @@ const store = createStore({
       setTimeout(() => {
         commit('add')
       }, 1000)
+    },
+
+    addRoutes({ commit }, accessRoutes) {
+      // 添加动态路由，同时保存移除函数，将来如果需要重置路由可以用到它们
+      const removeRoutes = []
+      accessRoutes.forEach((route) => {
+        const removeRoute = router.addRoute(route)
+        removeRoutes.push(removeRoute)
+      })
+      commit('SET_REMOVE_ROUTES', removeRoutes)
     }
   }
 })
