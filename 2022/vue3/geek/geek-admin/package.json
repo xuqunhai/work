@@ -12,6 +12,7 @@
     "axios": "^1.2.1",
     "echarts": "^5.4.1",
     "element3": "^0.0.40",
+    "rollup-plugin-visualizer": "^5.8.3",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0"
