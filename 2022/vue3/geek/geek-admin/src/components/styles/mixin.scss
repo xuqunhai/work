@@ -1,0 +1,29 @@
+// 定义了 namespace 变量为 el，
+// 使用 Mixin 注册一个可以重复使用的模块 b，可以通过传进来的 block 生成新的变量 $B，并且变量会渲染在 class 上，
+// 并且注册了 when 可以新增 class 选择器，实现多个 class 的样式。
+// bem
+
+$namespace: 'el';
+$element-separator: '__';
+$modifier-separator: '--';
+$state-prefix: 'is-';
+
+$--header-padding: 0 20px !default;
+$--footer-padding: 0 20px !default;
+$--main-padding: 20px !default;
+
+// bem
+@mixin b($block) {
+  $B: $namespace + '-' + $block !global;
+  .#{$B} {
+    @content;
+  }
+}
+// add class
+@mixin when($state) {
+  @at-root {
+    &.#{$state-prefix + $state} {
+      @content;
+    }
+  }
+}
