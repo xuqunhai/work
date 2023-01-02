@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.passive修饰符</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div>
+    <h1>
+      浏览器无法预先知道一个监听器会不会调用 preventDefault()，它需要等监听器执行完后，再去执行默认行为，而监听器执行是要耗时的，这样就会导致页面卡顿。
+      当你触摸滑动页面时，页面应该跟随手指一起滚动。而此时你绑定了一个 touchstart 事件，你的事件大概执行 200 毫秒。这时浏览器就犯迷糊了：如果你在事件绑定函数中调用了
+      preventDefault，那么页面就不应该滚动，如果你没有调用 preventDefault，页面就需要滚动。但是你到底调用了还是没有调用，浏览器不知道。只能先执行你的函数，等 200
+      毫秒后，绑定事件执行完了，浏览器才知道，“哦，原来你没有阻止默认行为，好的，我马上滚”。此时，页面开始滚。
+      <br>
+      在 Android 版 Chrome 浏览器的 touch 事件监听器的页面中，80% 的页面都不会调用 preventDefault 函数来阻止事件的默认行为。在滑动流畅度上，有 10% 的页面增加至少 100ms
+      的延迟，1%
+      的页面甚至增加 500ms 以上的延迟。
+
+      也就是说，当浏览器等待执行事件的默认行为时，大部分情况是白等了。如果 Web 开发者能够提前告诉浏览器：“我不调用 preventDefault 函数来阻止事件事件行为”，那么浏览器就能快速生成事件，从而提升页面性能。
+      <br>
+      .passive 会告诉浏览器你不想阻止事件的默认行为
+      prevent 是拦截默认事件，passive是不拦截默认事件。
+      <br>
+      某些标签拥有自身的默认事件，如a[href="#"]，button[type=“submit”] 这种标签在冒泡结束后会开始执行默认事件。
+      注意默认事件虽然是冒泡后开始，但不会因为stop阻止事件传递而停止。
+
+    </h1>
+  </div>
+  <div id='app'>
+    <div @click.capture="log('11')" @click="log('12')" @click.self="log('13')"
+      style="background-color: aqua; height: 400px; width: 400px;">
+      <div @click.capture="log('21')" @click="log('22')" @click.self="log('23')"
+        style="background-color: #2195de; height: 200px; width: 400px;">
+        <div @click.capture.stop="log('31')" @click.self="log('32')"
+          style="background-color: #9521de; height: 100px; width: 400px;color:#fff;line-height: 50px;text-align: center;">
+          <a @click="log('41')" href="javascript: console.log('默认事件')"
+            style="display: block;height: 50px;width: 4oopx;background-color: red;">点击a标签</a>
+        </div>
+      </div>
+    </div>
+    <hr>
+    因为在代码中写了@click.capture.stop="log(‘31’)"这一行，所以第三次捕获后终止事件传递，没有打印41，但不会阻止默认事件。
+    <hr>
+    <div @click.capture="log('11')" @click="log('12')" @click.self="log('13')"
+      style="background-color: aqua; height: 400px; width: 400px;">
+      <div @click.capture="log('21')" @click="log('22')" @click.self="log('23')"
+        style="background-color: #2195de; height: 200px; width: 400px;">
+        <div @click.capture="log('31')" @click="log('32')" @click.self="log('33')"
+          style="background-color: #9521de; height: 100px; width: 400px;color:#fff;line-height: 50px;text-align: center;">
+          <a @click="log('41')" @click.capture="log('42')" href="javascript: console.log('默认事件')"
+            style="display: block;height: 50px;width: 4oopx;background-color: red;">点击a标签</a>
+        </div>
+      </div>
+    </div>
+    <hr>
+    注意一点：默认事件在冒泡事件之后执行
+    <hr>
+    <div @click.capture="log('11')" @click="log('12')" @click.self="log('13')"
+      style="background-color: aqua; height: 400px; width: 400px;">
+      <div @click.capture="log('21')" @click="log('22')" @click.self="log('23')"
+        style="background-color: #2195de; height: 200px; width: 400px;">
+        <div @click.capture="log('31')" @click="log('32')" @click.self="log('33')"
+          style="background-color: #9521de; height: 100px; width: 400px;color:#fff;line-height: 50px;text-align: center;">
+          <a @click.passive="log('41')" @click.capture="log('42')" href="javascript: console.log('默认事件')"
+            style="display: block;height: 50px;width: 4oopx;background-color: red;">点击a标签</a>
+        </div>
+      </div>
+    </div>
+    <hr>
+    passive的作用是事件的默认行为立即执行（不用去查看有没有阻止默认事件的行为了），而且无需等待事件回调执行完毕。
+    发现42比41提前打印了。
+    <hr>
+    <h1>
+      浏览器只有等内核线程执行到事件监听器对应的JavaScript代码时，才能知道内部是否会调用preventDefault函数来阻止事件的默认行为，所以浏览器本身是没有办法对这种场景进行优化的。这种场景下，用户的手势事件无法快速产生，会导致页面无法快速执行滑动逻辑，从而让用户感觉到页面卡顿 
+      这里一般用在滚动监听，@scoll，@touchmove 。因为滚动监听过程中，移动每个像素都会产生一次事件，每次都使用内核线程查询prevent会使滑动卡顿。我们通过passive将内核线程查询跳过，可以大大提升滑动的流畅度。
+
+    </h1>
+  </div>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      methods: {
+        log(value) {
+          console.log(value)
+        }
+      }
+    })
+
+    // Chrome 51 和 Firefox 49 已经支持 passive 属性。如果浏览器不支持，已经有人做了非常巧妙地 polyfill：
+    // Test via a getter in the options object to see 
+    // if the passive property is accessed
+    var supportsPassive = false;
+    try {
+      var opts = Object.defineProperty({}, 'passive', {
+        get: function () {
+          supportsPassive = true;
+        }
+      });
+      window.addEventListener("test", null, opts);
+    } catch (e) { }
+
+    // Use our detect's results. 
+    // passive applied if supported, capture will be false either way.
+    elem.addEventListener(
+      'touchstart',
+      fn,
+      supportsPassive ? { passive: true } : false
+    );
+
+  </script>
+</body>
+
+</html>

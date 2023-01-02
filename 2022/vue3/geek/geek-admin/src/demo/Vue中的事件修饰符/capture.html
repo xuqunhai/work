@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.capture修饰符</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id='app'>
+    <div>
+      <h1>点击区域3</h1>
+      <h2>
+        先触发了区域1和2中的事件，然后再到区域3中的事件。
+        <br>
+        因为设置了stop所以冒泡阶段的事件没有触发
+      </h2>
+    </div>
+    <div @click.capture="log('11')" @click="log('12')" @click.self="log('13')"
+      style="background-color: aqua; height: 400px; width: 400px;">
+      1<div @click.capture="log('21')" @click="log('22')" @click.self="log('23')"
+        style="background-color: #2195de; height: 200px; width: 400px;">
+        2<div @click.stop="log('31')" @click.self="log('32')"
+          style="background-color: #9521de; height: 100px; width: 400px;color:#fff;line-height: 100px;text-align: center;">
+          3事件修饰符探索</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      methods: {
+        log(value) {
+          console.log(value)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

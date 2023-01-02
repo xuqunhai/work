@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.self修饰符</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id='app'>
+    <div>
+      <h1>点击区域3，</h1>
+      <h2>
+        先触发的是区域3中的.prevent和.self修饰符事件31\32,然后是区域2中的点击事件21, 最后是区域1中的点击事件11
+        <br>
+        区域2和区域3都是在事件冒泡阶段触发的
+      </h2>
+    </div>
+    <div @click="log('11')" @click.self="log('12')" style="background-color: aqua; height: 400px; width: 400px;">
+      1<div @click="log('21')" @click.self="log('22')" style="background-color: #2195de; height: 200px; width: 400px;">
+        2<div @click.prevent="log('31')" @click.self="log('32')"
+          style="background-color: #9521de; height: 100px; width: 400px;color:#fff;line-height: 100px;text-align: center;">
+          3事件修饰符探索</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      methods: {
+        log(value) {
+          console.log(value)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
