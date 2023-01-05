@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>边框+填充+内容=getBoundingClientRect或offsetHeight</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    #div {
+      height: 50px;
+      width: 50px;
+      border: 10px solid gray;
+      padding: 100px;
+      margin: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="div"></div>
+  <script>
+    var divEdges = div.getBoundingClientRect()
+    console.log(divEdges);
+    console.log(div.offsetHeight); // 270 border+padding+height
+    console.log(div.offsetWidth); // 270
+    console.log('offsetHeight===getBoundingClientRect.height', div.offsetHeight === divEdges.height); // true
+    /*
+    height: 270=10+100+50+100+10=borderTop+paddingTop+height+paddingBottom+borderBottom
+    width: 270
+    x: 100
+    y: 100
+    left: 100
+    top: 100
+    right: 370
+    bottom: 370
+    */
+  </script>
+</body>
+
+</html>

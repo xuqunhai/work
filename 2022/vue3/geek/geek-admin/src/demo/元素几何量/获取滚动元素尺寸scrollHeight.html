@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>获取滚动元素尺寸scrollHeight</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    div {
+      height: 100px;
+      width: 100px;
+      overflow: auto;
+      border: 1px solid blue;
+    }
+
+    #p1 {
+      height: 1000px;
+      width: 1000px;
+      background-color: red;
+    }
+
+    #p2 {
+      height: 50px;
+      width: 50px;
+      background-color: red;
+    }
+
+    #p3 {
+      height: 50px;
+      width: 50px;
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>scrollHeight获取的是直接子元素的高度叠加，如果子元素总高度小于自身，则返回自身</h1>
+  <div id="div1">
+    <p id="p1"></p>
+  </div>
+  <br>
+  <div id="div3">
+    <p id="p1"></p>
+    <p id="p3"></p>
+  </div>
+  <br>
+  <div id="div2">
+    <p id="p2"></p>
+  </div>
+  <script>
+    console.log(div1.scrollHeight, div1.scrollWidth); // 1000 1000
+    console.log(div3.scrollHeight, div3.scrollWidth); // 1050 1000
+    console.log(div2.scrollHeight, div2.scrollWidth); // 100 100
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元素边框最外沿到offsetParent边框内侧距离</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    /* body {
+      border: 5px solid gray;
+      margin: 5px;
+    } */
+
+    #blue1,
+    #blue2,
+    #blue3 {
+      height: 100px;
+      width: 100px;
+      border: 10px solid blue;
+      padding: 25px;
+      margin: 25px;
+    }
+
+    #blue2 {
+      position: relative;
+    }
+
+    #red1,
+    #red2,
+    #red3 {
+      height: 50px;
+      width: 50px;
+      border: 10px solid red
+    }
+  </style>
+</head>
+
+<body>
+  <div id="blue1">
+    <div id="red1"></div>
+  </div>
+  <div id="blue2">
+    <div id="red2"></div>
+  </div>
+  <table>
+    <tr>
+      <td>
+        <div id="blue3">
+          <div id="red3"></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <script>
+    // 当body有border和margin时，比如都是5px，chrome106会把red1.offsetLeft变成70；但是不同浏览器可能有差异
+    console.log(red1.offsetLeft); // 60=25+10+25=blue1.margin+blue1.border+blue1.padding
+    console.log(red1.offsetTop); // 60
+    console.log(red1.offsetParent); // body
+    console.log(red2.offsetLeft); // 25=blue2.padding
+    console.log(red2.offsetTop); // 25
+    console.log(red2.offsetParent); // <div id="blue2">，最近的css定位值部位static祖先元素
+    console.log(red3.offsetLeft); // 60
+    console.log(red3.offsetTop); // 60
+    console.log(red3.offsetParent); // td, 如果祖先找到td、th或table且定位值为static，则将它视为offsetParent 
+  </script>
+</body>
+
+</html>

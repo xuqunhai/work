@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>获取特定位置顶层元素</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    #top,
+    #bottom {
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      top: 50px;
+      left: 50px;
+    }
+
+    #div1 {
+      position: relative;
+      height: 100px;
+      width: 100px;
+      margin: 100px;
+      border: 1px solid red;
+    }
+
+    #div11,
+    #div12 {
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      top: 1px;
+      left: 1px;
+    }
+
+    #div11 {
+      z-index: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bottom"></div>
+  <div id="top"></div>
+  <div id="div1">
+    <div id="div11"></div>
+    <div id="div12"></div>
+  </div>
+  <script>
+    // 最顶层元素是什么？
+    // 没有设置z轴索引值，则为文档最后一个元素
+    console.log(document.elementFromPoint(50, 50)); // <div id="top"></div>
+    console.log(document.elementFromPoint(110, 110)); // <div id="div11"></div>
+  </script>
+</body>
+
+</html>

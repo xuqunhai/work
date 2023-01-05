@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>获取或设置滚动距离scrollTop</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    div {
+      height: 100px;
+      width: 100px;
+      overflow: auto;
+    }
+
+    p {
+      height: 1000px;
+      width: 1000px;
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="div">
+    <p></p>
+  </div>
+  <script>
+    // 读写属性
+    div.scrollTop = 750
+    div.scrollLeft = 750
+    console.log(div.scrollTop, div.scrollLeft);
+  </script>
+</body>
+
+</html>

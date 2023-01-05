@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>滚动元素到视区scrollIntoView</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    div {
+      height: 100px;
+      width: 100px;
+      overflow: auto;
+    }
+
+    p {
+      background-color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <content id="content1">
+      <p>1</p>
+      <p>2</p>
+      <p>3</p>
+      <p>4</p>
+      <p>5</p>
+      <p>6</p>
+      <p>7</p>
+      <p>8</p>
+      <p>9</p>
+      <p>10</p>
+    </content>
+  </div>
+  <hr>
+  <div>
+    <content id="content2">
+      <p>1</p>
+      <p>2</p>
+      <p>3</p>
+      <p>4</p>
+      <p>5</p>
+      <p>6</p>
+      <p>7</p>
+      <p>8</p>
+      <p>9</p>
+      <p>10</p>
+    </content>
+  </div>
+  <script>
+    // children从0开始
+    // 传true滚动到视区顶部，传false滚动到视区底部
+    content1.children[4].scrollIntoView(true)
+    content2.children[4].scrollIntoView(false)
+  </script>
+</body>
+
+</html>
