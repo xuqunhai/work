@@ -1,0 +1,20 @@
+<template>
+  <table>
+    <thead>
+      <tr>
+        <th>课程</th>
+        <th>价格</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>重学前端</td>
+        <td>129</td>
+      </tr>
+      <tr>
+        <td>玩转Vue3全家桶</td>
+        <td>129</td>
+      </tr>
+    </tbody>
+  </table>
+</template>
