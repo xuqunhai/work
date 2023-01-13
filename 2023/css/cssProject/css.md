@@ -12,7 +12,7 @@ vue里面只有base / state / theme，
 layout和modules都集成在了components组件里
 
 ITCSS
-分层：七层（纵向）
+分层：七层（纵向）- 下一层继承上一层，下一层权重越高，复用性越低
 Settings - 变量var
 Tools - scss的mixin/function
 Generic - normalize重置默认
@@ -25,4 +25,4 @@ ACSS
 一个样式属性一个类
 tailwindcss
 好吃：极强复用性，维护成本低
-坏处：破坏了CSs命名语义化
+坏处：破坏了CSS命名语义化
