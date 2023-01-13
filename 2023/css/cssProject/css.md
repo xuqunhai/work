@@ -13,7 +13,7 @@ layout和modules都集成在了components组件里
 
 ITCSS
 分层：七层（纵向）- 下一层继承上一层，下一层权重越高，复用性越低
-Settings - 变量var
+Settings - 变量var（颜色、边框、字体大小、阴影、层级...）
 Tools - scss的mixin/function
 Generic - normalize重置默认
 Base - 基础样式定制化设置 form.scss/a.scss

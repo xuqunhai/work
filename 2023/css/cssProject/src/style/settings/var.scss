@@ -1,0 +1,27 @@
+$color-primary: #666; // 参考elementui
+$color-white: #000;
+
+.text1 {
+  color: $col;
+}
+
+.main {
+  .redbox {
+    color: $col;
+  }
+}
+
+@mixin large-text {
+  color: #fff;
+}
+.page {
+  @include large-text; // color: #fff;
+  padding: 4px;
+}
+
+@function grid-width($n) {
+  @return $n * 100px;
+}
+#sidebar {
+  width: grid-width(2); // 200px
+}
