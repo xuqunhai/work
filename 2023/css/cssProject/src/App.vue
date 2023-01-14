@@ -1,8 +1,13 @@
 <script setup>
+import { onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 
 import './assets/style/hi.scss'
+
+onMounted(() => {
+  window.document.documentElement.setAttribute('data-theme', 'cool')
+})
 </script>
 
 <template>

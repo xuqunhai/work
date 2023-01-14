@@ -55,4 +55,9 @@ vue.config.js 引入scss 和 main.js 引入scss 的区别
 vue写组件就是写BEM，组件里面样式无法修改，只能给组件一个新class，然后进行覆盖；
 尽量不要改组件里面样式，否则会影响组件在其他地方的使用，所以用新class覆盖；
 
-Settings 和 Acss 层的关系
+Theme层代码实现只需要全局加属性选择器
+<div data-theme="default">
+ <div class="box"></div>
+</div>
+[data-theme="default"] .box {}
+[data-theme="warn"] .box {}
