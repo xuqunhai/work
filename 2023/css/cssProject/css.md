@@ -14,7 +14,7 @@ layout和modules都集成在了components组件里
 ITCSS
 分层：七层（纵向）- 下一层继承上一层，下一层权重越高，复用性越低
 Settings - 变量var（颜色、边框、字体大小、阴影、层级...）
-Tools - scss的mixin/function
+Tools - scss的mixin/function - SassMagic工具库
 Generic - normalize重置默认
 Base - 基础样式定制化设置 form.scss/a.scss
 Objects - 通用模块,集成在了components组件里
@@ -26,3 +26,16 @@ ACSS
 tailwindcss
 好吃：极强复用性，维护成本低
 坏处：破坏了CSS命名语义化
+
+scss和sass区别
+写法
+sass
+$border-dark: #fff
+.alert
+ border: 1px splid $border-dark
+
+scss
+$border-dark: #fff;
+.alert {
+  border: 1px splid $border-dark;
+}
