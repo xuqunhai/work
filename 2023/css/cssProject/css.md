@@ -44,3 +44,6 @@ vue.config.js 引入scss 和 main.js 引入scss 的区别
 通常 var.scss/function.scss/mixin.scss 会在vue.config.js引入，
 相当于在每个vue文件和其他scss文件头部引入 var.scss/function.scss/mixin.scss，就可以使用里面变量等 ；
 而纯样式，如normalize.scss，直接导成公共文件，导在公共入口即可；
+
+vue写组件就是写BEM，组件里面样式无法修改，只能给组件一个新class，然后进行覆盖；
+尽量不要改组件里面样式，否则会影响组件在其他地方的使用，所以用新class覆盖；
