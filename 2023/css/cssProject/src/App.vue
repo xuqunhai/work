@@ -21,6 +21,7 @@ import './assets/style/hi.scss'
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/layout">Layout</RouterLink>
       </nav>
     </div>
   </header>
