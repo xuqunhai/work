@@ -1,0 +1,30 @@
+@import "./warm.scss";
+
+$themes: (
+  warm: $theme-warn
+);
+
+@mixin themeable {
+  @each $section,$map in $themes {
+    $map: $map !global;
+    [data-theme="#{$section}"] & {
+      @content;
+    }
+  }
+}
+
+@function themed($key, $color) {
+  @return map-get(map-get($map, $key), $color);
+}
+
+@mixin box {
+  @include themeable {
+    background: themed('box', 'background');
+  }
+}
+
+@mixin text {
+  @include themeable {
+    color: themed('text', 'color');
+  }
+}
