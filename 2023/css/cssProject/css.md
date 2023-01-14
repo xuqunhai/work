@@ -16,7 +16,7 @@ ITCSS
 Settings - 变量var（颜色、边框、字体大小、阴影、层级...）
 Tools - scss的mixin/function - SassMagic工具库
 Generic - normalize重置默认
-Base - 基础样式定制化设置 form.scss/a.scss
+Base - 基础样式定制化设置 form.scss/a.scss，对各类元素基础样式进行补充
 Objects - 通用模块,集成在了components组件里
 Components - 组件,集成在了components组件里
 Trumps - 权重需要最高时

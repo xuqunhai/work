@@ -1,13 +1,26 @@
+// Color
 $color-primary: #666; // 参考elementui
 $color-white: #000;
 
+$color-text-primary: #333;
+$color-text-secondary: #333;
+$color-text-tertiary: $color-white;
+
+$border-color-base: #e5e5e5;
+
+$background-color-primary: red;
+
+// Border
+$border-width-base: 1px !default;
+$border-style-base: solid !default;
+
 .text1 {
-  color: $col;
+  color: $color-primary;
 }
 
 .main {
   .redbox {
-    color: $col;
+    color: $color-white;
   }
 }
 
