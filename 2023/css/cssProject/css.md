@@ -39,3 +39,8 @@ $border-dark: #fff;
 .alert {
   border: 1px splid $border-dark;
 }
+
+vue.config.js 引入scss 和 main.js 引入scss 的区别
+通常 var.scss/function.scss/mixin.scss 会在vue.config.js引入，
+相当于在每个vue文件和其他scss文件头部引入 var.scss/function.scss/mixin.scss，就可以使用里面变量等 ；
+而纯样式，如normalize.scss，直接导成公共文件，导在公共入口即可；
