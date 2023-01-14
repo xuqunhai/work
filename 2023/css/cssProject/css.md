@@ -25,7 +25,14 @@ ACSS
 一个样式属性一个类
 tailwindcss
 好吃：极强复用性，维护成本低
-坏处：破坏了CSS命名语义化
+坏处：破坏了CSS命名语义化 - 属性选择器解决
+<div class="media" fl></div>
+[fl] {
+  float: left;
+}
+[p-4] {
+  padding: 4px;
+}
 
 scss和sass区别
 写法
@@ -47,3 +54,5 @@ vue.config.js 引入scss 和 main.js 引入scss 的区别
 
 vue写组件就是写BEM，组件里面样式无法修改，只能给组件一个新class，然后进行覆盖；
 尽量不要改组件里面样式，否则会影响组件在其他地方的使用，所以用新class覆盖；
+
+Settings 和 Acss 层的关系
