@@ -1,0 +1,14 @@
+/*
+一行省略号
+[ellipsis1] {}
+二行省略号
+[ellipsis2] {}
+三行省略号
+[ellipsis3] {}
+*/
+
+@for $i from 1 through 3 {
+  [ellipsis#{$i}] {
+    @include ellipsis($i);
+  }
+}
