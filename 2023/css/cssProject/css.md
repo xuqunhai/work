@@ -21,7 +21,7 @@ Objects - 通用模块,集成在了components组件里
 Components - 组件,集成在了components组件里
 Trumps - 权重需要最高时
 
-ACSS
+ACSS - 公共、原子化、复用性
 一个样式属性一个类
 tailwindcss
 好吃：极强复用性，维护成本低
