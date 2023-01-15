@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 import Mui from '@/components'
 import '@/mock'
+import 'lib-flexible/flexible.js'
 
 import './assets/main.css'
 
