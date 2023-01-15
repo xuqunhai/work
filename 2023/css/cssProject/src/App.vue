@@ -11,6 +11,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <RouterView />
   <header>
     <img
       alt="Vue logo"
@@ -30,8 +31,6 @@ onMounted(() => {
       </nav>
     </div>
   </header>
-
-  <RouterView />
 </template>
 
 <style scoped>
