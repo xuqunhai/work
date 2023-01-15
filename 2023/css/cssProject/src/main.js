@@ -8,7 +8,7 @@ import Mui from '@/components'
 import '@/mock'
 import 'lib-flexible/flexible.js'
 
-import './assets/main.css'
+// import './assets/main.css'
 
 const app = createApp(App)
 
