@@ -7,6 +7,7 @@ import router from './router'
 import Mui from '@/components'
 import '@/mock'
 import 'lib-flexible/flexible.js'
+import '@icon-park/vue-next/styles/index.css'
 
 // import './assets/main.css'
 

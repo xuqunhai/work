@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@icon-park/vue-next": "^1.4.2",
     "axios": "^1.2.2",
     "lib-flexible": "^0.3.2",
     "mockjs": "^1.1.0",

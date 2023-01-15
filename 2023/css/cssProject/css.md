@@ -61,3 +61,7 @@ Theme层代码实现只需要全局加属性选择器
 </div>
 [data-theme="default"] .box {}
 [data-theme="warn"] .box {}
+
+制作svgIcon图片平台IconPark；
+多色图标svgIcon(多色、动画、矢量图)；
+https://www.npmjs.com/package/@icon-park/vue-next
