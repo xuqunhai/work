@@ -14,3 +14,13 @@
     <c-footer style="background: yellow">footer</c-footer>
   </c-layout>
 </template>
+
+<script setup>
+import { getUsers } from '@/api'
+import { onMounted } from 'vue'
+onMounted(() => {
+  getUsers().then((res) => {
+    console.log('getUsers', res)
+  })
+})
+</script>

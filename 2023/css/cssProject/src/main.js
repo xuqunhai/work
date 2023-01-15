@@ -5,6 +5,7 @@ import '@/style/index.scss'
 import App from './App.vue'
 import router from './router'
 import Mui from '@/components'
+import '@/mock'
 
 import './assets/main.css'
 
