@@ -2,15 +2,19 @@
   <div class="about">
     <h1>This is an about page</h1>
     <home theme="filled" />
+    <camera theme="outline" size="24" fill="#bd10e0" />
+    <star theme="filled" size="24" fill="#f8e71c" />
   </div>
 </template>
 
 <script>
-import { Home } from '@icon-park/vue-next'
+import { Home, Camera, Star } from '@icon-park/vue-next'
 
 export default {
   components: {
-    Home
+    Home,
+    Camera,
+    Star
   }
 }
 </script>
