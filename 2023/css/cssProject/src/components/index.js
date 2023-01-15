@@ -3,6 +3,9 @@ import 'vant/lib/col/index.css'
 import Row from 'vant/lib/row/index.js'
 import 'vant/lib/row/index.css'
 import { Layout, Header, Aside, Main, Footer } from './layout'
+import BoxCenter from './box-center'
+import SingleCenter from './single-center'
+import BoxSkin from './box-skin'
 
 const components = {
   Layout,
@@ -11,7 +14,10 @@ const components = {
   Main,
   Footer,
   CRow: Row,
-  CCol: Col
+  CCol: Col,
+  BoxCenter,
+  SingleCenter,
+  BoxSkin
 }
 
 const install = (app) => {
