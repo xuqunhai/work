@@ -6,6 +6,7 @@ import { Layout, Header, Aside, Main, Footer } from './layout'
 import BoxCenter from './box-center'
 import SingleCenter from './single-center'
 import BoxSkin from './box-skin'
+import Magazine from './magazine'
 
 const components = {
   Layout,
@@ -17,7 +18,8 @@ const components = {
   CCol: Col,
   BoxCenter,
   SingleCenter,
-  BoxSkin
+  BoxSkin,
+  Magazine
 }
 
 const install = (app) => {
