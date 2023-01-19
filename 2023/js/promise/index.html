@@ -12,7 +12,8 @@
   <script src="./promise.js"></script>
   <script>
     var p = new Promise((resolve, reject) => {
-      resolve(111);
+      // resolve(111);
+      reject(222)
     });
     console.log(p);
     // p.then(val => console.log(val), reason => console.warn(reaon));

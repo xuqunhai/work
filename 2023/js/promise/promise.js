@@ -4,9 +4,12 @@ function Promise(excutor) {
   var _this = this
   function resolve(data) {
     _this.promiseStatus = 'resolved'
-    _this.promiseStatus = data
+    _this.promsieResult = data
   }
-  function reject(data) {}
+  function reject(data) {
+    _this.promiseStatus = 'rejected'
+    _this.promsieResult = data
+  }
   excutor(resolve, reject)
 }
 Promise.prototype.then = function () {}
