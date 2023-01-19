@@ -10,6 +10,10 @@ function Promise(excutor) {
     _this.promiseStatus = 'rejected'
     _this.promsieResult = data
   }
-  excutor(resolve, reject)
+  try {
+    excutor(resolve, reject)
+  } catch (error) {
+    reject(error)
+  }
 }
 Promise.prototype.then = function () {}
