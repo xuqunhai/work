@@ -1,9 +1,10 @@
 function Promise(excutor) {
   this.promiseStatus = 'pending'
   this.promsieResult = null
+  var _this = this
   function resolve(data) {
-    this.promiseStatus = 'resolved'
-    this.promiseStatus = data
+    _this.promiseStatus = 'resolved'
+    _this.promiseStatus = data
   }
   function reject(data) {}
   excutor(resolve, reject)
