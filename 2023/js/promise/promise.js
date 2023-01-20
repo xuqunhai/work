@@ -18,4 +18,11 @@ function Promise(excutor) {
     reject(error)
   }
 }
-Promise.prototype.then = function () {}
+Promise.prototype.then = function (resFn, rejFn) {
+  if (this.promiseStatus === 'resolved') {
+    resFn(this.promsieResult)
+  }
+  if (this.promiseStatus === 'rejected') {
+    rejFn(this.promsieResult)
+  }
+}
