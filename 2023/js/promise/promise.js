@@ -23,24 +23,24 @@ function Promise(excutor) {
 }
 Promise.prototype.then = function (resFn, rejFn) {
   const _this = this
-  const cb = function (type) {
-    try {
-      // 不仅回调，还要处理返回值，则外面包一层函数，里面一并处理
-      let result = type(_this.promsieResult)
-      if (result instanceof Promise) {
-        // 想获取promise对象状态，可通过then拿到
-        result.then(
-          (v) => resolve(v),
-          (r) => reject(r)
-        )
-      } else {
-        resolve(result)
-      }
-    } catch (error) {
-      reject(error)
-    }
-  }
   return new Promise((resolve, reject) => {
+    const cb = function (type) {
+      try {
+        // 不仅回调，还要处理返回值，则外面包一层函数，里面一并处理
+        let result = type(_this.promsieResult)
+        if (result instanceof Promise) {
+          // 想获取promise对象状态，可通过then拿到
+          result.then(
+            (v) => resolve(v),
+            (r) => reject(r)
+          )
+        } else {
+          resolve(result)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    }
     if (this.promiseStatus === 'resolved') {
       cb(resFn)
     }
