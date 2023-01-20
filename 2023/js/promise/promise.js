@@ -22,16 +22,34 @@ function Promise(excutor) {
   }
 }
 Promise.prototype.then = function (resFn, rejFn) {
-  if (this.promiseStatus === 'resolved') {
-    resFn(this.promsieResult)
-  }
-  if (this.promiseStatus === 'rejected') {
-    rejFn(this.promsieResult)
-  }
-  if (this.promiseStatus === 'pending') {
-    this.callback.push({
-      resFn,
-      rejFn
-    })
-  }
+  return new Promise((resolve, reject) => {
+    if (this.promiseStatus === 'resolved') {
+      let result = resFn(this.promsieResult)
+      if (result instanceof Promise) {
+        result.then(
+          (v) => resolve(v),
+          (r) => reject(r)
+        )
+      } else {
+        resolve(result)
+      }
+    }
+    if (this.promiseStatus === 'rejected') {
+      let result = rejFn(this.promsieResult)
+      if (result instanceof Promise) {
+        result.then(
+          (v) => resolve(v),
+          (r) => reject(r)
+        )
+      } else {
+        resolve(result)
+      }
+    }
+    if (this.promiseStatus === 'pending') {
+      this.callback.push({
+        resFn,
+        rejFn
+      })
+    }
+  })
 }

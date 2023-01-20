@@ -12,15 +12,37 @@
   <script src="./promise.js"></script>
   <script>
     var p = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(111);
-        // reject(222)
-        // throw 'err'
-      })
+      // resolve(111);
+      reject(222)
+      // throw 'err'
+
+      // setTimeout(() => {
+      //   resolve(111);
+      //   // reject(222)
+      //   // throw 'err'
+      // })
     });
-    console.log(p);
-    p.then(val => console.log(val), reason => console.warn(reason));
-    p.then(val => alert(val), reason => console.error(reason));
+    // console.log(p);
+
+    // then返回值是一个新的promise对象
+    // 回调函数执行结果，
+    // 如果是promise，则它的状态决定then的状态
+    // 如果不是promise，则then返回值状态为成功
+    const res = p.then(val => {
+      console.log(val);
+      // return undefined
+      // return val
+      // return new Promise((s, j) => s(6))
+      return new Promise((s, j) => j(6))
+    }, reason => {
+      console.warn(reason)
+      // return undefined
+      // return reason
+      // return new Promise((s, j) => s(6))
+      return new Promise((s, j) => j(6))
+    });
+    // p.then(val => alert(val), reason => console.error(reason));
+    console.log(res);
   </script>
 </body>
 
