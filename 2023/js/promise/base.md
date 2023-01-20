@@ -26,3 +26,12 @@ p.then(a => console.log(a); return new Promise(() => {}))
  .then(b => console.log(b))
  .then(c => console.log(c))
  .catch(e => console.warn(e));
+
+
+
+总结要点
+    // then返回值是一个新的promise对象
+    // 回调函数执行结果，
+    // 如果是promise，则它的状态决定then的状态(想获取promise对象状态，可通过then拿到)
+    // 如果不是promise，则then返回值状态为成功
+  // 不仅回调，还要处理返回值，则外面包一层函数，里面一并处理
