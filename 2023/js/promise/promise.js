@@ -1,23 +1,19 @@
 function Promise(excutor) {
   this.promiseStatus = 'pending'
   this.promsieResult = null
-  this.callback = {}
+  this.callback = []
   var _this = this
   function resolve(data) {
     if (_this.promiseStatus !== 'pending') return
     _this.promiseStatus = 'resolved'
     _this.promsieResult = data
-    if (_this.callback.resFn) {
-      _this.callback.resFn(_this.promsieResult)
-    }
+    _this.callback.forEach((item) => item.resFn(_this.promsieResult))
   }
   function reject(data) {
     if (_this.promiseStatus !== 'pending') return
     _this.promiseStatus = 'rejected'
     _this.promsieResult = data
-    if (_this.callback.rejFn) {
-      _this.callback.rejFn(_this.promsieResult)
-    }
+    _this.callback.forEach((item) => item.rejFn(_this.promsieResult))
   }
   try {
     excutor(resolve, reject)
@@ -33,9 +29,9 @@ Promise.prototype.then = function (resFn, rejFn) {
     rejFn(this.promsieResult)
   }
   if (this.promiseStatus === 'pending') {
-    this.callback = {
+    this.callback.push({
       resFn,
       rejFn
-    }
+    })
   }
 }
