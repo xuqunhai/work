@@ -3,10 +3,12 @@ function Promise(excutor) {
   this.promsieResult = null
   var _this = this
   function resolve(data) {
+    if (_this.promiseStatus !== 'pending') return
     _this.promiseStatus = 'resolved'
     _this.promsieResult = data
   }
   function reject(data) {
+    if (_this.promiseStatus !== 'pending') return
     _this.promiseStatus = 'rejected'
     _this.promsieResult = data
   }
