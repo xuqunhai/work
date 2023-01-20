@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <script src="./promise.js"></script>
+  <!-- <script src="./promise.js"></script> -->
   <script>
     var p = new Promise((resolve, reject) => {
       // resolve(111);
@@ -17,8 +17,8 @@
       // throw 'err'
 
       setTimeout(() => {
-        // resolve(111);
-        reject(222)
+        resolve(111);
+        // reject(222)
         // throw 'err'
       })
     });
@@ -30,16 +30,17 @@
     // 如果不是promise，则then返回值状态为成功
     const res = p.then(val => {
       console.log(val);
+      // throw 'err'
       // return undefined
-      return val
+      // return val
       // return new Promise((s, j) => s(6))
-      // return new Promise((s, j) => j(6))
+      return new Promise((s, j) => j(6))
     }, reason => {
       console.warn(reason)
-      return undefined
+      // return undefined
       // return reason
       // return new Promise((s, j) => s(6))
-      // return new Promise((s, j) => j(6))
+      return new Promise((s, j) => j(6))
     });
     // p.then(val => alert(val), reason => console.error(reason));
     console.log(res);
