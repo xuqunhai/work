@@ -22,6 +22,7 @@ function Promise(excutor) {
   }
 }
 Promise.prototype.then = function (resFn, rejFn) {
+  const _this = this
   return new Promise((resolve, reject) => {
     if (this.promiseStatus === 'resolved') {
       let result = resFn(this.promsieResult)
@@ -47,8 +48,30 @@ Promise.prototype.then = function (resFn, rejFn) {
     }
     if (this.promiseStatus === 'pending') {
       this.callback.push({
-        resFn,
-        rejFn
+        resFn: function () {
+          // 不仅回调，还要处理返回值，则外面包一层函数，里面一并处理
+          let result = resFn(_this.promsieResult)
+          if (result instanceof Promise) {
+            // 想获取promise对象状态，可通过then拿到
+            result.then(
+              (v) => resolve(v),
+              (r) => reject(r)
+            )
+          } else {
+            resolve(result)
+          }
+        },
+        rejFn: function () {
+          let result = rejFn(_this.promsieResult)
+          if (result instanceof Promise) {
+            result.then(
+              (v) => resolve(v),
+              (r) => reject(r)
+            )
+          } else {
+            resolve(result)
+          }
+        }
       })
     }
   })
