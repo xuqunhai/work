@@ -90,3 +90,20 @@ Promise.reject = function (val) {
     reject(val)
   })
 }
+
+Promise.all = function (promises) {
+  const arr = []
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < promises.length; i++) {
+      promises[i].then(
+        (v) => {
+          arr[i] = v
+          if (arr.length === promises.length) {
+            resolve(arr)
+          }
+        },
+        (r) => reject(r)
+      )
+    }
+  })
+}

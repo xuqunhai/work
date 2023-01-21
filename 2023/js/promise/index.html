@@ -67,6 +67,13 @@
     console.log('r1', r1);
     console.log('r2', r2);
     console.log('r3', r3);
+
+    const allR = Promise.all([p1, p2])
+    console.log('all', allR);
+
+
+    const allR2 = Promise.all([p1, p2, r1])
+    console.log('all2', allR2);
   </script>
 </body>
 
