@@ -40,3 +40,10 @@ p.then(a => console.log(a); return new Promise(() => {}))
   then允许不传任何参数，所以当不传时，为了能穿透，
   then() 等价于
   then(val=>val,reason=>{throw 'err'})
+
+async函数规则和then方法一样的，
+即
+    // then返回值是一个新的promise对象
+    // 回调函数执行结果，
+    // 如果是promise，则它的状态决定then的状态(想获取promise对象状态，可通过then拿到)
+    // 如果不是promise，则then返回值状态为成功
