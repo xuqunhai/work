@@ -47,3 +47,22 @@ async函数规则和then方法一样的，
     // 回调函数执行结果，
     // 如果是promise，则它的状态决定then的状态(想获取promise对象状态，可通过then拿到)
     // 如果不是promise，则then返回值状态为成功
+
+
+await 表达式
+右侧表达式如果是promise对象，则await返回的是promise成功的值；
+如果不是promise对象，直接await作为返回值；
+
+await必须写在async函数中，但是async函数里可以没有await；
+如果await右侧promise失败了，会抛出异常 Uncaught (in promise) Error，需要trycatch捕获；
+
+async function haha(){
+  try{
+    const data1=await getData('url1');
+    const data2=await getData('url2');
+    const data3=await getData('url3');
+    console.log(data1+data2+data3);
+  }catch(e){
+
+  }
+}
