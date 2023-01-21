@@ -15,7 +15,7 @@
       // resolve(111);
       // reject(222)
       // throw 'err'
-
+      console.log('01');
       setTimeout(() => {
         // resolve(111);
         reject(222)
@@ -29,6 +29,7 @@
     // 如果是promise，则它的状态决定then的状态
     // 如果不是promise，则then返回值状态为成功
     const res = p.then(val => {
+      console.log('03');
       console.log(val);
       // throw 'err'
       // return undefined
@@ -36,6 +37,7 @@
       return new Promise((s, j) => s(6))
       // return new Promise((s, j) => j(6))
     }, reason => {
+      console.log('04');
       console.warn(reason)
       // return undefined
       // return reason
@@ -44,6 +46,7 @@
     });
     // p.then(val => alert(val), reason => console.error(reason));
     console.log(res);
+    console.log('02');
 
     res.then()
       .then(val => val)
