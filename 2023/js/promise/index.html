@@ -17,8 +17,8 @@
       // throw 'err'
 
       setTimeout(() => {
-        resolve(111);
-        // reject(222)
+        // resolve(111);
+        reject(222)
         // throw 'err'
       })
     });
@@ -33,8 +33,8 @@
       // throw 'err'
       // return undefined
       // return val
-      // return new Promise((s, j) => s(6))
-      return new Promise((s, j) => j(6))
+      return new Promise((s, j) => s(6))
+      // return new Promise((s, j) => j(6))
     }, reason => {
       console.warn(reason)
       // return undefined
@@ -44,6 +44,15 @@
     });
     // p.then(val => alert(val), reason => console.error(reason));
     console.log(res);
+
+    res.then()
+      .then(val => val)
+      .then(val => val)
+      .then(val => val)
+      .catch(e => {
+        console.log('catch', e);
+        return e
+      });
   </script>
 </body>
 

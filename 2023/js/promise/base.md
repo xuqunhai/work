@@ -35,3 +35,8 @@ p.then(a => console.log(a); return new Promise(() => {}))
     // 如果是promise，则它的状态决定then的状态(想获取promise对象状态，可通过then拿到)
     // 如果不是promise，则then返回值状态为成功
   // 不仅回调，还要处理返回值，则外面包一层函数，里面一并处理
+
+  catch本质就是触发reject进入失败回调；
+  then允许不传任何参数，所以当不传时，为了能穿透，
+  then() 等价于
+  then(val=>val,reason=>{throw 'err'})

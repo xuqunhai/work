@@ -23,6 +23,14 @@ function Promise(excutor) {
 }
 Promise.prototype.then = function (resFn, rejFn) {
   const _this = this
+  if (typeof resFn !== 'function') {
+    resFn = (val) => val
+  }
+  if (typeof rejFn !== 'function') {
+    rejFn = (reason) => {
+      throw 'reject'
+    }
+  }
   return new Promise((resolve, reject) => {
     const cb = function (type) {
       try {
@@ -58,4 +66,8 @@ Promise.prototype.then = function (resFn, rejFn) {
       })
     }
   })
+}
+
+Promise.prototype.catch = function (rejFn) {
+  this.then(undefined, rejFn)
 }
