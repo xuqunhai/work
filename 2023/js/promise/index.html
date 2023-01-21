@@ -60,6 +60,13 @@
     console.log('p1', p1);
     console.log('p2', p2);
     console.log('p3', p3);
+
+    var r1 = Promise.reject('p1')
+    var r2 = Promise.reject(new Promise((res, rej) => res(1)))
+    var r3 = Promise.reject(new Promise((res, rej) => rej(2)))
+    console.log('r1', r1);
+    console.log('r2', r2);
+    console.log('r3', r3);
   </script>
 </body>
 

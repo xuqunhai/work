@@ -84,3 +84,9 @@ Promise.resolve = function (val) {
     }
   })
 }
+
+Promise.reject = function (val) {
+  return new Promise((resolve, reject) => {
+    reject(val)
+  })
+}
