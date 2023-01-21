@@ -53,6 +53,13 @@
         console.log('catch', e);
         return e
       });
+
+    var p1 = Promise.resolve('p1')
+    var p2 = Promise.resolve(new Promise((res, rej) => res(1)))
+    var p3 = Promise.resolve(new Promise((res, rej) => rej(2)))
+    console.log('p1', p1);
+    console.log('p2', p2);
+    console.log('p3', p3);
   </script>
 </body>
 
