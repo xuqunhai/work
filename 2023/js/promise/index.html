@@ -74,6 +74,9 @@
 
     const allR2 = Promise.all([p1, p2, r1])
     console.log('all2', allR2);
+
+    const raceR = Promise.race([p1, p2])
+    console.log('race', raceR);
   </script>
 </body>
 
