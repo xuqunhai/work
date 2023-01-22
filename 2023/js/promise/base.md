@@ -25,7 +25,15 @@ let b = Promise.resolve(x) // b是一个有状态的promise对象，结果的 Pr
 let c = Promise.reject(y)  // c是一个有状态的promise对象，结果的 PromiseStatus 都是失败
 
 Promise.all(promises); // 都成功才返回成功promise对象，否则返回失败promise对象
-Promise.race(promise); // 返回第一个完成的promsie对象
+- 所有输入的 promise 的 resolve 回调都结束，或者只要任何一个输入的 promise 的 reject 回调执行或者输入不合法的 promise 就会立即抛出错误
+Promise.allSettled(promises); // 所有都完成时返回
+- 在你有多个不依赖于彼此成功完成的异步任务时，或者你总是想知道每个 promise 的结果时，使用 Promise.allSettled() 。
+Promise.race(promises); // 返回第一个完成的promsie对象
+Promise.any(promises); // 返回第一个成功的promise对象
+- 获取一些图片并显示第一张有效的图片（即最先 resolved 的那个 promise）。
+- 只能得到一个兑现值（假设至少有一个 promise 兑现）。
+- 返回的是第一个兑现的值。
+- 如果可迭代对象内所有的 promises 都被拒绝了，那么该方法所返回的 promise 就会异步的切换至被拒状态，并用一个 AggregateError（继承自 Error）实例来作为它的拒因。
 
 then方法返回的是一个新的promise，promise状态改变后所有then方法对应回调都会被执行；
 then函数返回值promise状态由then方法调用时函数参数决定，如
