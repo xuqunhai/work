@@ -1,5 +1,8 @@
 let p = new Promise(excutor) // excutor会当作同步代码立刻执行
 
+同步：数组遍历方法 / Promise的excutor函数
+异步：定时器 / ajax / Promise的成功/失败回调
+
 promsie对象包含两个属性：[[PromiseStatus]] / [[PromiseResult]]
 
 let b = Promise.resolve(x) // b是一个有状态的promise对象，结果的 PromiseStatus 由 x 决定，x是非promise则状态为成功，否则跟随x状态
