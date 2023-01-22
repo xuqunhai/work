@@ -142,3 +142,14 @@ then方法和excutor一样，是同步执行的，只是then方法的参数才�
 js引擎：堆放对象，栈放函数；
 宏队列：script、ajax、setTimeout、DOM事件回调
 微队列：Promsie、mutationObserver
+
+面试题
+Promise.resolve().then(s=>console.log(1)).then(s=>console.log(2));
+Promise.resolve().then(s=>console.log(3));
+// 1 3 2
+微任务队列【s=>console.log(1)】
+微任务队列【s=>console.log(1)，s=>console.log(3)】
+同步代码执行完，取微任务队列第一个执行 s=>console.log(1)
+执行后then返回undefined，即resolve，此时同步执行后一个then，再把 s=>console.log(2) 放入队列，
+微任务队列【s=>console.log(3)，s=>console.log(2)】
+所以1后输出3最后输出2
