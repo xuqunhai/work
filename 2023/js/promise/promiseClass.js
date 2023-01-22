@@ -26,7 +26,7 @@ class Promsie {
       reject(error)
     }
   }
-  then = function (resFn, rejFn) {
+  then(resFn, rejFn) {
     const _this = this
     if (typeof resFn !== 'function') {
       resFn = (val) => val
@@ -76,11 +76,11 @@ class Promsie {
       }
     })
   }
-  catch = function (rejFn) {
+  catch(rejFn) {
     this.then(undefined, rejFn)
   }
 
-  static resolve = function (val) {
+  static resolve(val) {
     return new Promise((resolve, reject) => {
       if (val instanceof Promise) {
         val.then(
@@ -93,13 +93,13 @@ class Promsie {
     })
   }
 
-  static reject = function (val) {
+  static reject(val) {
     return new Promise((resolve, reject) => {
       reject(val)
     })
   }
 
-  static all = function (promises) {
+  static all(promises) {
     const arr = []
     return new Promise((resolve, reject) => {
       for (let i = 0; i < promises.length; i++) {
@@ -116,7 +116,7 @@ class Promsie {
     })
   }
 
-  static race = function (promises) {
+  static race(promises) {
     return new Promise((resolve, reject) => {
       for (let i = 0; i < promises.length; i++) {
         promises[i].then(
