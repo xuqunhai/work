@@ -23,6 +23,8 @@ promsie对象包含两个属性：[[PromiseStatus]] / [[PromiseResult]]
 
 let b = Promise.resolve(x) // b是一个有状态的promise对象，结果的 PromiseStatus 由 x 决定，x是非promise则状态为成功，否则跟随x状态
 let c = Promise.reject(y)  // c是一个有状态的promise对象，结果的 PromiseStatus 都是失败
+Promise.resolve就是下面语法糖
+new Promise((resolve, reject)= > resolve())
 
 Promise.all(promises); // 都成功才返回成功promise对象，否则返回失败promise对象
 - 所有输入的 promise 的 resolve 回调都结束，或者只要任何一个输入的 promise 的 reject 回调执行或者输入不合法的 promise 就会立即抛出错误
