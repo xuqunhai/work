@@ -10,7 +10,7 @@
 
 <body>
   <!-- <script src="./promise.js"></script> -->
-  <script src="./promiseCLass.js"></script>
+  <script src="./promiseCLass.js?t=0"></script>
   <script>
     var p = new Promise((resolve, reject) => {
       // resolve(111);
@@ -43,7 +43,8 @@
       // return undefined
       // return reason
       // return new Promise((s, j) => s(6))
-      return new Promise((s, j) => j(6))
+      // return new Promise((s, j) => j(6))
+      return res;
     });
     // p.then(val => alert(val), reason => console.error(reason));
     console.log(res);

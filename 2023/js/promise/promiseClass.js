@@ -1,4 +1,4 @@
-class Promsie {
+class Promise {
   constructor(excutor) {
     this.promiseStatus = 'pending'
     this.promsieResult = null
@@ -36,11 +36,17 @@ class Promsie {
         throw 'reject'
       }
     }
-    return new Promise((resolve, reject) => {
+    const promise2 = new Promise((resolve, reject) => {
       const cb = function (type) {
         try {
           // 不仅回调，还要处理返回值，则外面包一层函数，里面一并处理
           let result = type(_this.promsieResult)
+          if (promise2 === result) {
+            console.error(
+              'rx TypeError: Chaining cycle detected for promise #<Promise>'
+            )
+            reject('TypeError: Chaining cycle detected for promise #<Promise>')
+          }
           if (result instanceof Promise) {
             // 想获取promise对象状态，可通过then拿到
             result.then(
@@ -75,6 +81,7 @@ class Promsie {
         })
       }
     })
+    return promise2
   }
   catch(rejFn) {
     this.then(undefined, rejFn)

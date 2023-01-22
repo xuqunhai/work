@@ -153,3 +153,8 @@ Promise.resolve().then(s=>console.log(3));
 执行后then返回undefined，即resolve，此时同步执行后一个then，再把 s=>console.log(2) 放入队列，
 微任务队列【s=>console.log(3)，s=>console.log(2)】
 所以1后输出3最后输出2
+
+// promise循环引用p2
+const p2 = p.then(() => {
+  return p2;
+})
