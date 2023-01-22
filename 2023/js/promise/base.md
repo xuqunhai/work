@@ -88,9 +88,37 @@ async function haha(){
 
 常见内置错误
 ReferenceError：引用的变量不存在
-TypeError：类型错误，如获取undefined属性，把undefined当函数调用
+TypeError：类型错误，如获取undefined属性，把undefined当函数调用; 值的类型非预期类型时发生的错误。
 RangeError：自己调用自己，死循环
+- 尝试使用 Array 构造函数创建一个具有不合法的长度的字符串, new Array(-1)
+- Number.prototype.toPrecision() / 一个用来指定有效数个数的整数。
+  numObj = 0.000123
+  console.log(numObj.toPrecision())    // 输出 '0.000123'
+  console.log(numObj.toPrecision(5))   // 输出 '0.00012300'
+  如果 precison 参数不在 1 和 100（包括）之间，将会抛出一个 RangeError 。
+- Number.prototype.toFixed(digits)
+  如果 digits 参数太小或太大 会引起 RangeError。
+  如果该方法在一个非Number类型的对象上调用,会引起 TypeError
 SyntaxError：语法错误
+URIError: 以一种错误的方式使用全局 URI 处理函数而产生的错误。
+- decodeURIComponent('%')
+EvalError: 关于 eval() 全局函数的错误,此异常不再会被 JavaScript 抛出，但是 EvalError 对象仍然存在，以保持兼容性。
+- throw new EvalError("Hello", "someFile.js", 10);
+AggregateError: Promise.any所有 promise 都被拒绝时，它的拒因会是一个 AggregateError 实例
+InternalError: 出现在 JavaScript 引擎内部的错误。通常描述某种数量过多的情况
+- "too many switch cases"（过多 case 子句）；
+- "too many parentheses in regular expression"（正则表达式中括号过多）；
+- "array initializer too large"（数组初始化器过大）；
+- "too much recursion"（递归过深）。
+  - function loop(x) {
+      if (x >= 1000000000000) return;
+
+      // 做一些事情
+      loop(x + 1);
+    }
+    loop(0);
+    // InternalError: too much recursion
+
 
 错误处理
 try-catch // catch的参数e为错误对象，有message和stack属性
