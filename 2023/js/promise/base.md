@@ -69,3 +69,13 @@ async function haha(){
 
   }
 }
+
+常见内置错误
+ReferenceError：引用的变量不存在
+TypeError：类型错误，如获取undefined属性，把undefined当函数调用
+RangeError：自己调用自己，死循环
+SyntaxError：语法错误
+
+错误处理
+try-catch // catch的参数e为错误对象，有message和stack属性
+throw error
