@@ -137,3 +137,8 @@ throw error
 
 中断promise的then链式调用只有返回一个pending状态的新promise；
 then方法和excutor一样，是同步执行的，只是then方法的参数才是异步执行；
+
+
+js引擎：堆放对象，栈放函数；
+宏队列：script、ajax、setTimeout、DOM事件回调
+微队列：Promsie、mutationObserver
