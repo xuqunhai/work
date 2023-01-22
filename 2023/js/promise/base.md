@@ -1,3 +1,19 @@
+Promise是什么？
+异步编程的最新解决方案，旧的方法是回调；
+Promsie是构造函数，可以封装一个异步操作并可以获取其结果；
+
+为什么要用promise？
+1、指定回调函数方式更加灵活，
+旧的必须启动时指定：http(options, successFn, failFn)
+promsie可以在启动后返回的promsie对象上绑定
+const p = new Promsie(()=>{启动});
+xxx;
+p.then(绑定回调)
+
+2、旧的回调地狱（嵌套调用-不便于阅读，不便于错误处理-外部回调函数异步处理结果是内部函数回调处理的条件）
+promise链式调用；
+终极方案 async/await
+
 let p = new Promise(excutor) // excutor会当作同步代码立刻执行
 
 同步：数组遍历方法 / Promise的excutor函数
