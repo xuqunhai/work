@@ -133,3 +133,7 @@ InternalError: 出现在 JavaScript 引擎内部的错误。通常描述某种�
 错误处理
 try-catch // catch的参数e为错误对象，有message和stack属性
 throw error
+
+
+中断promise的then链式调用只有返回一个pending状态的新promise；
+then方法和excutor一样，是同步执行的，只是then方法的参数才是异步执行；
