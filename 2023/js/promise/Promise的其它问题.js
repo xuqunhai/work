@@ -154,3 +154,28 @@ Promise.resolve(8)
     // will never called but will be GCed
     console.log('then')
   })
+
+/*
+  在所有的Promise链的最后都加上一个catch，这样出错后就能被捕获到，
+  这种方法确实是可行的，但是首先在每个地方都加上几乎相同的代码，违背了DRY原则，其次也相当的繁琐。
+  另外，最后一个catch依然返回一个Promise，除非你能保证这个catch里的函数不再出错，否则问题依然存在。
+
+  能不能在不加catch或者done的情况下，也能够让开发者发现Promise链最后的错误呢？
+  答案依然是肯定的。
+
+  可以在一个Promise被reject的时候检查这个Promise的onRejectedCallback数组，如果它为空，则说明它的错误将没有函数处理
+  */
+function reject(reason) {
+  setTimeout(function () {
+    if (self.status === 'pending') {
+      self.status = 'rejected'
+      self.data = reason
+      if (self.onRejectedCallback.length === 0) {
+        console.error(reason)
+      }
+      for (var i = 0; i < self.rejectedFn.length; i++) {
+        self.rejectedFn[i](reason)
+      }
+    }
+  })
+}
