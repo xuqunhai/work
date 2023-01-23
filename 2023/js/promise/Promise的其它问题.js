@@ -61,3 +61,96 @@ var soon = (function () {
     }
   }
 })()
+
+/*
+想要在发生某种错误后就停止执行Promise链后面所有的代码。
+一般的想法是抛出一个特殊的Error对象，然后在Promise链后面的所有catch回调里，检查传来的错误是否为该类型的错误，如果是，就一直往后抛，
+这种方案的问题在于，你需要在每一个catch里多写一个if来判断这个特殊的Error，繁琐不说，还增加了耦合度以及重构的困难。
+
+发生无法继续的错误后，直接返回一个始终不resolve也不reject的Promise，
+即这个Promise永远处于pending状态，那么后面的Promise链当然也就一直不会执行了，因为会一直等着。
+
+*/
+
+Promise.stop = function () {
+  return new Promise(function () {})
+}
+
+doSth()
+  .then((value) => {
+    if (sthBigErrorOccured()) {
+      return Promise.stop()
+    }
+    // normal logic
+  })
+  .catch((reason) => {
+    // will never get called
+    // normal logic
+    // this function will never got GCed
+  })
+  .then()
+  .catch((reason) => {
+    // will never get called
+    // normal logic
+    // this function will never got GCed
+  })
+  .then()
+  .catch((reason) => {
+    // will never get called
+    // normal logic
+    // this function will never got GCed
+  })(
+  /*
+好处在于你几乎不需要更改任何现有代码，而且兼容性也非常好
+但它引入的一个新问题就是链式调用后面的所有回调函数都无法被垃圾回收器回收，会造成潜在的内存泄露。
+在一个靠谱的实现里，Promise应该在执行完所有回调后删除对所有回调函数的引用以让它们能被回收
+但如果我们不使用匿名函数，而是使用函数定义或者函数变量的话，在需要多次执行的Promise链中，这些函数也都只有一份在内存中，不被回收也是可以接受的。
+
+返回一个永远处于pending状态的Promise之后的Promise链上的所有Promise都将处于pending状态，
+这意味着后面所有的回调函数的内存将一直得不到释放。
+在简单的页面里使用这种方案也许还行得通，但在WebApp或者Node里，这种方案明显是不可接受的。
+
+https://github.com/xieranmaya/blog/issues/5
+
+那有没有办法即达到停止后面的链，同时又避免内存泄露呢。
+在Promise链上所有的catch里都加上一句if，来判断传来的错误是否为一个无法处理的错误，
+如果是则一直往后面抛，这样就达到了即没有运行后面的逻辑，又避免了内存泄露的问题。
+
+对then的重写并不会造成什么问题，闭包里的对象在外界是访问不到，外界也永远也无法构造出一个跟闭包里Symbol一样的对象
+Promise.stop()返回一个外界无法得到的值，用以表达“跳过后面所有的Promise”，然后在我们重写的then方法里使用。
+*/
+  (function () {
+    var STOP_VALUE = Symbol() //构造一个Symbol以表达特殊的语义
+    var STOPPER_PROMISE = Promise.resolve(STOP_VALUE)
+
+    Promise.prototype._then = Promise.prototype.then
+
+    Promise.stop = function () {
+      return STOPPER_PROMISE //不是每次返回一个新的Promise，可以节省内存
+    }
+
+    Promise.prototype.then = function (onResolved, onRejected) {
+      return this._then(function (value) {
+        return value === STOP_VALUE ? STOP_VALUE : onResolved(value)
+      }, onRejected)
+    }
+  })()
+)
+
+Promise.resolve(8)
+  .then((v) => {
+    console.log(v)
+    return 9
+  })
+  .then((v) => {
+    console.log(v)
+    return Promise.stop() //较为明确的语义
+  })
+  .catch(function () {
+    // will never called but will be GCed
+    console.log('catch')
+  })
+  .then(function () {
+    // will never called but will be GCed
+    console.log('then')
+  })
