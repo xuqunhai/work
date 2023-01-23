@@ -179,3 +179,11 @@ function reject(reason) {
     }
   })
 }
+
+/*
+出错时，是用throw new Error()还是用return Promise.reject(new Error())呢？
+而使用Promise.reject(new Error())，则需要构造一个新的Promise对象（里面包含2个数组，4个函数：resolve/reject，onResolved/onRejected），也会花费一定的时间和内存。
+出错用throw，正常时用return，可以比较明显的区分出错与正常，
+
+在Promise里发现显式的错误后，用throw抛出错误会比较好，而不是显式的构造一个被reject的Promise对象。
+*/
