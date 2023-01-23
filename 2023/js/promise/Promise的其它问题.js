@@ -110,6 +110,11 @@ doSth()
 这意味着后面所有的回调函数的内存将一直得不到释放。
 在简单的页面里使用这种方案也许还行得通，但在WebApp或者Node里，这种方案明显是不可接受的。
 
+- 永不 resolve / reject 的 Promise 会导致内存泄漏吗？   https://zhuanlan.zhihu.com/p/385764204?ivk_sa=1024320u
+既不resolve又不reject的Promise对象。 例如：被取消的HTTP请求等。 
+JavaScript 的内存管理是基于引用计数的，出现上述情况的 Promise 对象时，并没有显式的方法告知 Promise “你将用不到了”，
+如此理论上如果出现大量这样的 Promise 对象，将导致内存泄漏。 然而事实是否这样呢？
+
 https://github.com/xieranmaya/blog/issues/5
 
 那有没有办法即达到停止后面的链，同时又避免内存泄露呢。
