@@ -158,3 +158,15 @@ Promise.resolve().then(s=>console.log(3));
 const p2 = p.then(() => {
   return p2;
 })
+
+1- 0
+3- 1
+5- 2
+7- 3
+4- 2
+2- 1
+8- 0
+10- false
+11- 1
+9- 1
+6- 3
